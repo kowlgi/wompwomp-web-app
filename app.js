@@ -26,7 +26,7 @@ if (ops.db) {
 }
 
 // database setup
-//require( './db' ).init(db_name);
+require( './db' ).init(db_name);
 
 // Set up routes
 var routes  = require( './routes' );

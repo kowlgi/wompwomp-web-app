@@ -2,19 +2,36 @@
  * routes.js
  */
 
-exports.index = function(req, res, next) {
+var mongoose = require('mongoose');
+var AgniModel = mongoose.model('Agni');
+var MAX_QUOTE_LENGTH = 140;
 
+exports.index = function(req, res, next) {
+    res.end();
 };
 
 exports.submit = function(req, res, next) {
-    var quote = req.body.quote;
-    console.log(quote);
+    var agniquote = new AgniModel({
+        quote        : req.body.quote.substring(0, MAX_QUOTE_LENGTH),
+        created_on   : Date.now()
+    }).save(function(err, agniquote) {
+        if (err) {
+            return next(err);
+        }
+        res.end();
+    });
 };
 
 exports.showall = function(req, res, next) {
-    response = {"list":["You look at a problem and say \"I can use regular expressions.\" Now you have two problems.",
-                        "The beginning is the end is the beginning",
-                        "Make in India: Khelo India Khelo",
-                        "Gamblers delusion, winner's pride"]};
-    res.json(response);
+    AgniModel.
+        find().
+        exec(function(err, quotes) {
+            var quotelist = [];
+            for (var i = 0; i < quotes.length; i++) {
+                quotelist.push(quotes[i].quote);
+            }
+            var response = {list:quotelist};
+            res.contentType('application/json');
+            res.send(JSON.stringify(response));
+        });
 };
