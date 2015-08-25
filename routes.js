@@ -2,32 +2,18 @@
  * routes.js
  */
 
-var REQUEST = require('request');
-var APP = require('./app');
-var TELEGRAM_URL = "https://api.telegram.org/bot" +  APP.auth_token;
-
-exports.me = function(req, res, next) {
-    REQUEST(TELEGRAM_URL + "/getMe", function(err, res, body) {
-        if (err) {
-            return next(err);
-        }
-    });
-};
-
-exports.updates = function(req, res, next) {
-    REQUEST(TELEGRAM_URL + "/getUpdates", function(err, res, body) {
-        if (err) {
-            return next(err);
-        }
-    });
-};
-
-exports.set_webhook = function(req, res, next) {
-    console.log("/set_webhook");
+exports.index = function(req, res, next) {
 
 };
 
-exports.webhook = function(req, res, next) {
-    console.log("/webhook");
+exports.submit = function(req, res, next) {
 
+};
+
+exports.showall = function(req, res, next) {
+    response = {"list":["You look at a problem and say \"I can use regular expressions.\" Now you have two problems.",
+                        "The beginning is the end is the beginning",
+                        "Make in India: Khelo India Khelo",
+                        "Gamblers delusion, winner's pride"]};
+    res.json(response);
 };

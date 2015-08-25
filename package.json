@@ -1,0 +1,20 @@
+{
+  "name": "agni",
+  "version": "1.0.0",
+  "description": "backend for agni app",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://alteredstateoftheunion@bitbucket.org/alteredstateoftheunion/agni.git"
+  },
+  "author": "Sunil Kowlgi",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/alteredstateoftheunion/agni#readme",
+  "dependencies": {
+    "express": "^4.13.3",
+    "stdio": "^0.2.7"
+  }
+}
