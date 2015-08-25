@@ -14,6 +14,7 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/alteredstateoftheunion/agni#readme",
   "dependencies": {
+    "body-parser": "^1.13.3",
     "express": "^4.13.3",
     "stdio": "^0.2.7"
   }
