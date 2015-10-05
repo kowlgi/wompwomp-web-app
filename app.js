@@ -32,7 +32,7 @@ require( './db' ).init(db_name);
 var routes  = require( './routes' );
 app.get('/', routes.index);
 app.post('/submit', routes.submit);
-app.get('/showall', routes.showall);
+app.get('/items', routes.items);
 
 if (ops.port) {
     app.set('port', ops.port);

@@ -3,7 +3,8 @@ var Schema   = mongoose.Schema;
 
 exports.init = function(agni_db_name) {
     var AgniSchema = new Schema({
-        quote          : String,
+        text           : String,
+        imageuri       : String,
         created_on     : Date
     });
     mongoose.model('Agni', AgniSchema);
