@@ -1,6 +1,8 @@
 // IMPORTANT: Install GraphicMagick on your computer before running this tool
 var stdio = require('stdio'),
     gm = require('gm'),
+    fs = require('fs'),
+    request = require('request'),
     stdio = require('stdio'),
     imgur = require('imgur-node-api'),
     exec = require('child_process').exec;
@@ -51,6 +53,18 @@ function resize(fname, width_int, height_int, callback) {
     });
 };
 
+function fetch(callback) {
+  var img = 'img';
+  if (ops.img.indexOf("http://") > -1 || ops.img.indexOf("https://") > -1) {
+    console.log('Fetching ' + ops.img);
+    var stream = fs.createWriteStream(img);
+    request(ops.img).pipe(stream);
+    stream.once('close', function() {
+      callback(img, ops.width, ops.height, upload);
+    });
+  } else {
+    callback(ops.img, ops.width, ops.height, upload);
+  }
+};
 
-
-resize(ops.img, ops.width, ops.height, upload);
+fetch(resize);
