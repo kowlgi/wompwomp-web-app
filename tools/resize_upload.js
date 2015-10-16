@@ -19,7 +19,7 @@ var ops = stdio.getopt({
     'quote':
         {key: 'q', args: 1, description: 'enter your quote', mandatory: true},
     'category':
-        {key: 'c', args: 1, description: 'enter a category', mandatory: true},
+        {key: 'c', args: 1, description: 'enter a category for the item', mandatory: true},
     'submitkey':
         {key: 's', args: 1, description: 'the agni submit key', mandatory: true}
     });
