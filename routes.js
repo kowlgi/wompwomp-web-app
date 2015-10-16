@@ -33,19 +33,19 @@ exports.submit = function(req, res, next) {
             return next(err);
         }
 
-        // var message = new gcm.Message();
-        //
-        // message.addData('message', req.body.text.substring(0, MAX_TEXT_LENGTH));
-        // message.addData('imageuri', req.body.imageuri.substring(0, MAX_TEXT_LENGTH));
-        //
-        // // Set up the sender with you API key
-        // var sender = new gcm.Sender('AIzaSyDUc4BD7uJoDcMCiiiYww6Pb-eI7oeN-KI');
-        //
-        // // Send to a topic, with no retry this time
-        // sender.sendNoRetry(message, { topic: '/topics/global' }, function (err, result) {
-        //     if(err) console.error(err);
-        //     else    console.log(result);
-        // });
+        var message = new gcm.Message();
+
+        message.addData('message', req.body.text.substring(0, MAX_TEXT_LENGTH));
+        message.addData('imageuri', req.body.imageuri.substring(0, MAX_TEXT_LENGTH));
+
+        // Set up the sender with you API key
+        var sender = new gcm.Sender('AIzaSyDUc4BD7uJoDcMCiiiYww6Pb-eI7oeN-KI');
+
+        // Send to a topic, with no retry this time
+        sender.sendNoRetry(message, { topic: '/topics/global' }, function (err, result) {
+            if(err) console.error(err);
+            else    console.log(result);
+        });
 
         console.log("Item saved");
         res.end();
