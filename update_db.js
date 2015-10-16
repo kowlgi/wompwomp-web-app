@@ -10,7 +10,7 @@ exports.update_db_oct_16_2015 = function() {
         if(err) return;
         docs.forEach(function(elem, index, array) {
             elem.category = "test";
-            elem.id = Db.Shortid.generate();
+            elem.id = Shortid.generate();
             elem.save();
         })
     });
