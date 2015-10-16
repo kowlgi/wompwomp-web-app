@@ -30,7 +30,7 @@ function upload(img) {
     console.log('Uploaded to ' + res.data.link);
     var cmd = 'curl --data "text=' + ops.quote + '&&imageuri=' + res.data.link +
               '&&category=' + ops.category + '&&submitkey=' + ops.submitkey +
-              '" http://45.55.216.153:3000/submit';
+              '" http://192.168.0.9:3000/submit';
     console.log(cmd);
     exec(cmd, function(error, stdout, stderr) {
       console.log(stderr);
@@ -65,6 +65,7 @@ function resize(fname, width_int, height_int, callback) {
           console.log('Converted the file to a size requested. Now uploading to imgur ...');
           callback(out_fname);
         } else {
+          console.log("Exiting...image can't be made square. Try again with a different image.");
           process.exit(1);
         }
       }

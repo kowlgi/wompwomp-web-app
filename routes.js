@@ -6,6 +6,7 @@ var mongoose = require('mongoose');
 var AgniModel = mongoose.model('Agni');
 var gcm = require('node-gcm');
 var Shortid = require('shortid');
+App = require('./app');
 
 var MAX_TEXT_LENGTH = 500;
 
@@ -14,8 +15,8 @@ exports.index = function(req, res, next) {
 };
 
 exports.submit = function(req, res, next) {
-    App = require('./app');
     if(req.body.submitkey != App.submit_key) {
+        console.log("wrong submit key")
         res.end();
         return;
     }
@@ -28,23 +29,25 @@ exports.submit = function(req, res, next) {
         created_on  : Date.now()
     }).save(function(err, agniquote) {
         if (err) {
+            console.log(err);
             return next(err);
         }
 
-        var message = new gcm.Message();
+        // var message = new gcm.Message();
+        //
+        // message.addData('message', req.body.text.substring(0, MAX_TEXT_LENGTH));
+        // message.addData('imageuri', req.body.imageuri.substring(0, MAX_TEXT_LENGTH));
+        //
+        // // Set up the sender with you API key
+        // var sender = new gcm.Sender('AIzaSyDUc4BD7uJoDcMCiiiYww6Pb-eI7oeN-KI');
+        //
+        // // Send to a topic, with no retry this time
+        // sender.sendNoRetry(message, { topic: '/topics/global' }, function (err, result) {
+        //     if(err) console.error(err);
+        //     else    console.log(result);
+        // });
 
-        message.addData('message', req.body.text.substring(0, MAX_TEXT_LENGTH));
-        message.addData('imageuri', req.body.imageuri.substring(0, MAX_TEXT_LENGTH));
-
-        // Set up the sender with you API key
-        var sender = new gcm.Sender('AIzaSyDUc4BD7uJoDcMCiiiYww6Pb-eI7oeN-KI');
-
-        // Send to a topic, with no retry this time
-        sender.sendNoRetry(message, { topic: '/topics/global' }, function (err, result) {
-            if(err) console.error(err);
-            else    console.log(result);
-        });
-
+        console.log("Item saved");
         res.end();
     });
 };
@@ -82,4 +85,21 @@ exports.items = function(req, res, next) {
             res.contentType('application/json');
             res.send(JSON.stringify(response));
         });
+}
+
+exports.viewitem = function(req, res, next) {
+    AgniModel.findOne({id : req.params.id}, function(err, item) {
+        if(err) {
+            res.render ('404', {url:req.url});
+            return;
+        }
+
+        if(item == null) {
+            res.render ('404', {url:req.url});
+            return;
+        }
+
+        res.render('viewitem', {imageuri: item.imageuri, quote: item.text});
+
+    });
 }

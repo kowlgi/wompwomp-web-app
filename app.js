@@ -2,7 +2,10 @@
  * app.js
  */
 var stdio = require('stdio'),
-    bodyParser = require('body-parser');
+    bodyParser = require('body-parser'),
+    jade = require('jade'),
+    path = require('path'),
+    favicon = require('serve-favicon');
 
 var ops = stdio.getopt({
     'port':
@@ -19,6 +22,9 @@ var http = require('http'),
     express = require('express');
 var app = express();
 app.set('port', process.env.PORT || 3000);
+app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.png')));
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
 app.use(bodyParser.urlencoded({
   extended: true
 }));
@@ -39,11 +45,21 @@ if(ops.updatedb) {
     }
 }
 
+app.use(express.static(__dirname +'/public'));
+app.use('/v', express.static(__dirname +'/public'));
+app.disable('etag');
+
 // Set up routes
 var routes  = require( './routes' );
+
 app.get('/', routes.index);
 app.post('/submit', routes.submit);
 app.get('/items', routes.items);
+app.get('/v/:id', routes.viewitem);
+app.use(function(req, res) {
+    console.log('Unable to find URI ' + req.url + ' redirecting back home');
+    res.redirect('/');
+});
 
 if (ops.port) {
     app.set('port', ops.port);
