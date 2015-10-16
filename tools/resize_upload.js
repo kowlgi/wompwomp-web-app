@@ -46,9 +46,21 @@ function resize(fname, width_int, height_int, callback) {
     .write(out_fname, function (err) {
       if (!err) {
         console.log('Converted ' + ops.img + ' to ' + out_fname);
-        callback(fname);
       } else {
         console.log(err);
+      }
+    });
+
+    gm(out_fname).size(function(err, value) {
+      if (!err) {
+        console.log('width = ' + value.width);
+        console.log('height = ' + value.height);
+        if (value.width == ops.width && value.height == ops.height) {
+          console.log('Converted the file to a size requested. Now uploading to imgur ...');
+          callback(out_fname);
+        } else {
+          process.exit(1);
+        }
       }
     });
 };
