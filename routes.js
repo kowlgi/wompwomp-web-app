@@ -70,6 +70,7 @@ exports.items = function(req, res, next) {
 
     AgniModel.
         find(conditions).
+        sort({_id:1}).
         exec(function(err, quotes) {
             if(limit == 0) {
                 limit = quotes.length;
