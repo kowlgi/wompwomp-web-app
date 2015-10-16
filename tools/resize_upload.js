@@ -18,13 +18,19 @@ var ops = stdio.getopt({
         {key: 'k', args: 1, description: 'the imgur api key', mandatory: true},
     'quote':
         {key: 'q', args: 1, description: 'enter your quote', mandatory: true},
+    'category':
+        {key: 'c', args: 1, description: 'enter a category', mandatory: true},
+    'submitkey':
+        {key: 's', args: 1, description: 'the agni submit key', mandatory: true}
     });
 
 function upload(img) {
   imgur.setClientID(ops.api_key);
   imgur.upload(img, function (err, res) {
     console.log('Uploaded to ' + res.data.link);
-    var cmd = 'curl --data "text=' + ops.quote + '&&imageuri=' + res.data.link + '" http://45.55.216.153:3000/submit';
+    var cmd = 'curl --data "text=' + ops.quote + '&&imageuri=' + res.data.link +
+              '&&category=' + ops.category + '&&submitkey=' + ops.submitkey +
+              '" http://45.55.216.153:3000/submit';
     console.log(cmd);
     exec(cmd, function(error, stdout, stderr) {
       console.log(stderr);
