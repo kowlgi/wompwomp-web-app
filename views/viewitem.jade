@@ -6,10 +6,19 @@ head
     title Agni
     link(rel="stylesheet",
         href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
+    link(rel="stylesheet", href="css/agni.css")
+    <!--Import Google Icon Font-->
+    link(href="http://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")
+    <!--Import materialize.css-->
+    link(type="text/css", rel="stylesheet", href="materialize/css/materialize.min.css",  media="screen,projection")
 body
     div.container-fluid
         div.row
-            div.col-sm-4
-                img(src="#{imageuri}", height="200", width="200")
-                p
-                    = quote
+            div.col.s12.m7
+                div.card
+                    div.card-image
+                        img(src="#{imageuri}")
+                    div.card-content
+                        p
+                            = quote
+    include footer.jade
