@@ -5,7 +5,8 @@ var stdio = require('stdio'),
     request = require('request'),
     stdio = require('stdio'),
     imgur = require('imgur-node-api'),
-    exec = require('child_process').exec;
+    exec = require('child_process').exec,
+    vibrant = require('node-vibrant');
 
 var ops = stdio.getopt({
     'img':
@@ -26,18 +27,47 @@ var ops = stdio.getopt({
 
 function upload(img) {
   imgur.setClientID(ops.api_key);
-  imgur.upload(img, function (err, res) {
-    console.log('Uploaded to ' + res.data.link);
+  var v = new vibrant(img);
+  v.getSwatches(function(err, swatches) {
+      if(err) {
+          console.log(err);
+          return;
+      }
 
-    var cmd = 'curl --data "text=' + ops.quote + '&&imageuri=' + res.data.link +
-              '&&category=' + ops.category + '&&submitkey=' + ops.submitkey +
-              '" http://45.55.216.153:3000/submit';
-    console.log(cmd);
-    exec(cmd, function(error, stdout, stderr) {
-      console.log(stderr);
-    });
+      var backgroundcolor = "#FFFFFF";
+      var bodytextcolor = "#000000";
+      if(typeof swatches['LightVibrant'].getHex === "function" &&
+         typeof swatches['LightVibrant'].getBodyTextColor === "function" ) {
+         backgroundcolor = normalizeHexCode(swatches['LightVibrant'].getHex());
+         bodytextcolor = normalizeHexCode(swatches['LightVibrant'].getBodyTextColor());
+      }
+
+      imgur.upload(img, function (err, res) {
+        console.log('Uploaded to ' + res.data.link);
+
+        var cmd = 'curl --data "text=' + ops.quote + '&&imageuri=' + res.data.link +
+                  '&&category=' + ops.category + '&&submitkey=' + ops.submitkey +
+                  '&&backgroundcolor=' + backgroundcolor + '&&bodytextcolor=' + bodytextcolor + '" http://45.55.216.153:3000/submit';
+        console.log(cmd);
+        exec(cmd, function(error, stdout, stderr) {
+          console.log(stderr);
+        });
+      });
   });
 };
+
+/* Workaround: vibrant.js return value is sometimes only #xxx (3 hex characters),
+   which causes an illegal argument exception in Java Color.parseColor()
+   on Android. To avoid the exception, we have to normalize the hex code
+   to be 6 hex characters in length */
+function normalizeHexCode(hexCode) {
+    if ( hexCode.length == 4) {
+        return "#" + hexCode[1] + hexCode[1] + hexCode[2] + hexCode[2] + hexCode[3] + hexCode[3];
+    }
+    else {
+        return hexCode;
+    }
+}
 
 function resize(fname, width_int, height_int, callback) {
   width = width_int.toString();

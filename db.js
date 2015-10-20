@@ -7,6 +7,8 @@ exports.init = function(agni_db_name) {
         imageuri       : String,
         id             : String,
         category       : [String],
+        backgroundcolor: String,
+        bodytextcolor  : String,
         created_on     : Date
     });
     mongoose.model('Agni', AgniSchema);

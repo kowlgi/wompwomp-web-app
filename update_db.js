@@ -1,17 +1,76 @@
-var Mongoose = require('mongoose');
-var AgniModel = Mongoose.model('Agni');
-var Shortid = require('shortid');
+var Mongoose = require('mongoose'),
+    AgniModel = Mongoose.model('Agni'),
+    Shortid = require('shortid'),
+    Vibrant = require('node-vibrant'),
+    Request = require('request'),
+    Fs = require('fs');
 
 exports.update_db_oct_16_2015 = function() {
     // Add categories and ids to
     var conditions = {category : {$exists: false}, id : {$exists: false}};
 
     AgniModel.find(conditions, function(err, docs) {
-        if(err) return;
+        if(err) {
+            console.log(err);
+            return;
+        }
+
         docs.forEach(function(elem, index, array) {
             elem.category = "test";
             elem.id = Shortid.generate();
             elem.save();
-        })
+        });
     });
+}
+
+exports.update_db_oct_20_2015 = function() {
+    // Add categories and ids to
+    var conditions = {backgroundcolor : {$exists: false}, bodytextcolor : {$exists: false}};
+
+    AgniModel.find(conditions, function(err, docs) {
+        if(err) {
+            console.log(err);
+            return;
+        }
+
+        docs.forEach(function(elem, index, array) {
+            var filename = "file";
+            var stream = Fs.createWriteStream("file");
+            Request.get(elem.imageuri).pipe(stream);
+            stream.once('close', function() {
+                var v = new Vibrant(filename);
+                v.getSwatches(function(err, swatches) {
+                    if(err ||
+                       typeof swatches['LightVibrant'].getHex === "undefined" ||
+                       typeof swatches['LightVibrant'].getBodyTextColor === "undefined" ) {
+                        console.log(err);
+                        elem.backgroundcolor = "#FFFFFF";
+                        elem.bodytextcolor = "#000000";
+                        elem.save();
+                        return;
+                    }
+
+                    var backgroundcolor = normalizeHexCode(swatches['LightVibrant'].getHex());
+                    var bodytextcolor = normalizeHexCode(swatches['LightVibrant'].getBodyTextColor());
+
+                    elem.backgroundcolor = backgroundcolor;
+                    elem.bodytextcolor = bodytextcolor;
+                    elem.save();
+                });
+            });
+        });
+    });
+}
+
+/* Workaround: vibrant.js return value is sometimes only #xxx (3 hex characters),
+   which causes an illegal argument exception in Java Color.parseColor()
+   on Android. To avoid the exception, we have to normalize the hex code
+   to be 6 hex characters in length */
+function normalizeHexCode(hexCode) {
+    if ( hexCode.length == 4) {
+        return "#" + hexCode[1] + hexCode[1] + hexCode[2] + hexCode[2] + hexCode[3] + hexCode[3];
+    }
+    else {
+        return hexCode;
+    }
 }

@@ -6,6 +6,7 @@ var mongoose = require('mongoose');
 var AgniModel = mongoose.model('Agni');
 var gcm = require('node-gcm');
 var Shortid = require('shortid');
+var Vibrant = require('node-vibrant');
 App = require('./app');
 
 var MAX_TEXT_LENGTH = 500;
@@ -22,35 +23,40 @@ exports.submit = function(req, res, next) {
     }
 
     var agniitem = new AgniModel({
-        text        : req.body.text.substring(0, MAX_TEXT_LENGTH),
-        imageuri    : req.body.imageuri.substring(0, MAX_TEXT_LENGTH),
-        id          : Shortid.generate(),
-        category    : req.body.category.slice(0, 10), // limit to 10 categories
-        created_on  : Date.now()
+        text            : req.body.text.substring(0, MAX_TEXT_LENGTH),
+        imageuri        : req.body.imageuri.substring(0, MAX_TEXT_LENGTH),
+        id              : Shortid.generate(),
+        category        : req.body.category.slice(0, 10), // limit to 10 categories
+        backgroundcolor : req.body.backgroundcolor,
+        bodytextcolor   : req.body.bodytextcolor,
+        created_on      : Date.now()
     }).save(function(err, agniquote) {
         if (err) {
             console.log(err);
             return next(err);
         }
 
-        var message = new gcm.Message();
-
-        message.addData('message', req.body.text.substring(0, MAX_TEXT_LENGTH));
-        message.addData('imageuri', req.body.imageuri.substring(0, MAX_TEXT_LENGTH));
-
-        // Set up the sender with you API key
-        var sender = new gcm.Sender('AIzaSyDUc4BD7uJoDcMCiiiYww6Pb-eI7oeN-KI');
-
-        // Send to a topic, with no retry this time
-        sender.sendNoRetry(message, { topic: '/topics/global' }, function (err, result) {
-            if(err) console.error(err);
-            else    console.log(result);
-        });
-
-        console.log("Item saved");
+        /*
+        sendNotification(req.body.text.substring(0, MAX_TEXT_LENGTH),
+                         req.body.imageuri.substring(0, MAX_TEXT_LENGTH)); */
         res.end();
     });
 };
+
+function sendNotification(message, imageuri) {
+    var message = new gcm.Message();
+    message.addData('message', message);
+    message.addData('imageuri', imageuri);
+
+    // Set up the sender with you API key
+    var sender = new gcm.Sender('AIzaSyDUc4BD7uJoDcMCiiiYww6Pb-eI7oeN-KI');
+
+    // Send to a topic, with no retry this time
+    sender.sendNoRetry(message, { topic: '/topics/global' }, function (err, result) {
+        if(err) console.error(err);
+        else    console.log(result);
+    });
+}
 
 exports.items = function(req, res, next) {
     var limit = 0,  offset = 0;
@@ -80,7 +86,11 @@ exports.items = function(req, res, next) {
             }
             var quotelist = [];
             for (var i = offset; i < quotes.length && limit > 0; i++, limit--) {
-                quotelist.push({"text": quotes[i].text, "imageuri": quotes[i].imageuri, "id":quotes[i].id});
+                quotelist.push({"text": quotes[i].text,
+                                "imageuri": quotes[i].imageuri,
+                                "id":quotes[i].id,
+                                "backgroundcolor":quotes[i].backgroundcolor,
+                                "bodytextcolor":quotes[i].bodytextcolor});
             }
             var response = {list:quotelist};
             res.contentType('application/json');
@@ -100,7 +110,10 @@ exports.viewitem = function(req, res, next) {
             return;
         }
 
-        res.render('viewitem', {imageuri: item.imageuri, quote: item.text});
-
+        res.render('viewitem',
+                    {imageuri: item.imageuri,
+                     quote: item.text,
+                     backgroundcolor: item.backgroundcolor,
+                     bodytextcolor: item.bodytextcolor});
     });
 }
