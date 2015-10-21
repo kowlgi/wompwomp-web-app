@@ -11,14 +11,21 @@ head
     link(href="http://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")
     <!--Import materialize.css-->
     link(type="text/css", rel="stylesheet", href="materialize/css/materialize.min.css",  media="screen,projection")
+    style.
+        .card {
+            background-color:#{backgroundcolor}
+        }
+        .card-content {
+            color:#{bodytextcolor}
+        }
 body
     div.container-fluid
         div.row
             div.col.s12.m4
-                div.card(background-color="#{backgroundcolor}")
+                div.card
                     div.card-image
                         img(src="#{imageuri}")
                     div.card-content
-                        p(color="#{bodytextcolor}")
+                        p
                             = quote
     include footer.jade
