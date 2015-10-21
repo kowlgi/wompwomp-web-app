@@ -4,6 +4,7 @@ var Mongoose = require('mongoose'),
     Vibrant = require('node-vibrant'),
     Request = require('request'),
     Fs = require('fs');
+    Path = require('path');
 
 exports.update_db_oct_16_2015 = function() {
     // Add categories and ids to
@@ -25,7 +26,7 @@ exports.update_db_oct_16_2015 = function() {
 
 exports.update_db_oct_20_2015 = function() {
     // Add categories and ids to
-    var conditions = {backgroundcolor : {$exists: false}, bodytextcolor : {$exists: false}};
+    var conditions = {backgroundcolor : {$exists: true}, bodytextcolor : {$exists: true}};
 
     AgniModel.find(conditions, function(err, docs) {
         if(err) {
@@ -34,8 +35,9 @@ exports.update_db_oct_20_2015 = function() {
         }
 
         docs.forEach(function(elem, index, array) {
-            var filename = "file";
-            var stream = Fs.createWriteStream("file");
+            var filename = "images/" + Path.basename(elem.imageuri);
+            console.log(filename);
+            var stream = Fs.createWriteStream(filename);
             Request.get(elem.imageuri).pipe(stream);
             stream.once('close', function() {
                 var v = new Vibrant(filename);
