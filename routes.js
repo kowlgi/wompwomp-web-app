@@ -48,7 +48,7 @@ function sendNotification(notificationText, imageuri) {
     message.addData('imageuri', imageuri);
 
     // Set up the sender with you API key
-    var sender = new gcm.Sender('AIzaSyDUc4BD7uJoDcMCiiiYww6Pb-eI7oeN-KI');
+    var sender = new gcm.Sender(App.pushnotificationkey);
 
     // Send to a topic, with no retry this time
     sender.sendNoRetry(message, { topic: '/topics/global' }, function (err, result) {

@@ -15,7 +15,9 @@ var ops = stdio.getopt({
     'updatedb':
         {key: 'u', args: 1, description: 'EXERCISE EXTREME CAUTION: this command will update the database', mandatory: false},
     'submitkey':
-        {key: 's', args: 1, description: 'Set key required to submit content to the agni db', mandatory: true}
+        {key: 's', args: 1, description: 'Key required to submit content to the agni db', mandatory: true},
+    'pushnotificationkey':
+        {key: 'h', args: 1, description: 'Key required to send push notifications', mandatory: true},
     });
 
 var http = require('http'),
@@ -71,3 +73,4 @@ http.createServer(app).listen(app.get('port'), function() {
 });
 
 exports.submit_key = ops.submitkey;
+exports.pushnotificationkey = ops.pushnotificationkey;
