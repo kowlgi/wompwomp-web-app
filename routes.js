@@ -42,9 +42,9 @@ exports.submit = function(req, res, next) {
     });
 };
 
-function sendNotification(message, imageuri) {
+function sendNotification(notificationText, imageuri) {
     var message = new gcm.Message();
-    message.addData('message', message);
+    message.addData('message', notificationText);
     message.addData('imageuri', imageuri);
 
     // Set up the sender with you API key
