@@ -22,7 +22,9 @@ var ops = stdio.getopt({
     'category':
         {key: 'c', args: 1, description: 'enter a category for the item', mandatory: true},
     'submitkey':
-        {key: 's', args: 1, description: 'the agni submit key', mandatory: true}
+        {key: 's', args: 1, description: 'the agni submit key', mandatory: true},
+    'notifyuser':
+        {key: 'n', args: 1, description: 'send push notification to user? yes/(no)', default: 'no', mandatory: false}
     });
 
 function upload(img) {
@@ -47,7 +49,8 @@ function upload(img) {
 
         var cmd = 'curl --data "text=' + ops.quote + '&&imageuri=' + res.data.link +
                   '&&category=' + ops.category + '&&submitkey=' + ops.submitkey +
-                  '&&backgroundcolor=' + backgroundcolor + '&&bodytextcolor=' + bodytextcolor + '" http://45.55.216.153:3000/submit';
+                  '&&backgroundcolor=' + backgroundcolor + '&&bodytextcolor=' + bodytextcolor +
+                  '&&notifyuser=' + ops.notifyuser + '" http://45.55.216.153:3000/submit';
         console.log(cmd);
         exec(cmd, function(error, stdout, stderr) {
           console.log(stderr);

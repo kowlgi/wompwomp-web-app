@@ -36,8 +36,11 @@ exports.submit = function(req, res, next) {
             return next(err);
         }
 
-        sendNotification(req.body.text.substring(0, MAX_TEXT_LENGTH),
+        if(req.body.notifyuser == "yes") {
+            sendNotification(req.body.text.substring(0, MAX_TEXT_LENGTH),
                          req.body.imageuri.substring(0, MAX_TEXT_LENGTH));
+        }
+        
         res.end();
     });
 };
