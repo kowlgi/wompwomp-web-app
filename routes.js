@@ -27,9 +27,9 @@ exports.submit = function(req, res, next) {
         imageuri        : req.body.imageuri.substring(0, MAX_TEXT_LENGTH),
         id              : Shortid.generate(),
         category        : req.body.category.slice(0, 10), // limit to 10 categories
-        backgroundcolor : req.body.backgroundcolor,
-        bodytextcolor   : req.body.bodytextcolor,
-        created_on      : Date.now()
+        created_on      : Date.now(),
+        numfavorites    : 0,
+        numshares       : 0
     }).save(function(err, agniquote) {
         if (err) {
             console.log(err);
@@ -40,7 +40,7 @@ exports.submit = function(req, res, next) {
             sendNotification(req.body.text.substring(0, MAX_TEXT_LENGTH),
                          req.body.imageuri.substring(0, MAX_TEXT_LENGTH));
         }
-        
+
         res.end();
     });
 };
@@ -91,8 +91,9 @@ exports.items = function(req, res, next) {
                 quotelist.push({"text": quotes[i].text,
                                 "imageuri": quotes[i].imageuri,
                                 "id":quotes[i].id,
-                                "backgroundcolor":quotes[i].backgroundcolor,
-                                "bodytextcolor":quotes[i].bodytextcolor});
+                                "created_on":quotes[i].created_on,
+                                "numfavorites":quotes[i].numfavorites,
+                                "numshares":quotes[i].numshares});
             }
             var response = {list:quotelist};
             res.contentType('application/json');
@@ -114,8 +115,60 @@ exports.viewitem = function(req, res, next) {
 
         res.render('viewitem',
                     {imageuri: item.imageuri,
-                     quote: item.text,
-                     backgroundcolor: item.backgroundcolor,
-                     bodytextcolor: item.bodytextcolor});
+                     quote: item.text});
+    });
+}
+
+exports.share = function(req, res, next) {
+    AgniModel.findOne({id : req.params.id}, function(err, item) {
+        if(err) {
+            res.render ('404', {url:req.url});
+            return;
+        }
+
+        if(item == null) {
+            res.render ('404', {url:req.url});
+            return;
+        }
+
+        item.numshares += 1;
+        item.save();
+    });
+}
+
+exports.favorite = function(req, res, next) {
+    AgniModel.findOne({id : req.params.id}, function(err, item) {
+        if(err) {
+            res.render ('404', {url:req.url});
+            return;
+        }
+
+        if(item == null) {
+            res.render ('404', {url:req.url});
+            return;
+        }
+
+        item.numfavorites += 1;
+        item.save();
+    });
+}
+
+exports.unfavorite = function(req, res, next) {
+    AgniModel.findOne({id : req.params.id}, function(err, item) {
+        if(err) {
+            res.render ('404', {url:req.url});
+            return;
+        }
+
+        if(item == null) {
+            res.render ('404', {url:req.url});
+            return;
+        }
+
+        if(item.numfavorites > 0) {
+            item.numfavorites -= 1;
+        }
+
+        item.save();
     });
 }

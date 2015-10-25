@@ -7,7 +7,7 @@ var Mongoose = require('mongoose'),
     Path = require('path');
 
 exports.update_db_oct_16_2015 = function() {
-    // Add categories and ids to
+    // Add categories and ids
     var conditions = {category : {$exists: false}, id : {$exists: false}};
 
     AgniModel.find(conditions, function(err, docs) {
@@ -26,7 +26,7 @@ exports.update_db_oct_16_2015 = function() {
 
 exports.update_db_oct_20_2015 = function() {
     // Add categories and ids to
-    var conditions = {backgroundcolor : {$exists: true}, bodytextcolor : {$exists: true}};
+    var conditions = {backgroundcolor : {$exists: false}, bodytextcolor : {$exists: false}};
 
     AgniModel.find(conditions, function(err, docs) {
         if(err) {
@@ -75,4 +75,22 @@ function normalizeHexCode(hexCode) {
     else {
         return hexCode;
     }
+}
+
+exports.update_db_oct_24_2015 = function() {
+    // Add numfavorites and numshares
+    var conditions = {numfavorites : {$exists: false}, numshares : {$exists: false}};
+
+    AgniModel.find(conditions, function(err, docs) {
+        if(err) {
+            console.log(err);
+            return;
+        }
+
+        docs.forEach(function(elem, index, array) {
+            elem.numfavorites = 0;
+            elem.numshares = 0;
+            elem.save();
+        });
+    });
 }
