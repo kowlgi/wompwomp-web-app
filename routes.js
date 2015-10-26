@@ -150,6 +150,7 @@ exports.favorite = function(req, res, next) {
 
         item.numfavorites += 1;
         item.save();
+        res.end();
     });
 }
 
@@ -170,5 +171,6 @@ exports.unfavorite = function(req, res, next) {
         }
 
         item.save();
+        res.end();
     });
 }
