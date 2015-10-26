@@ -16,9 +16,14 @@ body
         div.row
             div.col.s12.m4
                 div.card
-                    div.card-image
-                        img(src="#{imageuri}")
-                    div.card-content
-                        p
-                            = quote
-    include footer.jade
+                  include appinstall.jade
+                  div.card-image
+                      img(src="#{imageuri}")
+                  div.card-content(align="center")
+                      p
+                          = quote
+        div.row
+          div.col.s12.m4
+            div.card
+              include email.jade
+        include footer.jade
