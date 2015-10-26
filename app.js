@@ -58,6 +58,9 @@ app.get('/', routes.index);
 app.post('/submit', routes.submit);
 app.get('/items', routes.items);
 app.get('/v/:id', routes.viewitem);
+app.post('/s/:id', routes.share);
+app.post('/f/:id', routes.favorite);
+app.post('/uf/:id', routes.unfavorite);
 app.use(function(req, res) {
     console.log('Unable to find URI ' + req.url + ' redirecting back home');
     res.redirect('/');
