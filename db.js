@@ -1,5 +1,5 @@
-var mongoose = require( 'mongoose' );
-var Schema   = mongoose.Schema;
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
 exports.init = function(agni_db_name) {
     var AgniSchema = new Schema({
