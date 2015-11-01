@@ -8,8 +8,8 @@ App = require('./app');
 var MAX_TEXT_LENGTH = 500;
 
 exports.index = function(req, res, next) {
-  // Show the top ten most recent items on the home page
-  AgniModel.find().sort('-created_on').limit(10).exec(function(err, items) {
+  // Show the top 20 most recent items on the home page
+  AgniModel.find().sort('-created_on').limit(20).exec(function(err, items) {
     res.render(
       'showall', {
         items: items,
