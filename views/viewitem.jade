@@ -15,15 +15,15 @@ body
     div.container-fluid
         div.row
             div.col.s12.m4
-                div.card
+                div.card(class="card-panel hoverable")
                   include appinstall.jade
                   div.card-image
-                      img(src="#{imageuri}")
+                      img(src="#{imageuri}" class="materialboxed")
                   div.card-content(align="center")
                       p
                           = quote
         div.row
           div.col.s12.m4
-            div.card
+            div.card(class="card-panel hoverable")
               include email.jade
         include footer.jade

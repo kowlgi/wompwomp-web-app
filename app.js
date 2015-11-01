@@ -30,7 +30,7 @@ app.set('view engine', 'jade');
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-
+app.locals.moment = require('moment');
 
 var db_name = "";
 if (ops.db) {

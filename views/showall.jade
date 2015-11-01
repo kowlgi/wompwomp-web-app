@@ -12,40 +12,41 @@ head
     <!--Import materialize.css-->
     link(type="text/css", rel="stylesheet", href="materialize/css/materialize.min.css",  media="screen,projection")
 body
-  nav
-    div(class="nav-wrapper")
-      a(href="#", class="brand-logo center")
-        |Agni
-  div(class="row")
-    h3(class="col s12 light center header")
-      | The best images on the internet
-    p(class="col s8 offset-s2 caption center")
-      | One click share to WhatsApp. No pressure. Just one notification a day. 
-    p(class="col s8 offset-s2 caption center")      
-      | Here are a few images recently posted on Agni. Get the app now!
+  div(class="container-fluid")
+    nav
+      div(class="nav-wrapper")
+        a(href="#", class="brand-logo center")
+          |Agni
+    div(class="row")
+      h3(class="col s12 light center header")
+        | The best images on the internet
+      p(class="col s8 offset-s2 caption center")
+        | One click share to WhatsApp. No pressure. Just one notification a day. 
+      p(class="col s8 offset-s2 caption center")      
+        | Here are a few images recently posted on Agni. Get the app now!
 
 
-  div.row
-     div.col.s4.m4
-       div.card(class="card-panel hoverable")
-         include email.jade
-       div.card(class="card-panel hoverable")
-         include appinstall.jade    
-         
-   div.container-fluid
-     each item in items
+    div.row
+       div.col.s4.m4
+         div.card(class="card-panel hoverable")
+           include email.jade
+         div.card(class="card-panel hoverable")
+           include appinstall.jade
+
+     div.container-fluid
        div.row
-         div.col.s4.m4
+       each item in items
+         div(class="col s4 m4")
            div.card(class="card-panel hoverable")
-             div.card-image
-                 img(src="#{item.imageuri}" height="312" width="312")
+             div.card-image(class="card")
+                 img(src="#{item.imageuri}" )
              div.card-content(align="center")
                  p
                      = item.text
                  p
                      em.text-muted.small
-                       = moment(created_on).fromNow()
-  
+                       = moment(item.created_on).fromNow()
+
 
 
 
