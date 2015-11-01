@@ -1,7 +1,3 @@
-/*!
- * routes.js
- */
-
 var mongoose = require('mongoose');
 var AgniModel = mongoose.model('Agni');
 var gcm = require('node-gcm');
@@ -12,6 +8,7 @@ App = require('./app');
 var MAX_TEXT_LENGTH = 500;
 
 exports.index = function(req, res, next) {
+  // Show the top ten most recent items on the home page
   AgniModel.find().sort('-created_on').limit(10).exec(function(err, items) {
     res.render(
       'showall', {
@@ -118,9 +115,11 @@ exports.viewitem = function(req, res, next) {
             return;
         }
 
-        res.render('viewitem',
-                    {imageuri: item.imageuri,
-                     quote: item.text});
+        res.render('viewitem', {
+          // To simplify the rendering logic for showing one item and multiple items, we'll stick
+          // the item into an array.
+          items: [ item ],
+        });
     });
 }
 
