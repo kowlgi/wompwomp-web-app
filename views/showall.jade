@@ -1,0 +1,52 @@
+doctype html
+head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    title Agni
+    link(rel="stylesheet",
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
+    link(rel="stylesheet", href="css/agni.css")
+    <!--Import Google Icon Font-->
+    link(href="http://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")
+    <!--Import materialize.css-->
+    link(type="text/css", rel="stylesheet", href="materialize/css/materialize.min.css",  media="screen,projection")
+body
+  nav
+    div(class="nav-wrapper")
+      a(href="#", class="brand-logo center")
+        |Agni
+  div(class="row")
+    h3(class="col s12 light center header")
+      | The best images on the internet
+    p(class="col s8 offset-s2 caption center")
+      | One click share to WhatsApp. No pressure. Just one notification a day. 
+    p(class="col s8 offset-s2 caption center")      
+      | Here are a few images recently posted on Agni. Get the app now!
+
+
+  div.row
+     div.col.s4.m4
+       div.card(class="card-panel hoverable")
+         include email.jade
+       div.card(class="card-panel hoverable")
+         include appinstall.jade    
+         
+   div.container-fluid
+     each item in items
+       div.row
+         div.col.s4.m4
+           div.card(class="card-panel hoverable")
+             div.card-image
+                 img(src="#{item.imageuri}" height="312" width="312")
+             div.card-content(align="center")
+                 p
+                     = item.text
+                 p
+                     em.text-muted.small
+                       = moment(created_on).fromNow()
+  
+
+
+
+                
