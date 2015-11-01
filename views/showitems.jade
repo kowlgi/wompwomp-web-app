@@ -4,7 +4,7 @@ div.container-fluid
   each item in items
     div(class="col s4 m4")
       if (n % 3 == 0)
-         div.card(class="card-panel hoverable")
+         div.card(class="card-panel hoverable grey lighten-3")
            include appinstall.jade
       div.card(class="card-panel hoverable")
         div.card-image(class="card")
@@ -19,6 +19,6 @@ div.container-fluid
               &nbsp; 
               a(href='/v/' + item.id) agni.co&#47;r&#47;#{item.id}
       if (n % 3 == 0)
-         div.card(class="card-panel hoverable")
+         div.card(class="card-panel hoverable grey lighten-4")
            include email.jade
     - n++
