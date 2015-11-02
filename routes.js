@@ -17,6 +17,16 @@ exports.index = function(req, res, next) {
   });
 };
 
+exports.subscribe = function(req, res, next) {
+  // Get the email from the user and add it to the mailgun database
+  // TODO(hnag): Add mail gun support
+  res.render('emailsuccess', {
+    email: req.query.email,
+  });
+  res.end();
+  return;
+}
+
 exports.submit = function(req, res, next) {
     if(req.body.submitkey != App.submit_key) {
         console.log("wrong submit key")
