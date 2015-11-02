@@ -32,32 +32,36 @@ exports.submit = function(req, res, next) {
         numshares       : 0
     }).save(function(err, agniquote) {
         if (err) {
-            console.log(err);
+            console.error(err);
             return next(err);
         }
 
-        if(req.body.notifyuser == "yes") {
-            sendNotification(req.body.text.substring(0, MAX_TEXT_LENGTH),
-                         req.body.imageuri.substring(0, MAX_TEXT_LENGTH));
-        }
+        try {
+            // send another notification to notify phone app to sync feed
+            sendNotification("/topics/sync", "", "");
 
-        res.end();
+            if(req.body.notifyuser == "content") {
+                sendNotification("/topics/content", req.body.text.substring(0, MAX_TEXT_LENGTH),
+                    req.body.imageuri.substring(0, MAX_TEXT_LENGTH));
+            }
+        } catch(err) {
+            console.error(err);
+        }finally {
+            res.end();
+        }
     });
 };
 
-function sendNotification(notificationText, imageuri) {
+function sendNotification(topicString, notificationText, imageuri) {
     var message = new gcm.Message();
-    message.addData('message', notificationText);
-    message.addData('imageuri', imageuri);
+    if(notificationText != "") message.addData('message', notificationText);
+    if(imageuri != "") message.addData('imageuri', imageuri);
 
     // Set up the sender with you API key
     var sender = new gcm.Sender(App.pushnotificationkey);
 
     // Send to a topic, with no retry this time
-    sender.sendNoRetry(message, { topic: '/topics/global' }, function (err, result) {
-        if(err) console.error(err);
-        else    console.log(result);
-    });
+    sender.sendNoRetry(message, { topic: topicString });
 }
 
 exports.items = function(req, res, next) {
@@ -95,7 +99,7 @@ exports.items = function(req, res, next) {
                                 "numfavorites":quotes[i].numfavorites,
                                 "numshares":quotes[i].numshares});
             }
-            var response = {list:quotelist};
+            var response = quotelist;
             res.contentType('application/json');
             res.send(JSON.stringify(response));
         });
@@ -133,6 +137,8 @@ exports.share = function(req, res, next) {
 
         item.numshares += 1;
         item.save();
+        res.end();
+        console.log("share:" + item.id);
     });
 }
 
@@ -151,6 +157,7 @@ exports.favorite = function(req, res, next) {
         item.numfavorites += 1;
         item.save();
         res.end();
+        console.log("favorite:" + item.id);
     });
 }
 
@@ -172,5 +179,6 @@ exports.unfavorite = function(req, res, next) {
 
         item.save();
         res.end();
+        console.log("unfavorite:" + item.id);
     });
 }
