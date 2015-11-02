@@ -55,6 +55,7 @@ app.disable('etag');
 var routes  = require( './routes' );
 
 app.get('/', routes.index);
+app.get('/subscribe', routes.subscribe);
 app.post('/submit', routes.submit);
 app.get('/items', routes.items);
 app.get('/v/:id', routes.viewitem);

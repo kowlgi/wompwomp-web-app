@@ -4,6 +4,7 @@ div(class="row")
       | Get Agni beamed to your Inbox
     | The best of Agni sent to you every week!
   div(class="col s6", align="center")
-    input(type="email", class="validate", name="email", placeholder="you@gmail.com", autocomplete="on")
-    a(href="#" class="btn waves-effect btn-sm green lighten-1" type="submit" name="action")
-        | Activate
+    form(role="form", id="emailform", method="get", action="/subscribe")
+      input(type="email", class="validate", name="email", placeholder="you@gmail.com", autocomplete="on")
+    button(type="submit", class="btn waves-effect btn-sm green lighten-1", form="emailform", value="Activate")
+      | Activate
