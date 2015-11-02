@@ -21,6 +21,8 @@ var ops = stdio.getopt({
         {key: 'q', args: 1, description: 'enter your quote', mandatory: true},
     'category':
         {key: 'c', args: 1, description: 'enter a category for the item', mandatory: true},
+    'auto_color':
+        {key: 'a', args: 1, description: 'enter a category for the item', mandatory: false, default: false},
     'submitkey':
         {key: 's', args: 1, description: 'the agni submit key', mandatory: true},
     'notifyuser':
@@ -38,10 +40,13 @@ function upload(img) {
 
       var backgroundcolor = "#FFFFFF";
       var bodytextcolor = "#000000";
-      if(typeof swatches['LightVibrant'].getHex === "function" &&
-         typeof swatches['LightVibrant'].getBodyTextColor === "function" ) {
-         backgroundcolor = normalizeHexCode(swatches['LightVibrant'].getHex());
-         bodytextcolor = normalizeHexCode(swatches['LightVibrant'].getBodyTextColor());
+
+      if (ops.auto_color) {
+        if(typeof swatches['LightVibrant'].getHex === "function" &&
+          typeof swatches['LightVibrant'].getBodyTextColor === "function" ) {
+            backgroundcolor = normalizeHexCode(swatches['LightVibrant'].getHex());
+            bodytextcolor = normalizeHexCode(swatches['LightVibrant'].getBodyTextColor());
+          }
       }
 
       imgur.upload(img, function (err, res) {
@@ -64,7 +69,7 @@ function upload(img) {
    on Android. To avoid the exception, we have to normalize the hex code
    to be 6 hex characters in length */
 function normalizeHexCode(hexCode) {
-    if ( hexCode.length == 4) {
+    if (hexCode.length == 4) {
         return "#" + hexCode[1] + hexCode[1] + hexCode[2] + hexCode[2] + hexCode[3] + hexCode[3];
     }
     else {
