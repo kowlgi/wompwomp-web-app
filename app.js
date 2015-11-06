@@ -57,6 +57,8 @@ var routes  = require( './routes' );
 app.get('/', routes.index);
 app.get('/subscribe', routes.subscribe);
 app.post('/submit', routes.submit);
+app.post('/promptuser', routes.promptUser);
+app.post('/removeallprompts', routes.removeAllPrompts);
 app.get('/items', routes.items);
 app.get('/v/:id', routes.viewitem);
 app.post('/s/:id', routes.share);

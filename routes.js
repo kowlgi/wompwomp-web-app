@@ -49,7 +49,7 @@ exports.submit = function(req, res, next) {
         }
 
         try {
-            // send another notification to notify phone app to sync feed
+            // send notification to notify phone app to sync feed
             sendNotification("/topics/sync", "", "");
 
             if(req.body.notifyuser == "content") {
@@ -64,11 +64,49 @@ exports.submit = function(req, res, next) {
     });
 };
 
+exports.promptUser = function(req, res, next) {
+    if(req.body.submitkey != App.submit_key) {
+        console.log("wrong submit key")
+        res.end();
+        return;
+    }
+
+    try {
+        var date = new Date();
+        if(req.body.promptuser == "share" || req.body.promptuser == "rate"){
+            // send notification to add share card to feed
+            sendNotification("/topics/prompt_"+req.body.promptuser, date.toISOString(), "");
+        }
+    } catch(err) {
+        console.error(err);
+    }finally {
+        res.end();
+    }
+}
+
+exports.removeAllPrompts = function(req, res, next) {
+    if(req.body.submitkey != App.submit_key) {
+        console.log("wrong submit key")
+        res.end();
+        return;
+    }
+
+    try {
+        sendNotification("/topics/remove_all_prompts", "", "");
+    } catch(err) {
+        console.error(err);
+    }finally {
+        res.end();
+    }
+}
+
 function sendNotification(topicString, notificationText, imageuri) {
     var message = new gcm.Message();
     if(notificationText != "") message.addData('message', notificationText);
     if(imageuri != "") message.addData('imageuri', imageuri);
 
+    console.log(topicString);
+    console.log(notificationText);
     // Set up the sender with you API key
     var sender = new gcm.Sender(App.pushnotificationkey);
 
