@@ -5,19 +5,12 @@ var stdio = require('stdio'),
     bodyParser = require('body-parser'),
     jade = require('jade'),
     path = require('path'),
-    favicon = require('serve-favicon');
+    favicon = require('serve-favicon'),
+    config = require('./config');
 
 var ops = stdio.getopt({
-    'port':
-        {key: 'p', args: 1, description: 'the server port number', mandatory: false},
-    'db':
-        {key: 'd', args: 1, description: 'The agni db name', mandatory: true},
     'updatedb':
         {key: 'u', args: 1, description: 'EXERCISE EXTREME CAUTION: this command will update the database', mandatory: false},
-    'submitkey':
-        {key: 's', args: 1, description: 'Key required to submit content to the agni db', mandatory: true},
-    'pushnotificationkey':
-        {key: 'h', args: 1, description: 'Key required to send push notifications', mandatory: true},
     });
 
 var http = require('http'),
@@ -32,13 +25,8 @@ app.use(bodyParser.urlencoded({
 }));
 app.locals.moment = require('moment');
 
-var db_name = "";
-if (ops.db) {
-    db_name = ops.db;
-}
-
 // database setup
-require( './db' ).init(db_name);
+require( './db' ).init(config.db);
 update_db = require('./update_db');
 if(ops.updatedb) {
     func = "update_db_" + ops.updatedb;
@@ -69,14 +57,12 @@ app.use(function(req, res) {
     res.redirect('/');
 });
 
-if (ops.port) {
-    app.set('port', ops.port);
-}
+app.set('port', config.port);
 
 // Start server
 http.createServer(app).listen(app.get('port'), function() {
     console.log('Express listening on port ' + app.get('port'));
 });
 
-exports.submit_key = ops.submitkey;
-exports.pushnotificationkey = ops.pushnotificationkey;
+exports.submit_key = config.submitkey;
+exports.pushnotificationkey = config.pushnotificationkey;

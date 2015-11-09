@@ -5,6 +5,7 @@ exports.init = function(agni_db_name) {
     var AgniSchema = new Schema({
         text           : String,
         imageuri       : String,
+        sourceuri      : String,
         id             : String,
         category       : [String],
         created_on     : Date,
