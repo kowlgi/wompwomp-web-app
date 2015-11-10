@@ -37,6 +37,7 @@ exports.submit = function(req, res, next) {
     var agniitem = new AgniModel({
         text            : req.body.text.substring(0, MAX_TEXT_LENGTH),
         imageuri        : req.body.imageuri.substring(0, MAX_TEXT_LENGTH),
+        sourceuri       : req.body.sourceuri.substring(0, MAX_TEXT_LENGTH),
         id              : Shortid.generate(),
         category        : req.body.category.slice(0, 10), // limit to 10 categories
         created_on      : Date.now(),
