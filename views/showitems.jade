@@ -1,23 +1,26 @@
 div.container-fluid
-  div.row
+  div(class="row")
   - var n = 0
   each item in items
-    div(class="col s4 m4")
+    div(class="col")
       if (n % 4 == 0)
-         div.card(class="card-panel hoverable grey lighten-3")
-           include appinstall.jade
-      div.card(class="card-panel hoverable")
-        div.card-image(class="card")
-          img(src="#{item.imageuri}" )
-        div.card-content(align="center")
-          p
-            = item.text
-          p
-            em.text-muted.small
-              = moment(item.created_on).fromNow()
-            em.text-muted.small
-              | &nbsp; 
-              a(href='/v/' + item.id) agni.co&#47;r&#47;#{item.id}
+        div(class="col l4 offset-l4")
+          div.card(class="card-panel hoverable grey lighten-3")
+            include appinstall.jade
+      div(class="row")
+        div(class="col l4 offset-l4")
+          div(class="card hoverable")
+            div(class="card-image")
+              img(src="#{item.imageuri}")
+            div(class="card-content")
+              p
+                = item.text
+              p
+                em.text-muted.small
+                  = moment(item.created_on).fromNow()
+                em.text-muted.small
+                | &nbsp; 
+                a(href='/v/' + item.id) agni.co&#47;r&#47;#{item.id}
       if (n % 6 == 0)
          div.card(class="card-panel hoverable grey lighten-4")
            include email.jade
