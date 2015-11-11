@@ -65,7 +65,7 @@ exports.submit = function(req, res, next) {
     });
 };
 
-exports.promptUser = function(req, res, next) {
+exports.pushCTA= function(req, res, next) {
     if(req.body.submitkey != App.submit_key) {
         console.log("wrong submit key")
         res.end();
@@ -74,26 +74,13 @@ exports.promptUser = function(req, res, next) {
 
     try {
         var date = new Date();
-        if(req.body.promptuser == "share" || req.body.promptuser == "rate"){
+        if(req.body.ctatype == "share" || req.body.ctatype == "rate"){
             // send notification to add share card to feed
-            sendNotification("/topics/prompt_"+req.body.promptuser, date.toISOString(), "");
+            sendNotification("/topics/cta_"+req.body.ctatype, date.toISOString(), "");
         }
-    } catch(err) {
-        console.error(err);
-    }finally {
-        res.end();
-    }
-}
-
-exports.removeAllPrompts = function(req, res, next) {
-    if(req.body.submitkey != App.submit_key) {
-        console.log("wrong submit key")
-        res.end();
-        return;
-    }
-
-    try {
-        sendNotification("/topics/remove_all_prompts", "", "");
+        else if(req.body.ctatype == "removeall") {
+            sendNotification("/topics/remove_all_ctas", "", "");
+        }
     } catch(err) {
         console.error(err);
     }finally {
