@@ -6,10 +6,11 @@ var Vibrant = require('node-vibrant');
 App = require('./app');
 
 var MAX_TEXT_LENGTH = 500;
+var FILTER_CONDITION = {category: {$ne: "hidden"}};
 
 exports.index = function(req, res, next) {
   // Show the top 20 most recent items on the home page
-  AgniModel.find().sort('-created_on').limit(20).exec(function(err, items) {
+  AgniModel.find(FILTER_CONDITION).sort('-created_on').limit(20).exec(function(err, items) {
     res.render(
       'showall', {
         items: items,
@@ -111,10 +112,10 @@ exports.items = function(req, res, next) {
         offset = parseInt(req.query.offset);
     }
 
-    var conditions = {};
-    if(typeof req.query.category != "undefined"){
-        conditions = {category: req.query.category};
-    }
+    var conditions = FILTER_CONDITION;
+    //if(typeof req.query.category != "undefined"){
+    //    conditions = {category: req.query.category};
+    //}
 
     AgniModel.
         find(conditions).
