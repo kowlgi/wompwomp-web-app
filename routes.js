@@ -75,7 +75,7 @@ exports.submit = function(req, res, next) {
     });
 };
 
-exports.promptUser = function(req, res, next) {
+exports.pushCTA= function(req, res, next) {
     if(req.body.submitkey != App.submit_key) {
         console.log("wrong submit key")
         res.end();
@@ -84,9 +84,12 @@ exports.promptUser = function(req, res, next) {
 
     try {
         var date = new Date();
-        if(req.body.promptuser == "share" || req.body.promptuser == "rate"){
+        if(req.body.ctatype == "share" || req.body.ctatype == "rate"){
             // send notification to add share card to feed
-            sendNotification("/topics/prompt_"+req.body.promptuser, date.toISOString(), "");
+            sendNotification("/topics/cta_"+req.body.ctatype, date.toISOString(), "");
+        }
+        else if(req.body.ctatype == "removeall") {
+            sendNotification("/topics/remove_all_ctas", "", "");
         }
     } catch(err) {
         console.error(err);
@@ -106,7 +109,7 @@ exports.removeAllPrompts = function(req, res, next) {
         sendNotification("/topics/remove_all_prompts", "", "");
     } catch(err) {
         console.error(err);
-    }finally {
+    } finally {
         res.end();
     }
 }
@@ -116,8 +119,6 @@ function sendNotification(topicString, notificationText, imageuri) {
     if(notificationText != "") message.addData('message', notificationText);
     if(imageuri != "") message.addData('imageuri', imageuri);
 
-    console.log(topicString);
-    console.log(notificationText);
     // Set up the sender with you API key
     var sender = new gcm.Sender(App.pushnotificationkey);
 
@@ -201,7 +202,6 @@ exports.share = function(req, res, next) {
         item.numshares += 1;
         item.save();
         res.end();
-        console.log("share:" + item.id);
     });
 }
 
@@ -220,7 +220,6 @@ exports.favorite = function(req, res, next) {
         item.numfavorites += 1;
         item.save();
         res.end();
-        console.log("favorite:" + item.id);
     });
 }
 
@@ -242,6 +241,5 @@ exports.unfavorite = function(req, res, next) {
 
         item.save();
         res.end();
-        console.log("unfavorite:" + item.id);
     });
 }
