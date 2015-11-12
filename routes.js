@@ -244,3 +244,22 @@ exports.unfavorite = function(req, res, next) {
         res.end();
     });
 }
+
+exports.hideitem = function(req, res, next) {
+    AgniModel.findOne({id : req.params.id}, function(err, item) {
+        if(err) {
+            res.render ('404', {url:req.url});
+            return;
+        }
+
+        if(item == null) {
+            res.render ('404', {url:req.url});
+            return;
+        }
+
+        item.category[0] = "hidden";
+        item.markModified('category');
+        item.save();
+        res.end();
+    });
+}
