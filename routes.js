@@ -1,11 +1,13 @@
 var mongoose = require('mongoose');
 var AgniModel = mongoose.model('Agni');
+var AgniMailingListModel = mongoose.model('AgniMailingList');
 var gcm = require('node-gcm');
 var Shortid = require('shortid');
 var Vibrant = require('node-vibrant');
 App = require('./app');
 
 var MAX_TEXT_LENGTH = 500;
+var MAX_EMAIL_LENGTH = 128;
 
 exports.index = function(req, res, next) {
   // Show the top 20 most recent items on the home page
@@ -18,14 +20,22 @@ exports.index = function(req, res, next) {
 };
 
 exports.subscribe = function(req, res, next) {
-  // Get the email from the user and add it to the mailgun database
-  // TODO(hnag): Add mail gun support
-  res.render('emailsuccess', {
-    email: req.query.email,
+  var user_entered_email = req.query.email.substring(0, MAX_EMAIL_LENGTH);
+  var one_email = new AgniMailingListModel({
+    email           : user_entered_email,
+    created_on      : Date.now(),
+  }).save(function(err, email) {
+    if (err) {
+      console.error(err);
+      return next(err);
+    }
+    console.log('Added ' + user_entered_email + ' to the db');
+    res.render('emailsuccess', {
+      email: user_entered_email,
+    });
+    res.end();
   });
-  res.end();
-  return;
-}
+};
 
 exports.submit = function(req, res, next) {
     if(req.body.submitkey != App.submit_key) {
@@ -59,7 +69,7 @@ exports.submit = function(req, res, next) {
             }
         } catch(err) {
             console.error(err);
-        }finally {
+        } finally {
             res.end();
         }
     });
@@ -80,7 +90,7 @@ exports.promptUser = function(req, res, next) {
         }
     } catch(err) {
         console.error(err);
-    }finally {
+    } finally {
         res.end();
     }
 }

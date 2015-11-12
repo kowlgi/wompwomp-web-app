@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({
 app.locals.moment = require('moment');
 
 // database setup
-require( './db' ).init(config.db);
+require('./db').init(config.db);
 update_db = require('./update_db');
 if(ops.updatedb) {
     func = "update_db_" + ops.updatedb;

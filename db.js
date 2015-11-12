@@ -13,5 +13,20 @@ exports.init = function(agni_db_name) {
         numshares      : Number
     });
     mongoose.model('Agni', AgniSchema);
-    mongoose.connect( 'mongodb://localhost/' + agni_db_name );
+
+    // the database which contains the list of all users signed up for the mailing list
+    var AgniMailingListSchema = new Schema({
+        email          : String,
+        created_on     : Date,
+    });
+    mongoose.model('AgniMailingList', AgniMailingListSchema);
+
+    // the database which contains the date the last email blast was sent
+    var AgniMailingListStatsSchema = new Schema({
+        last_sent      : String,
+        created_on     : Date,
+    });
+    mongoose.model('AgniMailingListStats', AgniMailingListStatsSchema);
+
+    mongoose.connect('mongodb://localhost/' + agni_db_name);
 };
