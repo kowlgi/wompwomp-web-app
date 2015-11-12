@@ -1,12 +1,19 @@
 div.container-fluid
   div(class="row")
-  - var n = 0
+  - var itemcount = 0
+  - var ctacount = 0
   each item in items
     div(class="col")
-      if (n % 5 == 0)
-        div(class="col l4 offset-l4")
-          div.card(class="card-panel hoverable grey lighten-3")
-            include appinstall.jade
+      if (itemcount % 5 == 0)
+        if (ctacount % 2 == 0)
+            div(class="col l4 offset-l4")
+              div.card(class="card-panel hoverable grey lighten-3")
+                include appinstall.jade
+            - ctacount++
+        else
+            div.card(class="card-panel hoverable grey lighten-4")
+              include email.jade
+            - ctacount++
       div(class="row")
         div(class="col l4 offset-l4")
           div(class="card hoverable")
@@ -20,7 +27,8 @@ div.container-fluid
                   = moment(item.created_on).fromNow()
                 em.text-muted.small
                 | &nbsp;
-      if (n % 6 == 0)
-         div.card(class="card-panel hoverable grey lighten-4")
-           include email.jade
-    - n++
+      if (ctacount == 1)
+          div.card(class="card-panel hoverable grey lighten-4")
+            include email.jade
+          - ctacount++
+    - itemcount++
