@@ -93,8 +93,6 @@ function sendNotification(topicString, notificationText, imageuri) {
     if(notificationText != "") message.addData('message', notificationText);
     if(imageuri != "") message.addData('imageuri', imageuri);
 
-    console.log(topicString);
-    console.log(notificationText);
     // Set up the sender with you API key
     var sender = new gcm.Sender(App.pushnotificationkey);
 
@@ -178,7 +176,6 @@ exports.share = function(req, res, next) {
         item.numshares += 1;
         item.save();
         res.end();
-        console.log("share:" + item.id);
     });
 }
 
@@ -197,7 +194,6 @@ exports.favorite = function(req, res, next) {
         item.numfavorites += 1;
         item.save();
         res.end();
-        console.log("favorite:" + item.id);
     });
 }
 
@@ -219,6 +215,5 @@ exports.unfavorite = function(req, res, next) {
 
         item.save();
         res.end();
-        console.log("unfavorite:" + item.id);
     });
 }
