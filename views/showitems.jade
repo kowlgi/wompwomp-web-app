@@ -3,14 +3,14 @@ div.container-fluid
   - var n = 0
   each item in items
     div(class="col")
-      if (n % 4 == 0)
+      if (n % 5 == 0)
         div(class="col l4 offset-l4")
           div.card(class="card-panel hoverable grey lighten-3")
             include appinstall.jade
       div(class="row")
         div(class="col l4 offset-l4")
           div(class="card hoverable")
-            div(class="card-image")
+            a(href="/v/"+ item.id, class="card-image")
               img(src="#{item.imageuri}")
             div(class="card-content")
               p
@@ -20,7 +20,6 @@ div.container-fluid
                   = moment(item.created_on).fromNow()
                 em.text-muted.small
                 | &nbsp;
-                a(href='/v/' + item.id) wompwomp.co&#47;v&#47;#{item.id}
       if (n % 6 == 0)
          div.card(class="card-panel hoverable grey lighten-4")
            include email.jade
