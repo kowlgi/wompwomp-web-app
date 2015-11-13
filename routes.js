@@ -62,11 +62,13 @@ exports.submit = function(req, res, next) {
 
         try {
             // send notification to notify phone app to sync feed
-            sendNotification("/topics/sync", "", "");
+            sendNotification("/topics/sync");
 
             if(req.body.notifyuser == "content") {
-                sendNotification("/topics/content", req.body.text.substring(0, MAX_TEXT_LENGTH),
-                    req.body.imageuri.substring(0, MAX_TEXT_LENGTH));
+                sendNotification("/topics/content",
+                    req.body.text.substring(0, MAX_TEXT_LENGTH),
+                    req.body.imageuri.substring(0, MAX_TEXT_LENGTH),
+                    agniquote.id);
             }
         } catch(err) {
             console.error(err);
@@ -87,10 +89,10 @@ exports.pushCTA= function(req, res, next) {
         var date = new Date();
         if(req.body.ctatype == "share" || req.body.ctatype == "rate"){
             // send notification to add share card to feed
-            sendNotification("/topics/cta_"+req.body.ctatype, date.toISOString(), "");
+            sendNotification("/topics/cta_"+req.body.ctatype, date.toISOString());
         }
         else if(req.body.ctatype == "removeall") {
-            sendNotification("/topics/remove_all_ctas", "", "");
+            sendNotification("/topics/remove_all_ctas");
         }
     } catch(err) {
         console.error(err);
@@ -107,7 +109,7 @@ exports.removeAllPrompts = function(req, res, next) {
     }
 
     try {
-        sendNotification("/topics/remove_all_prompts", "", "");
+        sendNotification("/topics/remove_all_prompts");
     } catch(err) {
         console.error(err);
     } finally {
@@ -115,10 +117,19 @@ exports.removeAllPrompts = function(req, res, next) {
     }
 }
 
-function sendNotification(topicString, notificationText, imageuri) {
+function sendNotification(topicString, notificationText, imageuri, itemid) {
     var message = new gcm.Message();
-    if(notificationText != "") message.addData('message', notificationText);
-    if(imageuri != "") message.addData('imageuri', imageuri);
+    if(typeof notificationText !== 'undefined' && notificationText != "") {
+        message.addData('message', notificationText);
+    }
+    
+    if(typeof imageuri !== 'undefined' && imageuri != "") {
+        message.addData('imageuri', imageuri);
+    }
+
+    if(typeof itemid !== 'undefined' && itemid != "") {
+        message.addData("itemid", itemid);
+    }
 
     // Set up the sender with you API key
     var sender = new gcm.Sender(App.pushnotificationkey);
