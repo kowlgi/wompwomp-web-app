@@ -66,3 +66,4 @@ http.createServer(app).listen(app.get('port'), function() {
 
 exports.submit_key = config.submitkey;
 exports.pushnotificationkey = config.pushnotificationkey;
+exports.google_tracking_code = config.google_tracking_code;

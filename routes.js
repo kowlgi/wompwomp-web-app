@@ -16,6 +16,7 @@ exports.index = function(req, res, next) {
     res.render(
       'showall', {
         items: items,
+        google_tracking_code   : App.google_tracking_code
     });
   });
 };
@@ -122,7 +123,7 @@ function sendNotification(topicString, notificationText, imageuri, itemid) {
     if(typeof notificationText !== 'undefined' && notificationText != "") {
         message.addData('message', notificationText);
     }
-    
+
     if(typeof imageuri !== 'undefined' && imageuri != "") {
         message.addData('imageuri', imageuri);
     }
@@ -195,6 +196,7 @@ exports.viewitem = function(req, res, next) {
           // To simplify the rendering logic for showing one item and multiple items, we'll stick
           // the item into an array.
           items: [ item ],
+          google_tracking_code   : App.google_tracking_code
         });
     });
 }
