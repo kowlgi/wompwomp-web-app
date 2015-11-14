@@ -1,11 +1,11 @@
 div.container-fluid
-  div(class="row")
+  div(class="section")
   - var itemcount = 0
   - var ctacount = 0
   each item in items
     div(class="col")
-      if (itemcount % 5 == 0)
-        if (ctacount % 2 == 0)
+      if (itemcount % 5 == 4)
+        if (ctacount % 2 == 1)
             div(class="col l4 offset-l4")
               div.card(class="card-panel hoverable grey lighten-3")
                 include appinstall.jade
@@ -27,8 +27,4 @@ div.container-fluid
                   = moment(item.created_on).fromNow()
                 em.text-muted.small
                 | &nbsp;
-      if (ctacount == 1)
-          div.card(class="card-panel hoverable grey lighten-4")
-            include email.jade
-          - ctacount++
     - itemcount++

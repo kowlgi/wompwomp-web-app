@@ -4,7 +4,19 @@
  * Copyright 2015–2015, Hatching Amazing Labs
  */
 
-footer {
-    text-align: center;
-    margin-top: 3em;
+@import url("http://fonts.googleapis.com/css?family=Montserrat:400,700");
+
+.brand {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+}
+
+.byline {
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* to prevent unwanted horizontal scrolling */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
 }
