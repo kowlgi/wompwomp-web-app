@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var AgniModel = mongoose.model('Agni');
 var AgniMailingListModel = mongoose.model('AgniMailingList');
+var AgniMailingListStatsModel = mongoose.model('AgniMailingListStats');
 var gcm = require('node-gcm');
 var Shortid = require('shortid');
 var Vibrant = require('node-vibrant');
