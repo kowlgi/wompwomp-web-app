@@ -16,6 +16,8 @@ var ops = stdio.getopt({
 var http = require('http'),
     express = require('express');
 var app = express();
+var compress = require('compression');
+app.use(compress());
 app.set('port', process.env.PORT || 3000);
 app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.png')));
 app.set('views', path.join(__dirname, 'views'));
@@ -43,7 +45,7 @@ app.disable('etag');
 var routes  = require( './routes' );
 
 app.get('/', routes.index);
-app.get('/subscribe', routes.subscribe);
+app.post('/subscribe', routes.subscribe);
 app.post('/submit', routes.submit);
 app.post('/pushcta', routes.pushCTA);
 app.get('/items', routes.items);
@@ -66,4 +68,3 @@ http.createServer(app).listen(app.get('port'), function() {
 
 exports.submit_key = config.submitkey;
 exports.pushnotificationkey = config.pushnotificationkey;
-exports.google_tracking_code = config.google_tracking_code;

@@ -16,6 +16,7 @@
   "homepage": "https://bitbucket.org/alteredstateoftheunion/agni#readme",
   "dependencies": {
     "body-parser": "^1.13.3",
+    "compression": "^1.6.0",
     "express": "^4.13.3",
     "jade": "^1.11.0",
     "moment": "^2.10.6",

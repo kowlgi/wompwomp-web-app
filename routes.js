@@ -22,7 +22,7 @@ exports.index = function(req, res, next) {
 };
 
 exports.subscribe = function(req, res, next) {
-  var user_entered_email = req.query.email.substring(0, MAX_EMAIL_LENGTH);
+  var user_entered_email = req.body.email.substring(0, MAX_EMAIL_LENGTH);
   var one_email = new AgniMailingListModel({
     email           : user_entered_email,
     created_on      : Date.now(),
@@ -32,9 +32,6 @@ exports.subscribe = function(req, res, next) {
       return next(err);
     }
     console.log('Added ' + user_entered_email + ' to the db');
-    res.render('emailsuccess', {
-      email: user_entered_email,
-    });
     res.end();
   });
 };

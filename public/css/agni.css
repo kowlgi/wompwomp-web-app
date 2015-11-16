@@ -4,16 +4,34 @@
  * Copyright 2015–2015, Hatching Amazing Labs
  */
 
+.theme-background {
+    background-color: #6985EC;
+}
+
+.theme-text {
+    color: #ffffff;
+}
+
+.theme-dark, .btn, .btn:hover, .btn:focus {
+    background-color: #264BD0;
+}
+
+.theme-light {
+    background-color: #8FA5F4;
+}
+
 .brandlink {
     text-decoration: none !important;
 }
 
 .brand {
-    font-weight: 700;
+    font-weight: 600;
+    font-size: 3em;
 }
 
 .tagline {
     font-weight: 400;
+    font-size: 1.5em;
 }
 
 /* to prevent unwanted horizontal scrolling */
@@ -22,7 +40,7 @@ html, body {
     overflow-x: hidden;
 }
 
-#logo {
+#logo, .modal-trigger {
     margin: 0 auto;
     height: 45px;
     width: 139px;
@@ -36,4 +54,41 @@ html, body {
 
 #installsubscribe, #installsubscribe_placeholder{
     width: 100%;
+}
+
+.modal .modal-footer .btn{
+    float: none;
+}
+
+/* label color */
+.input-field label {
+    color: #ffffff;
+}
+
+/* label focus color */
+.input-field input[type=email]:focus + label {
+    color: #ffffff;
+}
+/* label underline focus color */
+.input-field input[type=email]:focus {
+    border-bottom: 1px solid #ffffff;
+    box-shadow: 0 1px 0 0 #ffffff;
+}
+/* valid color */
+.input-field input[type=email].valid {
+    border-bottom: 1px solid #ffffff;
+    box-shadow: 0 1px 0 0 #ffffff;
+}
+/* invalid color */
+.input-field input[type=email].invalid {
+    border-bottom: 1px solid #ffffff;
+    box-shadow: 0 1px 0 0 #ffffff;
+}
+/* icon prefix focus color */
+.input-field .prefix.active {
+    color: #ffffff;
+}
+
+input[type=email] {
+   border-bottom: 1px solid #ffffff;
 }
