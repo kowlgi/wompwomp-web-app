@@ -1,20 +1,22 @@
-/*!
- * app.js
- */
 var stdio = require('stdio'),
     bodyParser = require('body-parser'),
     jade = require('jade'),
     path = require('path'),
     favicon = require('serve-favicon'),
+    schedule = require('node-schedule'),
+    http = require('http'),
+    express = require('express'),
     config = require('./config');
 
 var ops = stdio.getopt({
     'updatedb':
         {key: 'u', args: 1, description: 'EXERCISE EXTREME CAUTION: this command will update the database', mandatory: false},
+    'mailgun_api':
+        {key: 'm', args: 1, description: 'The mailgun API key. Invalid API = no email notifications', mandatory: false},
+    'email_domain':
+        {key: 'e', args: 1, description: 'The deckrank email domain. Invalid domain = no email notifications', mandatory: false},
     });
 
-var http = require('http'),
-    express = require('express');
 var app = express();
 var compress = require('compression');
 app.use(compress());
@@ -43,7 +45,6 @@ app.disable('etag');
 
 // Set up routes
 var routes  = require( './routes' );
-
 app.get('/', routes.index);
 app.post('/subscribe', routes.subscribe);
 app.post('/submit', routes.submit);
@@ -61,10 +62,24 @@ app.use(function(req, res) {
 
 app.set('port', config.port);
 
+// TODO(hnag): Fix this to be a wompwomp address once mailgun verifies
+var MAILING_LIST = 'wompwomp@mg.deckrank.co';
+// The global mailgun object that will be used in other modules
+var mg = require('mailgun-js')({apiKey: ops.mailgun_api, domain: ops.email_domain});
+
+var mailinglist = require('./mailinglist');
+var rule = new schedule.RecurrenceRule();
+// TODO(hnag): Eventually when all the mailinglist code is complete don't run
+// the scheduler so aggressively.
+rule.minute = 1; // Run the scheduler in the first minute of every hour
+schedule.scheduleJob(rule, mailinglist.GetFresh);
+
 // Start server
 http.createServer(app).listen(app.get('port'), function() {
-    console.log('Express listening on port ' + app.get('port'));
+  console.log('Express listening on port ' + app.get('port'));
 });
 
 exports.submit_key = config.submitkey;
 exports.pushnotificationkey = config.pushnotificationkey;
+exports.mailgun = mg;
+exports.MAILING_LIST = MAILING_LIST;

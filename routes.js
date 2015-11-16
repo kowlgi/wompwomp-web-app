@@ -2,9 +2,10 @@ var mongoose = require('mongoose');
 var AgniModel = mongoose.model('Agni');
 var AgniMailingListModel = mongoose.model('AgniMailingList');
 var gcm = require('node-gcm');
+var Mail = require('./mail');
 var Shortid = require('shortid');
 var Vibrant = require('node-vibrant');
-App = require('./app');
+var App = require('./app');
 
 var MAX_TEXT_LENGTH = 500;
 var FILTER_CONDITION = {category: {$ne: "hidden"}};
@@ -32,7 +33,15 @@ exports.subscribe = function(req, res, next) {
       return next(err);
     }
     console.log('Added ' + user_entered_email + ' to the db');
-    res.end();
+
+    // Add the user to the mailing list
+    var members = [ { address: user_entered_email } ];
+    // TODO(hnag): Change the mailing list to a wompwomp.co address
+    App.mailgun.lists(App.MAILING_LIST).members().add({
+      members: members, subscribed: true}, function (err, body) {
+        console.log('Added ' + user_entered_email + ' to mailgun');
+        res.end();
+    });
   });
 };
 
