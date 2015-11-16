@@ -1,4 +1,6 @@
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+  Mail = require('./mail'),
+  App = require('./app');
 var AgniModel = mongoose.model('Agni');
 var AgniMailingListModel = mongoose.model('AgniMailingList');
 var AgniMailingListStatsModel = mongoose.model('AgniMailingListStats');
@@ -20,7 +22,7 @@ function UpdateMailingListSendTime(payload, timestamp) {
   });
 };
 
-// If there's something new it will return fresh items that we can mail to users
+// If there's something new to send email the users in the mailing list
 exports.GetFresh = function() {
   var previous_time = 0;
   var current_time = Date.now();
@@ -33,11 +35,17 @@ exports.GetFresh = function() {
       var diff_secs = Math.abs(current_time - previous_time)/1000;
       console.log('Difference is ' + diff_secs);
       if (diff_secs > LAST_SENT_SECS) {
-        var date_filter = {"created_on" : { $gte : new Date(previous_time) }};
+        var date_filter = { "created_on" : { $gte : new Date(previous_time) }};
         AgniModel.find(date_filter).sort('-created_on').limit(10).exec(function(err, items) {
           if (items.length > 0) {
             // Now prepare an email to send ...
             console.log('Here are the newest items' + items);
+            //
+            // TODO(hnag): Write the code to generate the email. All fresh items are above
+            //
+            // TODO(hnag): Fix the code to send the email. The library has changed and this dumps an error
+            // Mail.sendHtmlEmail(App.mailgun, App.MAILING_LIST, '', 'Whats new', '<html>Hey Now</html>', 'Okiiee');
+            //
             // Update the last sent time ...
             UpdateMailingListSendTime('test', current_time);
           } else {

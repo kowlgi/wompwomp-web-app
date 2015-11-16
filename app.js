@@ -60,16 +60,16 @@ app.use(function(req, res) {
 
 app.set('port', config.port);
 
-var mail = require('./mail');
-var email_domain = "";
-if (ops.mailgun_api && ops.email_domain) {
-    api_key = ops.mailgun_api;
-    email_domain = ops.email_domain;
-};
+// TODO(hnag): Fix this to be a wompwomp address once mailgun verifies
+var MAILING_LIST = 'wompwomp@mg.deckrank.co';
+// The global mailgun object that will be used in other modules
+var mg = require('mailgun-js')({apiKey: ops.mailgun_api, domain: ops.email_domain});
 
 var mailinglist = require('./mailinglist');
-var rule = 1; // Run the scheduler in the first second of every minute
-rule.second = mailinglist.SCHEDULER_SLEEP_SECS;
+var rule = new schedule.RecurrenceRule();
+// TODO(hnag): Eventually when all the mailinglist code is complete don't run
+// the scheduler so aggressively.
+rule.minute = 1; // Run the scheduler in the first minute of every hour
 schedule.scheduleJob(rule, mailinglist.GetFresh);
 
 // Start server
@@ -80,3 +80,5 @@ http.createServer(app).listen(app.get('port'), function() {
 exports.submit_key = config.submitkey;
 exports.pushnotificationkey = config.pushnotificationkey;
 exports.google_tracking_code = config.google_tracking_code;
+exports.mailgun = mg;
+exports.MAILING_LIST = MAILING_LIST;
