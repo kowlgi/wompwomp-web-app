@@ -1,19 +1,6 @@
-div.container-fluid
+div.container-fluid.main
   div(class="section")
-  - var itemcount = 0
-  - var ctacount = 0
   each item in items
-    div(class="col")
-      if (itemcount % 5 == 4)
-        if (ctacount % 2 == 1)
-            div(class="col l4 offset-l4")
-              div.card(class="card-panel hoverable grey lighten-3")
-                include appinstall.jade
-            - ctacount++
-        else
-            div.card(class="card-panel hoverable grey lighten-4")
-              include email.jade
-            - ctacount++
       div(class="row")
         div(class="col l4 offset-l4")
           div(class="card hoverable")

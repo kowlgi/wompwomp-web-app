@@ -1,10 +1,33 @@
-div.section.no-pad-bot.amber.darken-2
-    div.container-fluid
-        h3.center.amber-text.text-darken-4.brand
-            |WompWomp
-        div.row.center.tagline
-            h5.amber-text.text-lighten-4
-                | Mobile app with the best images for sharing to WhatsApp
-        div.row.center
-            a.btn.btn-large.amber(href="#", role="button")
-                |Install on Android
+div(id="masthead")
+    div.section.amber.darken-2
+        div.container-fluid
+            a.brandlink(href="/")
+                h3.center.amber-text.text-darken-4.brand
+                    |WompWomp
+            div.row.center
+                h5.amber-text.text-lighten-4.tagline
+                    |The best images for sharing to WhatsApp
+    div.divider.amber
+div(id="installsubscribe_placeholder")
+div(id="installsubscribe")
+    div.section.amber.darken-2
+        div.container-fluid
+            div.row
+                div.col.s12.m6.center
+                    a(href="#")
+                        img(id="logo", alt="Get it on Google Play",
+                            src="images/googel-play-badge.png")
+                div.col.s12.hide-on-med-and-up
+                    br
+                div.col.s12.m6.center
+                    div.amber-text.text-lighten-4
+                        |Get the best of WompWomp emailed once a week
+                        br
+                        button(class="btn modal-trigger amber",
+                            data-target="subscribemodal") Subscribe
+div(id="subscribemodal", class="modal")
+    div.modal-content
+        h4 Subscribe
+        p  Send me something
+    div.modal-footer
+        a(href="#!" class="modal-action waves-effect waves-light btn amber") Subscribe
