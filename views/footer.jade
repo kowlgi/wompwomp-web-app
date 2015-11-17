@@ -3,18 +3,22 @@ div(id="subscribe")
     div.theme-background
         div.container-fluid
             div.theme-text.center
-                |The Best of WompWomp email beamed to your inbox&nbsp;
+                |The Best of WompWomp beamed to your inbox&nbsp;
                 br
                 button(class="btn modal-trigger theme-dark",
                     data-target="subscribemodal") Subscribe
             div.bottom.center.tiny-text.theme-text
                 |&copy; 2015 Hatching Amazing Labs&nbsp;&nbsp;
 div.theme-background(id="subscribemodal", class="modal")
-    div.modal-header.right
-        i.material-icons.theme-background.modal-close.theme-text close
-    div.modal-content.no-pad-right.no-pad-left
+    div.modal-header
+        div.right
+            i.material-icons.theme-background.modal-close.theme-text close
+        div.center.theme-text
+                b Sign up
+    div.modal-content
         div.row.center.theme-text
-            b The Weekly Best of WompWomp Email
+            | Get an email once a week with the best
+            | images from WompWomp
         form.subscribeform(role="form", method="post", action="/subscribe")
             div.row.center
                 div.input-field.col.s10.offset-s1
