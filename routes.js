@@ -265,6 +265,12 @@ exports.unfavorite = function(req, res, next) {
 }
 
 exports.hideitem = function(req, res, next) {
+    if(req.body.submitkey != App.submit_key) {
+        console.log("wrong submit key")
+        res.end();
+        return;
+    }
+    
     AgniModel.findOne({id : req.params.id}, function(err, item) {
         if(err) {
             res.render ('404', {url:req.url});
