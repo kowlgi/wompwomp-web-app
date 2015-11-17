@@ -1,30 +1,29 @@
-div.container-fluid.main
+div.container-fluid(id="main")
   div(class="section")
-  each item in items
-      div(class="row")
-        div(class="col l4 offset-l4")
-          div(class="card hoverable")
-            a(href="/v/"+ item.id, class="card-image")
-              img(src="#{item.imageuri}")
-            div(class="card-content")
-                p
-                    = item.text
-                span.right
-                    =item.numshares
-                div.right
-                    |&nbsp;
-                a.right(href="whatsapp://send?text=" + encodeURIComponent(item.text
-                        + " - wompwomp.co/v/"+ item.id),
-                        data-action="share/whatsapp/share")
-                        img(src="images/share-icon.png" height="24px", width="24px")
-                div.right
-                    |&nbsp;&nbsp;
-                span.right
-                    =item.numfavorites
-                div.right
-                    |&nbsp;
-                i.material-icons.right.red-text favorite
-                p.em.small.grey-text
-                    =moment(item.created_on).fromNow()
-
-    - itemcount++
+      each item in items
+          div(class="row")
+            div(class="col l4 offset-l4")
+              div(class="card hoverable")
+                a(href="/v/"+ item.id, class="card-image")
+                  img(src="#{item.imageuri}")
+                div(class="card-content")
+                    p
+                        = item.text
+                    span.right
+                        =item.numshares
+                    div.right
+                        |&nbsp;
+                    a.right(href="whatsapp://send?text=" + encodeURIComponent(item.text
+                            + " - wompwomp.co/v/"+ item.id),
+                            data-action="share/whatsapp/share")
+                            img(src="images/share-icon.png" height="24px", width="24px")
+                    div.right
+                        |&nbsp;&nbsp;
+                    span.right
+                        =item.numfavorites
+                    div.right
+                        |&nbsp;
+                    i.material-icons.right.red-text favorite
+                    p.em.small.grey-text
+                        =moment(item.created_on).fromNow()
+        - itemcount++

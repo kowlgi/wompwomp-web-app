@@ -34,6 +34,10 @@
     font-size: 1.5em;
 }
 
+.tiny-text {
+    font-size: 0.5em;
+}
+
 /* to prevent unwanted horizontal scrolling */
 html, body {
     max-width: 100%;

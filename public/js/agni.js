@@ -1,29 +1,41 @@
 $(document).ready(function() {
     setupGoogleAnalytics();
 
+    //http://stackoverflow.com/questions/10118172/setting-div-width-and-height-in-javascript
     var installHeightInPixels = String($('#install').height())+"px";
     document.getElementById('install_placeholder')
-        .setAttribute("style","display:none"); /* Needed to set attributes */
+        .setAttribute("style","display:none;height:"+installHeightInPixels);
     document.getElementById('install_placeholder')
-        .style.height=installHeightInPixels;
+        .style.height = installHeightInPixels;
+    document.getElementById('install_placeholder')
+        .style.display = "none";
 
     var subscribeHeightInPixels = String($('#subscribe').height())+"px";
     document.getElementById('subscribe_placeholder')
-        .setAttribute("style","display:block"); /* Needed to set attributes */
+        .setAttribute("style","display:none;height:"+subscribeHeightInPixels);
     document.getElementById('subscribe_placeholder')
-        .style.height=subscribeHeightInPixels;
+        .style.height = subscribeHeightInPixels;
+    document.getElementById('subscribe_placeholder')
+        .style.display = "none";
 
-    var triggerPosition = $('#install').offset().top;
+    //var triggerPosition = $('#install').offset().top;
+    var SHOW_CTA_POSITION = 3000;
     $(window).scroll(function() {
-        if( $(window).scrollTop() > triggerPosition )
+        if( $(window).scrollTop() > SHOW_CTA_POSITION)
         {
-            $('#install').addClass('fixed-top')
+            $('#install').addClass('fixed-top');
             $('#install_placeholder').css({display: 'block'});
+
+            $('#subscribe').addClass('fixed-bottom');
+            $('#subscribe_placeholder').css({display: 'block'});
         }
         else
         {
             $('#install').removeClass('fixed-top');
             $('#install_placeholder').css({display: 'none'});
+
+            $('#subscribe').removeClass('fixed-bottom');
+            $('#subscribe_placeholder').css({display: 'none'});
         }
     });
 
