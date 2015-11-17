@@ -13,7 +13,9 @@ div.container-fluid.main
                     =item.numshares
                 div.right
                     |&nbsp;
-                a.right(href="whatsapp://send?text=" + item.text + " - wompwomp.co/v/"+ item.id, data-action="share/whatsapp/share")
+                a.right(href="whatsapp://send?text=" + encodeURIComponent(item.text
+                        + " - wompwomp.co/v/"+ item.id),
+                        data-action="share/whatsapp/share")
                         img(src="images/share-icon.png" height="24px", width="24px")
                 div.right
                     |&nbsp;&nbsp;
