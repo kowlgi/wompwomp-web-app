@@ -1,23 +1,29 @@
 $(document).ready(function() {
     setupGoogleAnalytics();
 
-    var heightInPixels = String($('#installsubscribe').height())+"px";
-    document.getElementById('installsubscribe_placeholder')
+    var installHeightInPixels = String($('#install').height())+"px";
+    document.getElementById('install_placeholder')
         .setAttribute("style","display:none"); /* Needed to set attributes */
-    document.getElementById('installsubscribe_placeholder')
-        .style.height=heightInPixels;
+    document.getElementById('install_placeholder')
+        .style.height=installHeightInPixels;
 
-    var triggerPosition = $('#installsubscribe').offset().top;
+    var subscribeHeightInPixels = String($('#subscribe').height())+"px";
+    document.getElementById('subscribe_placeholder')
+        .setAttribute("style","display:block"); /* Needed to set attributes */
+    document.getElementById('subscribe_placeholder')
+        .style.height=subscribeHeightInPixels;
+
+    var triggerPosition = $('#install').offset().top;
     $(window).scroll(function() {
         if( $(window).scrollTop() > triggerPosition )
         {
-            $('#installsubscribe').addClass('fixed-top')
-            $('#installsubscribe_placeholder').css({display: 'block'});
+            $('#install').addClass('fixed-top')
+            $('#install_placeholder').css({display: 'block'});
         }
         else
         {
-            $('#installsubscribe').removeClass('fixed-top');
-            $('#installsubscribe_placeholder').css({display: 'none'});
+            $('#install').removeClass('fixed-top');
+            $('#install_placeholder').css({display: 'none'});
         }
     });
 
@@ -26,7 +32,7 @@ $(document).ready(function() {
       opacity: .7, // Opacity of modal background
       in_duration: 300, // Transition in duration
       out_duration: 300, // Transition out duration}
-    }); 
+    });
 
     // disable email subscribe button by default and enable when the input
     // field has some text

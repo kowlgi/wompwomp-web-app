@@ -2,6 +2,29 @@ div.section.theme-background
     div.container-fluid
         div.center.theme-text
             |A Hatching Amazing Labs creation &copy; 2015
+div(id="subscribe_placeholder")
+div.fixed-bottom(id="subscribe")
+    div.section.theme-background
+        div.container-fluid
+            div.theme-text.center
+                |The Best of WompWomp email beamed to your inbox&nbsp;
+                br
+                button(class="btn modal-trigger theme-dark",
+                    data-target="subscribemodal") Subscribe
+div.theme-background(id="subscribemodal", class="modal")
+    div.modal-header.right
+        i.material-icons.theme-background.modal-close.theme-text close
+    div.modal-content.no-pad-right.no-pad-left
+        div.row.center.theme-text
+            b The Weekly Best of WompWomp Email
+        form.subscribeform(role="form", method="post", action="/subscribe")
+            div.row.center
+                div.input-field.col.s10.offset-s1
+                    input(id="emailfield", type="email", class="validate",
+                        name="email", autocomplete="on", maxlength="100")
+                    label(for="email") Your Email
+                    button(type="submit", id="subscribebutton", class="btn theme-dark")
+                            |Subscribe
 script(src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js")
 script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.2/js/materialize.min.js")
 script(src="js/agni.js")

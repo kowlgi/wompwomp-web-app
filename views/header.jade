@@ -7,33 +7,13 @@ div(id="masthead")
             div.center
                 b.theme-text.tagline
                     |The best images for sharing to WhatsApp
-div(id="installsubscribe_placeholder")
-div(id="installsubscribe")
-    div.section.theme-background.no-pad-bot
+div(id="install_placeholder")
+div(id="install")
+    div.section.theme-background
         div.container-fluid
-            div.row
-                div.col.s6.center
-                    div.theme-text.hide-on-small-only
-                        br
-                    a(href="#")
-                        img(id="logo", alt="Get it on Google Play",
-                            src="images/googel-play-badge.png")
-                div.col.s6.center
-                    div.theme-text.hide-on-small-only
-                        |Get the weekly Best of WompWomp email
-                    button(class="btn modal-trigger theme-dark",
-                        data-target="subscribemodal") Subscribe
-div.theme-background(id="subscribemodal", class="modal")
-    div.modal-header.right
-        i.material-icons.theme-background.modal-close.theme-text close
-    div.modal-content.no-pad-right.no-pad-left
-        div.row.center.theme-text
-            b The Weekly Best of WompWomp Email
-        form.subscribeform(role="form", method="post", action="/subscribe")
-            div.row.center
-                div.input-field.col.s10.offset-s1
-                    input(id="emailfield", type="email", class="validate",
-                        name="email", autocomplete="on", maxlength="100")
-                    label(for="email") Your Email
-                    button(type="submit", id="subscribebutton", class="btn theme-dark")
-                            |Subscribe
+            div.theme-text.center
+                |Install our app for amazing content to share
+                br
+                a(href="#")
+                    img(id="logo", alt="Get it on Google Play",
+                        src="images/googel-play-badge.png")

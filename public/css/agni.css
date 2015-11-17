@@ -52,7 +52,13 @@ html, body {
     z-index: 1;
 }
 
-#installsubscribe, #installsubscribe_placeholder{
+.fixed-bottom {
+    position: fixed;
+    bottom: 0px;
+    z-index: 1;
+}
+
+#install, #install_placeholder, #subscribe, #subscribe_placeholder{
     width: 100%;
 }
 
