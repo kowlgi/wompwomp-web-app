@@ -6,7 +6,7 @@ div.container-fluid(id="main")
               div(class="card hoverable")
                 a(href="/v/"+ item.id, class="card-image")
                   img(src="#{item.imageuri}")
-                div(class="card-content")
+                div(class="card-content", id=item.id)
                     p
                         = item.text
                     span.right
@@ -23,7 +23,8 @@ div.container-fluid(id="main")
                         =item.numfavorites
                     div.right
                         |&nbsp;
-                    i.material-icons.right.red-text favorite
+                    a.right(href="", id="favorite" + item.id)
+                        i.material-icons.red-text.text-lighten-5(id="favoriteicon" + item.id) favorite
                     p.em.small.grey-text
                         =moment(item.created_on).fromNow()
         - itemcount++
