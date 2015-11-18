@@ -23,6 +23,12 @@ exports.index = function(req, res, next) {
 };
 
 exports.subscribe = function(req, res, next) {
+  if(typeof req.body.email == 'undefined'){
+      console.log("missing email param for subscribe()")
+      res.end();
+      return;
+  }
+
   var user_entered_email = req.body.email.substring(0, MAX_EMAIL_LENGTH);
   var one_email = new AgniMailingListModel({
     email           : user_entered_email,
@@ -46,6 +52,14 @@ exports.subscribe = function(req, res, next) {
 };
 
 exports.submit = function(req, res, next) {
+    if(typeof req.body.text == 'undefined' ||
+       typeof req.body.imageuri == 'undefined' ||
+       typeof req.body.sourceuri == 'undefined' ||
+       typeof req.body.category == 'undefined'){
+        console.log("missing param for submit()")
+        res.end();
+        return;
+    }
     if(req.body.submitkey != App.submit_key) {
         console.log("wrong submit key")
         res.end();
@@ -270,8 +284,8 @@ exports.hideitem = function(req, res, next) {
         res.end();
         return;
     }
-    
-    AgniModel.findOne({id : req.params.id}, function(err, item) {
+
+    AgniModel.findOne({id : req.body.id}, function(err, item) {
         if(err) {
             res.render ('404', {url:req.url});
             return;
