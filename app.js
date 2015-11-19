@@ -71,7 +71,7 @@ var mailinglist = require('./mailinglist');
 var rule = new schedule.RecurrenceRule();
 // TODO(hnag): Eventually when all the mailinglist code is complete don't run
 // the scheduler so aggressively.
-rule.second = 1; // Run the scheduler in the first minute of every hour
+rule.minute = 1; // Run the scheduler in the first minute of every hour
 schedule.scheduleJob(rule, mailinglist.GetFresh);
 
 // Start server
