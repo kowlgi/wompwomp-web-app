@@ -1,22 +1,24 @@
 var MailComposer = require("mailcomposer");
 
 // Pass a valid mg
-function sendHtmlEmail(mg, to, bcc, subject, body_html, body_text) {
+function sendHtmlEmail(mg, to, subject, body_text, body_html) {
   var mailcomposer = new MailComposer({
-      from: 'deckrank.co <no-reply@mg.deckrank.co>',
+      from: 'wompwomp.co <no-reply@mg.deckrank.co>',
       to: to,
       subject: subject,
       body: body_text,
       html: body_html
   });
-  mailcomposer.build(function(err, msg) {
+
+  mailcomposer.build(function(err, message) {
     var dataToSend = {
-      to: to + "," + bcc,
-      message: msg
+      to: to,
+      message: message.toString('ascii')
     };
+
     mg.messages().sendMime(dataToSend, function (err, body) {
       if (err) {
-        console.log('unable to send ' + err);
+        console.log('unable to send ' + err.statusCode);
         return;
       }
     });

@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
   Mail = require('./mail'),
+  jade = require('jade'),
   App = require('./app');
 var AgniModel = mongoose.model('Agni');
 var AgniMailingListModel = mongoose.model('AgniMailingList');
@@ -39,15 +40,16 @@ exports.GetFresh = function() {
         AgniModel.find(date_filter).sort('-created_on').limit(10).exec(function(err, items) {
           if (items.length > 0) {
             // Now prepare an email to send ...
-            console.log('Here are the newest items' + items);
-            //
-            // TODO(hnag): Write the code to generate the email. All fresh items are above
-            //
-            // TODO(hnag): Fix the code to send the email. The library has changed and this dumps an error
-            // Mail.sendHtmlEmail(App.mailgun, App.MAILING_LIST, '', 'Whats new', '<html>Hey Now</html>', 'Okiiee');
-            //
+            console.log('Here are the newest items: ' + items);
+            var body_html = jade.renderFile('views/email.jade', {items: items});
+            var subject = items[0].text + ' and other steaming hot posts on WompWomp.co';
+            if (items.length == 1) {
+              subject = 'Steaming hot post on WompWomp.co: ' + items[0].text;
+            }
+            Mail.sendHtmlEmail(App.mailgun, App.MAILING_LIST, subject, '', body_html);
             // Update the last sent time ...
-            UpdateMailingListSendTime('test', current_time);
+            var donotcare = 'test';
+            UpdateMailingListSendTime(donotcare, current_time);
           } else {
             console.log('There are no new items to send via email');
           }

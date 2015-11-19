@@ -80,7 +80,7 @@ exports.submit = function(req, res, next) {
             console.error(err);
             return next(err);
         }
-
+        console.log('/submit: received an item and submitted into db');
         try {
             // send notification to notify phone app to sync feed
             sendNotification("/topics/sync");
