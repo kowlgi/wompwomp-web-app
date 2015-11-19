@@ -18,8 +18,8 @@ function sendHtmlEmail(mg, to, subject, body_text, body_html) {
 
     mg.messages().sendMime(dataToSend, function (err, body) {
       if (err) {
-        console.log('unable to send ' + err.statusCode);
-        return;
+        console.log('Unable to send outbound emails. Error:' + err.statusCode);
+        return false;
       }
     });
   });

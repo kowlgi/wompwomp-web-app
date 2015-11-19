@@ -6,7 +6,9 @@ var AgniModel = mongoose.model('Agni');
 var AgniMailingListModel = mongoose.model('AgniMailingList');
 var AgniMailingListStatsModel = mongoose.model('AgniMailingListStats');
 
-// If there are new updates, push an email after these many seconds
+// If there are new updates, push an email after these many seconds.
+// Value of 60 is aggressive. Basically this means sending an email
+// everytime the scheduler runs. To send an email once a day set this to 86400.
 var LAST_SENT_SECS = 60;
 
 // Helper to update the last time we sent users an email
@@ -46,10 +48,11 @@ exports.GetFresh = function() {
             if (items.length == 1) {
               subject = 'Steaming hot post on WompWomp.co: ' + items[0].text;
             }
-            Mail.sendHtmlEmail(App.mailgun, App.MAILING_LIST, subject, '', body_html);
-            // Update the last sent time ...
-            var donotcare = 'test';
-            UpdateMailingListSendTime(donotcare, current_time);
+            if (Mail.sendHtmlEmail(App.mailgun, App.MAILING_LIST, subject, '', body_html)) {
+              // Update the last sent time on success
+              var donotcare = 'test';
+              UpdateMailingListSendTime(donotcare, current_time);
+            }
           } else {
             console.log('There are no new items to send via email');
           }
