@@ -1,21 +1,7 @@
-doctype html
-html(xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 100%; line-height: 1.6; margin: 0; padding: 0;")
-  head
-  meta(name="viewport", content="width=device-width")
-  meta(http-equiv="Content-Type", content="text/html; charset=UTF-8")
-  title(An email from wompwomp.co)
-  body(bgcolor="#f6f6f6" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; font-size: 100%; line-height: 1.6; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; margin: 0; padding: 0;")
+each item in items
+  h3
+    = item.text
+  a(href="http://localhost:3000/v/" + item.id)
+    img(src="#{item.imageuri}")
   p
-    | Here's what's hot on WompWomp.co. Get our <a href="#">app on android</a> and you'll never miss a post.
-  each item in items
-    p
-      b
-        = item.text
-    a(href="http://localhost:3000/v/" + item.id)
-      img(src="#{item.imageuri}")
-    p
-      a(href='http://wompwomp.co/v/' + item.id)  www.wompwomp.co&#47;v&#47;#{item.id}
-  hr
-  footer
-    | Have a great day!
-    | Hatching Amazing Labs Inc
+    a(href='http://wompwomp.co/v/' + item.id)  wompwomp.co&#47;v&#47;#{item.id}

@@ -4,7 +4,7 @@ var MailComposer = require('mailcomposer'),
 // Pass a valid mg
 function sendHtmlEmail(mg, to, subject, body_text, body_html, current_time, update_callback) {
   var mailcomposer = new MailComposer({
-      from: 'wompwomp.co <no-reply@mg.deckrank.co>',
+      from: 'wompwomp.co <fun@mg.wompwomp.co>',
       to: to,
       subject: subject,
       body: body_text,
