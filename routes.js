@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var AgniModel = mongoose.model('Agni');
 var AgniMailingListModel = mongoose.model('AgniMailingList');
 var gcm = require('node-gcm');
+var util = require('util');
 var Mail = require('./mail');
 var Shortid = require('shortid');
 var Vibrant = require('node-vibrant');
@@ -24,7 +25,7 @@ exports.index = function(req, res, next) {
 
 exports.subscribe = function(req, res, next) {
   if(typeof req.body.email == 'undefined'){
-      console.log("missing email param for subscribe()")
+      util.log("missing email param for subscribe()")
       res.end();
       return;
   }
@@ -35,17 +36,17 @@ exports.subscribe = function(req, res, next) {
     created_on      : Date.now(),
   }).save(function(err, email) {
     if (err) {
-      console.error(err);
+      util.error(err);
       return next(err);
     }
-    console.log('Added ' + user_entered_email + ' to the db');
+    util.log('Added ' + user_entered_email + ' to the db');
 
     // Add the user to the mailing list
     var members = [ { address: user_entered_email } ];
     // TODO(hnag): Change the mailing list to a wompwomp.co address
     App.mailgun.lists(App.MAILING_LIST).members().add({
       members: members, subscribed: true}, function (err, body) {
-        console.log('Added ' + user_entered_email + ' to mailgun');
+        util.log('Added ' + user_entered_email + ' to mailgun');
         res.end();
     });
   });
@@ -56,12 +57,12 @@ exports.submit = function(req, res, next) {
        typeof req.body.imageuri == 'undefined' ||
        typeof req.body.sourceuri == 'undefined' ||
        typeof req.body.category == 'undefined'){
-        console.log("missing param for submit()")
+        util.log("missing param for submit()")
         res.end();
         return;
     }
     if(req.body.submitkey != App.submit_key) {
-        console.log("wrong submit key")
+        util.log("wrong submit key")
         res.end();
         return;
     }
@@ -77,10 +78,10 @@ exports.submit = function(req, res, next) {
         numshares       : 0
     }).save(function(err, agniquote) {
         if (err) {
-            console.error(err);
+            util.error(err);
             return next(err);
         }
-        console.log('/submit: received an item and submitted into db');
+        util.log('/submit: received an item and submitted into db');
         try {
             // send notification to notify phone app to sync feed
             sendNotification("/topics/sync");
@@ -92,7 +93,7 @@ exports.submit = function(req, res, next) {
                     agniquote.id);
             }
         } catch(err) {
-            console.error(err);
+            util.error(err);
         } finally {
             res.end();
         }
@@ -101,7 +102,7 @@ exports.submit = function(req, res, next) {
 
 exports.pushCTA= function(req, res, next) {
     if(req.body.submitkey != App.submit_key) {
-        console.log("wrong submit key")
+        util.log("wrong submit key")
         res.end();
         return;
     }
@@ -116,7 +117,7 @@ exports.pushCTA= function(req, res, next) {
             sendNotification("/topics/remove_all_ctas");
         }
     } catch(err) {
-        console.error(err);
+        util.error(err);
     } finally {
         res.end();
     }
@@ -124,7 +125,7 @@ exports.pushCTA= function(req, res, next) {
 
 exports.removeAllPrompts = function(req, res, next) {
     if(req.body.submitkey != App.submit_key) {
-        console.log("wrong submit key")
+        util.log("wrong submit key")
         res.end();
         return;
     }
@@ -132,7 +133,7 @@ exports.removeAllPrompts = function(req, res, next) {
     try {
         sendNotification("/topics/remove_all_prompts");
     } catch(err) {
-        console.error(err);
+        util.error(err);
     } finally {
         res.end();
     }
@@ -280,7 +281,7 @@ exports.unfavorite = function(req, res, next) {
 
 exports.hideitem = function(req, res, next) {
     if(req.body.submitkey != App.submit_key) {
-        console.log("wrong submit key")
+        util.log("wrong submit key")
         res.end();
         return;
     }

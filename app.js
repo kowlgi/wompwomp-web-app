@@ -2,6 +2,7 @@ var stdio = require('stdio'),
     bodyParser = require('body-parser'),
     jade = require('jade'),
     path = require('path'),
+    util = require('util'),
     favicon = require('serve-favicon'),
     schedule = require('node-schedule'),
     http = require('http'),
@@ -61,7 +62,7 @@ app.post('/f/:id', routes.favorite);
 app.post('/uf/:id', routes.unfavorite);
 app.post('/hideitem', routes.hideitem);
 app.use(function(req, res) {
-    console.log('Unable to find URI ' + req.url + ' redirecting back home');
+    util.log('Unable to find URI ' + req.url + ' redirecting back home');
     res.redirect('/');
 });
 
@@ -76,17 +77,17 @@ var rule = new schedule.RecurrenceRule();
 // TODO(hnag): Eventually when all the mailinglist code is complete don't run
 // the scheduler so aggressively.
 if (ops.scheduler_frequency == 'lazy') {
-  console.log('Running the scheduler in the first minute of every hour');
+  util.log('Running the scheduler in the first minute of every hour');
   rule.minute = 1;
 } else {
-  console.log('Running the scheduler in the first second of every minute');
+  util.log('Running the scheduler in the first second of every minute');
   rule.second = 1;
 }
 schedule.scheduleJob(rule, mailinglist.GetFresh);
 
 // Start server
 http.createServer(app).listen(app.get('port'), function() {
-  console.log('Express listening on port ' + app.get('port'));
+  util.log('Express listening on port ' + app.get('port'));
 });
 
 exports.submit_key = config.submitkey;

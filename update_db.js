@@ -2,8 +2,9 @@ var Mongoose = require('mongoose'),
     AgniModel = Mongoose.model('Agni'),
     Shortid = require('shortid'),
     Vibrant = require('node-vibrant'),
+    util = require('util'),
     Request = require('request'),
-    Fs = require('fs');
+    Fs = require('fs'),
     Path = require('path');
 
 exports.update_db_oct_16_2015 = function() {
@@ -12,7 +13,7 @@ exports.update_db_oct_16_2015 = function() {
 
     AgniModel.find(conditions, function(err, docs) {
         if(err) {
-            console.log(err);
+            util.log(err);
             return;
         }
 
@@ -30,13 +31,13 @@ exports.update_db_oct_20_2015 = function() {
 
     AgniModel.find(conditions, function(err, docs) {
         if(err) {
-            console.log(err);
+            util.log(err);
             return;
         }
 
         docs.forEach(function(elem, index, array) {
             var filename = "images/" + Path.basename(elem.imageuri);
-            console.log(filename);
+            util.log(filename);
             var stream = Fs.createWriteStream(filename);
             Request.get(elem.imageuri).pipe(stream);
             stream.once('close', function() {
@@ -45,7 +46,7 @@ exports.update_db_oct_20_2015 = function() {
                     if(err ||
                        typeof swatches['LightVibrant'].getHex === "undefined" ||
                        typeof swatches['LightVibrant'].getBodyTextColor === "undefined" ) {
-                        console.log(err);
+                        util.log(err);
                         elem.backgroundcolor = "#FFFFFF";
                         elem.bodytextcolor = "#000000";
                         elem.save();
@@ -83,7 +84,7 @@ exports.update_db_oct_24_2015 = function() {
 
     AgniModel.find(conditions, function(err, docs) {
         if(err) {
-            console.log(err);
+            util.log(err);
             return;
         }
 

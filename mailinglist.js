@@ -1,6 +1,7 @@
 var mongoose = require('mongoose'),
   Mail = require('./mail'),
   jade = require('jade'),
+  util = require('util'),
   App = require('./app');
 var AgniModel = mongoose.model('Agni');
 var AgniMailingListModel = mongoose.model('AgniMailingList');
@@ -21,7 +22,7 @@ function UpdateMailingListSendTime(payload, timestamp) {
       console.error(err);
       return next(err);
     }
-    console.log('Updated the mailing list time ' + timestamp);
+    util.log('Updated the mailing list time ' + timestamp);
   });
 };
 
@@ -32,17 +33,17 @@ exports.GetFresh = function() {
   AgniMailingListStatsModel.find().sort('-created_on').limit(1).exec(function(err, items) {
     if (items.length == 0) {
       UpdateMailingListSendTime('test', current_time);
-      console.log('mailing stats db empty; creating first entry');
+      util.log('mailing stats db empty; creating first entry');
     } else {
       previous_time = items[0].created_on;
       var diff_secs = Math.abs(current_time - previous_time)/1000;
-      console.log('Difference is ' + diff_secs);
+      util.log('Difference is ' + diff_secs);
       if (diff_secs > LAST_SENT_SECS) {
         var date_filter = { "created_on" : { $gte : new Date(previous_time) }};
         AgniModel.find(date_filter).sort('-created_on').limit(10).exec(function(err, items) {
           if (items.length > 0) {
             // Now prepare an email to send ...
-            console.log('Here are the newest posts we can mail users: ' + items);
+            util.log('Here are the newest posts we can mail users: ' + items);
             var body_html = jade.renderFile('views/email.jade', {items: items});
             var subject = items[0].text + ' and other steaming hot posts on WompWomp.co';
             if (items.length == 1) {
@@ -50,7 +51,7 @@ exports.GetFresh = function() {
             }
             Mail.sendHtmlEmail(App.mailgun, App.MAILING_LIST, subject, '', body_html, current_time, UpdateMailingListSendTime);
           } else {
-            console.log('There are no new items to mail our users');
+            util.log('There are no new items to mail our users');
           }
         });
       }

@@ -1,4 +1,5 @@
-var MailComposer = require("mailcomposer");
+var MailComposer = require('mailcomposer'),
+    util = require('util');
 
 // Pass a valid mg
 function sendHtmlEmail(mg, to, subject, body_text, body_html, current_time, update_callback) {
@@ -18,7 +19,7 @@ function sendHtmlEmail(mg, to, subject, body_text, body_html, current_time, upda
 
     mg.messages().sendMime(dataToSend, function (err, body) {
       if (err) {
-        console.log('Unable to send outbound emails. Error:' + err.statusCode);
+        util.log('Unable to send outbound emails. Error:' + err.statusCode);
       } else {
         update_callback(body_html, current_time);
       }
