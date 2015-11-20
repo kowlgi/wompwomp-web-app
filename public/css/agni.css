@@ -107,6 +107,10 @@ input[type=email] {
    border-bottom: 1px solid #ffffff;
 }
 
-#pinnedfooterclosebutton, #pinnedheaderclosebutton {
+#pinnedinstallclosebutton, #pinnedsubscribeclosebutton {
     display:none;
+}
+
+.closebutton {
+    font-size:1.5em;
 }

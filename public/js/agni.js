@@ -21,21 +21,36 @@ $(document).ready(function() {
     //var triggerPosition = $('#install').offset().top;
     var SHOW_CTA_POSITION = 3000;
     $(window).scroll(function() {
-        if( $(window).scrollTop() > SHOW_CTA_POSITION)
+        if($(window).scrollTop() > SHOW_CTA_POSITION)
         {
-            $('#install').addClass('fixed-top');
-            $('#install_placeholder').css({display: 'block'});
+            if(!docCookies.hasItem("nopininstall")) {
+                $('#install').addClass('fixed-top');
+                $('#install_placeholder').css({display: 'block'});
+                $('#pinnedinstallclosebutton').css({display: 'block'});
+            }
 
-            $('#subscribe').addClass('fixed-bottom');
-            $('#subscribe_placeholder').css({display: 'block'});
+            if(!docCookies.hasItem("nopinsubscribe")) {
+                $('#subscribe').addClass('fixed-bottom');
+                $('#subscribe_placeholder').css({display: 'block'});
+                $('#pinnedsubscribeclosebutton').css({display: 'block'});
+            }
         }
         else
         {
             $('#install').removeClass('fixed-top');
             $('#install_placeholder').css({display: 'none'});
+            $('#pinnedinstallclosebutton').css({display: 'none'});
 
             $('#subscribe').removeClass('fixed-bottom');
             $('#subscribe_placeholder').css({display: 'none'});
+            $('#pinnedsubscribeclosebutton').css({display: 'none'});
+        }        
+
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+            $('#pinnedsubscribeclosebutton').css({display: 'none'});
+        }
+        else if(!docCookies.hasItem("nopinsubscribe")) {
+            $('#pinnedsubscribeclosebutton').css({display: 'block'});
         }
     });
 
@@ -74,9 +89,21 @@ $(document).ready(function() {
         return false;
     });
 
-    $('#pinnedheaderclosebutton').onclick = function(event) {
+    document.getElementById('pinnedinstallclosebutton').onclick = function(event){
         event.preventDefault();
-        alert("closed");
+        $('#install').removeClass('fixed-top');
+        $('#install_placeholder').css({display: 'none'});
+        $('#pinnedinstallclosebutton').css({display: 'none'});
+        docCookies.setItem("nopininstall", "");
+        return false;
+    }
+
+    document.getElementById('pinnedsubscribeclosebutton').onclick = function(event){
+        event.preventDefault();
+        $('#subscribe').removeClass('fixed-bottom');
+        $('#subscribe_placeholder').css({display: 'none'});
+        $('#pinnedsubscribeclosebutton').css({display: 'none'});
+        docCookies.setItem("nopinsubscribe", "");
         return false;
     }
 
