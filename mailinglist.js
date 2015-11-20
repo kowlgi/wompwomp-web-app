@@ -1,6 +1,7 @@
 var mongoose = require('mongoose'),
   Mail = require('./mail'),
   jade = require('jade'),
+  fs = require('fs'),
   util = require('util'),
   App = require('./app');
 var AgniModel = mongoose.model('Agni');
@@ -44,12 +45,13 @@ exports.GetFresh = function() {
           if (items.length > 0) {
             // Now prepare an email to send ...
             util.log('Here are the newest posts we can mail users: ' + items);
-            var body_html = jade.renderFile('views/email.jade', {items: items});
+            var meat_html = jade.renderFile('views/email.jade', {items: items});
+            var html = fs.readFileSync('views/email_above.jade').toString() + meat_html + fs.readFileSync('views/email_below.jade').toString();
             var subject = items[0].text + ' and other steaming hot posts on WompWomp.co';
             if (items.length == 1) {
               subject = 'Steaming hot post on WompWomp.co: ' + items[0].text;
             }
-            Mail.sendHtmlEmail(App.mailgun, App.MAILING_LIST, subject, '', body_html, current_time, UpdateMailingListSendTime);
+            Mail.sendHtmlEmail(App.mailgun, App.MAILING_LIST, subject, '', html, current_time, UpdateMailingListSendTime);
           } else {
             util.log('There are no new items to mail our users');
           }

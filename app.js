@@ -16,9 +16,8 @@ var ops = stdio.getopt({
         {key: 'm', args: 1, description: 'The mailgun API key. Invalid API = no email notifications', mandatory: false},
     'email_domain':
         {key: 'e', args: 1, description: 'The deckrank email domain. Invalid domain = no email notifications', mandatory: false},
-    // TODO(hnag): Fix this to be a wompwomp address once mailgun verifies
     'mailing_list':
-        {key: 'l', args: 1, description: 'Who to send the mail to', default: 'wompwomp@mg.deckrank.co', mandatory: false},
+        {key: 'l', args: 1, description: 'Who to send the mail to', default: 'fun@mg.wompwomp.co', mandatory: false},
     'scheduler_frequency':
         {key: 's', args: 1, description: 'How frequently should we run the mailing list scheduler (lazy|aggressive)', default: 'lazy', mandatory: false},
     });
