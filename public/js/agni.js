@@ -18,10 +18,9 @@ $(document).ready(function() {
     document.getElementById('subscribe_placeholder')
         .style.display = "none";
 
-    //var triggerPosition = $('#install').offset().top;
-    var SHOW_CTA_POSITION = 3000;
+    var triggerPosition = $('#install').offset().top;
     $(window).scroll(function() {
-        if($(window).scrollTop() > SHOW_CTA_POSITION)
+        if($(window).scrollTop() > triggerPosition)
         {
             if(!docCookies.hasItem("nopininstall")) {
                 $('#install').addClass('fixed-top');
@@ -44,7 +43,7 @@ $(document).ready(function() {
             $('#subscribe').removeClass('fixed-bottom');
             $('#subscribe_placeholder').css({display: 'none'});
             $('#pinnedsubscribeclosebutton').css({display: 'none'});
-        }        
+        }
 
         if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
             $('#pinnedsubscribeclosebutton').css({display: 'none'});
