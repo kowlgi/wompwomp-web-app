@@ -105,26 +105,6 @@ $(document).ready(function() {
         docCookies.setItem("nopinsubscribe", "");
         return false;
     }
-
-    $(".card-content").each(function() {
-        var uniqueID = this.id;
-        if(docCookies.hasItem(uniqueID)){
-            $('#favoriteicon'+uniqueID).removeClass('text-lighten-5');
-        }
-
-        document.getElementById('favorite'+uniqueID).onclick = function(event){
-            event.preventDefault();
-            if(!docCookies.hasItem(uniqueID)) {
-                docCookies.setItem(uniqueID, "");
-                $('#favoriteicon'+uniqueID).removeClass('text-lighten-5');
-            }
-            else {
-                docCookies.removeItem(uniqueID);
-                $('#favoriteicon'+uniqueID).addClass('text-lighten-5');
-            }
-            return false;
-        }
-    });
 });
 
 function setupGoogleAnalytics() {

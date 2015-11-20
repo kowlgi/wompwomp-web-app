@@ -17,14 +17,6 @@ div.container-fluid(id="main")
                             + " - wompwomp.co/v/"+ item.id),
                             data-action="share/whatsapp/share")
                             img(src="images/share-icon.png" height="24px", width="24px")
-                    div.right
-                        |&nbsp;&nbsp;
-                    span.right
-                        =item.numfavorites
-                    div.right
-                        |&nbsp;
-                    a.right(href="", id="favorite" + item.id)
-                        i.material-icons.red-text.text-lighten-5(id="favoriteicon" + item.id) favorite
                     p.em.small.grey-text
                         =moment(item.created_on).fromNow()
         - itemcount++
