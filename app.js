@@ -15,6 +15,11 @@ var ops = stdio.getopt({
         {key: 'm', args: 1, description: 'The mailgun API key. Invalid API = no email notifications', mandatory: false},
     'email_domain':
         {key: 'e', args: 1, description: 'The deckrank email domain. Invalid domain = no email notifications', mandatory: false},
+    // TODO(hnag): Fix this to be a wompwomp address once mailgun verifies
+    'mailing_list':
+        {key: 'l', args: 1, description: 'Who to send the mail to', default: 'wompwomp@mg.deckrank.co', mandatory: false},
+    'scheduler_frequency':
+        {key: 's', args: 1, description: 'How frequently should we run the mailing list scheduler (lazy|aggressive)', default: 'lazy', mandatory: false},
     });
 
 var app = express();
@@ -62,8 +67,7 @@ app.use(function(req, res) {
 
 app.set('port', config.port);
 
-// TODO(hnag): Fix this to be a wompwomp address once mailgun verifies
-var MAILING_LIST = 'wompwomp@mg.deckrank.co';
+var MAILING_LIST = ops.mailing_list;
 // The global mailgun object that will be used in other modules
 var mg = require('mailgun-js')({apiKey: ops.mailgun_api, domain: ops.email_domain});
 
@@ -71,7 +75,13 @@ var mailinglist = require('./mailinglist');
 var rule = new schedule.RecurrenceRule();
 // TODO(hnag): Eventually when all the mailinglist code is complete don't run
 // the scheduler so aggressively.
-rule.minute = 1; // Run the scheduler in the first minute of every hour
+if (ops.scheduler_frequency == 'lazy') {
+  console.log('Running the scheduler in the first minute of every hour');
+  rule.minute = 1;
+} else {
+  console.log('Running the scheduler in the first second of every minute');
+  rule.second = 1;
+}
 schedule.scheduleJob(rule, mailinglist.GetFresh);
 
 // Start server

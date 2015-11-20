@@ -42,19 +42,15 @@ exports.GetFresh = function() {
         AgniModel.find(date_filter).sort('-created_on').limit(10).exec(function(err, items) {
           if (items.length > 0) {
             // Now prepare an email to send ...
-            console.log('Here are the newest items: ' + items);
+            console.log('Here are the newest posts we can mail users: ' + items);
             var body_html = jade.renderFile('views/email.jade', {items: items});
             var subject = items[0].text + ' and other steaming hot posts on WompWomp.co';
             if (items.length == 1) {
               subject = 'Steaming hot post on WompWomp.co: ' + items[0].text;
             }
-            if (Mail.sendHtmlEmail(App.mailgun, App.MAILING_LIST, subject, '', body_html)) {
-              // Update the last sent time on success
-              var donotcare = 'test';
-              UpdateMailingListSendTime(donotcare, current_time);
-            }
+            Mail.sendHtmlEmail(App.mailgun, App.MAILING_LIST, subject, '', body_html, current_time, UpdateMailingListSendTime);
           } else {
-            console.log('There are no new items to send via email');
+            console.log('There are no new items to mail our users');
           }
         });
       }
