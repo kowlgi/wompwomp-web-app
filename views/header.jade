@@ -4,17 +4,19 @@ div(id="masthead")
             a.brandlink(href="/")
                 div.center.brand.theme-text
                     image(src="images/trombone_white.svg", height="36px", width="auto")
-                    |&nbsp;WompWomp
+                    |&nbsp;wompwomp
             div.center
                 b.theme-text.tagline
-                    |The best content for sharing to WhatsApp
+                    |The best content you can share on WhatsApp
 div(id="install_placeholder")
 div(id="install")
+    div.right
+        i.material-icons.theme-background.theme-text(id="pinnedheaderclosebutton") close
     div.section.theme-background
         div.container-fluid
-            div.theme-text.center
-                |Try the app
-                br
-                a(href="#")
-                    img(id="logo", alt="Get it on Google Play",
-                        src="images/googel-play-badge.png")
+            div.section
+                div.theme-text.center
+                    |Try the app &nbsp;
+                    a(href="#")
+                        img(id="logo", alt="Get it on Google Play",
+                            src="images/googel-play-badge.png")

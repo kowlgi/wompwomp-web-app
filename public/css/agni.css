@@ -4,6 +4,8 @@
  * Copyright 2015–2015, Hatching Amazing Labs
  */
 
+@import url(https://fonts.googleapis.com/css?family=Comfortaa:700);
+
 .theme-background {
     background-color: #6985EC;
 }
@@ -27,6 +29,7 @@
 .brand {
     font-weight: 600;
     font-size: 3em;
+    font-family: 'Comfortaa', cursive;
 }
 
 .tagline {
@@ -48,6 +51,7 @@ html, body {
     margin: 0 auto;
     height: 45px;
     width: 139px;
+    vertical-align: middle;
 }
 
 .fixed-top {
@@ -101,4 +105,8 @@ html, body {
 
 input[type=email] {
    border-bottom: 1px solid #ffffff;
+}
+
+#pinnedfooterclosebutton, #pinnedheaderclosebutton {
+    display:none;
 }

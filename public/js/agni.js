@@ -74,6 +74,12 @@ $(document).ready(function() {
         return false;
     });
 
+    $('#pinnedheaderclosebutton').onclick = function(event) {
+        event.preventDefault();
+        alert("closed");
+        return false;
+    }
+
     $(".card-content").each(function() {
         var uniqueID = this.id;
         if(docCookies.hasItem(uniqueID)){

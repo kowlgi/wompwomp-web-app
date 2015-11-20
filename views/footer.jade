@@ -1,14 +1,16 @@
 div(id="subscribe_placeholder")
 div(id="subscribe")
     div.theme-background
-        div.container-fluid
-            div.theme-text.center
-                |The Best of WompWomp beamed to your inbox&nbsp;
-                br
-                button(class="btn modal-trigger theme-dark",
-                    data-target="subscribemodal") Subscribe
-            div.bottom.center.tiny-text.theme-text
-                |&copy; 2015 Hatching Amazing Labs&nbsp;&nbsp;
+        div.right
+            i.material-icons.theme-background.theme-text(id="pinnedfooterclosebutton") close
+        div.section
+            div.container-fluid
+                div.theme-text.center
+                    |The Best of WompWomp beamed to your inbox &nbsp;
+                    button(class="btn modal-trigger theme-dark",
+                        data-target="subscribemodal") Subscribe
+        div.bottom.center.tiny-text.theme-text
+            |&copy; 2015 Hatching Amazing Labs&nbsp;&nbsp;
 div.theme-background(id="subscribemodal", class="modal")
     div.modal-header
         div.right
