@@ -201,6 +201,47 @@ exports.items = function(req, res, next) {
         });
 }
 
+exports.abbreviateditems = function(req, res, next) {
+    var limit = 0,  offset = 0;
+
+    if(typeof req.query.limit != "undefined"){
+        limit = parseInt(req.query.limit);
+    }
+
+    if(typeof req.query.offset != "undefined"){
+        offset = parseInt(req.query.offset);
+    }
+
+    var conditions = FILTER_CONDITION;
+    //if(typeof req.query.category != "undefined"){
+    //    conditions = {category: req.query.category};
+    //}
+
+    AgniModel.
+        find(conditions).
+        sort({_id:1}).
+        exec(function(err, quotes) {
+            if(limit == 0) {
+                limit = quotes.length;
+            }
+            if(offset == -1 ) {
+                offset = quotes.length > limit ? quotes.length - limit : 0;
+            }
+            var quotelist = [];
+            for (var i = offset; i < quotes.length && limit > 0; i++, limit--) {
+                quotelist.push({"t": quotes[i].text, /* text */
+                                "u": quotes[i].imageuri, /* image uri */
+                                "i":quotes[i].id, /* unique id */
+                                "c":quotes[i].created_on, /* created_on */
+                                "f":quotes[i].numfavorites, /* num favorites */
+                                "s":quotes[i].numshares}); /* num shares */
+            }
+            var response = quotelist;
+            res.contentType('application/json');
+            res.send(JSON.stringify(response));
+        });
+}
+
 exports.viewitem = function(req, res, next) {
     AgniModel.findOne({id : req.params.id}, function(err, item) {
         if(err) {
