@@ -12,6 +12,7 @@ var AgniMailingListStatsModel = mongoose.model('AgniMailingListStats');
 // Value of 60 is aggressive. Basically this means sending an email
 // everytime the scheduler runs. To send an email once a day set this to 86400.
 var LAST_SENT_SECS = 60;
+var MAX_CAPTION_LENGTH = 40;
 
 // Helper to update the last time we sent users an email
 function UpdateMailingListSendTime(payload, timestamp) {
@@ -47,9 +48,13 @@ exports.GetFresh = function() {
             util.log('Here are the newest posts we can mail users: ' + items);
             var meat_html = jade.renderFile('views/email.jade', {items: items});
             var html = fs.readFileSync('views/email_above.jade').toString() + meat_html + fs.readFileSync('views/email_below.jade').toString();
-            var subject = items[0].text + ' and other steaming hot posts on WompWomp.co';
+            var caption = items[0].text;
+            if (caption.length > MAX_CAPTION_LENGTH) {
+              caption = caption.substring(0, MAX_CAPTION_LENGTH) + '...';
+            }
+            var subject = caption + ' and other steaming hot posts on WompWomp.co';
             if (items.length == 1) {
-              subject = 'Steaming hot post on WompWomp.co: ' + items[0].text;
+              subject = 'Steaming hot post on WompWomp.co: ' + caption;
             }
             Mail.sendHtmlEmail(App.mailgun, App.MAILING_LIST, subject, '', html, current_time, UpdateMailingListSendTime);
           } else {
