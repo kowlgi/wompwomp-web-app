@@ -201,6 +201,60 @@ exports.items = function(req, res, next) {
         });
 }
 
+/* Here's how this works:
+   cursor not specified, limit not specified: return all items
+   cursor not specified, limit = x: return if (x > 0) return x number of latest items, otherwise nothing
+   cursor = somedate, limit not specified: return all items created after somedate
+   cursor = somedate, limit = x: if (x < 0) return x items immediately before somedate
+                                 OR if (x > 0) return x items immediately after somedate
+*/
+exports.abbreviateditems = function(req, res, next) {
+    var limitval = 0,
+        cursor = new Date('1995-12-17T03:24:00'), /*an arbitrary date that's
+                                                    guaranteed prior to any item
+                                                    creation date*/
+        sortorder = -1; // descending order
+
+    if(typeof req.query.limit != "undefined"){
+        limitval = parseInt(req.query.limit);
+    }
+
+    if(typeof req.query.cursor != "undefined"){
+        cursor = Date.parse(req.query.cursor) ;
+        sortorder = 1; // ascending order
+    }
+
+    var find_condition = {}, sort_condition = {};
+
+    if(limitval >= 0) {
+        sort_condition = {created_on: sortorder};
+        find_condition = {created_on: {$gt: cursor}};
+    } else {
+        find_condition = {created_on: {$lt: cursor}};
+        sort_condition = {created_on: -1};
+    }
+
+    AgniModel.
+        find(FILTER_CONDITION).
+        find(find_condition).
+        sort(sort_condition).
+        limit(limitval).
+        exec(function(err, quotes) {
+            var quotelist = [];
+            for (var i = 0; i < quotes.length; i++) {
+                quotelist.push({"t": quotes[i].text, /* text */
+                                "u": quotes[i].imageuri, /* image uri */
+                                "i":quotes[i].id, /* unique id */
+                                "c":quotes[i].created_on, /* created_on */
+                                "f":quotes[i].numfavorites, /* num favorites */
+                                "s":quotes[i].numshares}); /* num shares */
+            }
+            var response = quotelist;
+            res.contentType('application/json');
+            res.send(JSON.stringify(response));
+        });
+}
+
 exports.viewitem = function(req, res, next) {
     AgniModel.findOne({id : req.params.id}, function(err, item) {
         if(err) {

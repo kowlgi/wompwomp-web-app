@@ -55,6 +55,7 @@ app.post('/subscribe', routes.subscribe);
 app.post('/submit', routes.submit);
 app.post('/pushcta', routes.pushCTA);
 app.get('/items', routes.items);
+app.get('/i', routes.abbreviateditems);
 app.get('/v/:id', routes.viewitem);
 app.post('/s/:id', routes.share);
 app.post('/f/:id', routes.favorite);
