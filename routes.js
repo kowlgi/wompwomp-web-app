@@ -201,34 +201,47 @@ exports.items = function(req, res, next) {
         });
 }
 
+/* Here's how this works:
+   cursor not specified, limit not specified: return all items
+   cursor not specified, limit = x: return if (x > 0) return x number of latest items, otherwise nothing
+   cursor = somedate, limit not specified: return all items created after somedate
+   cursor = somedate, limit = x: if (x < 0) return x items immediately before somedate
+                                 OR if (x > 0) return x items immediately after somedate
+*/
 exports.abbreviateditems = function(req, res, next) {
-    var limit = 0,  offset = 0;
+    var limitval = 0,
+        cursor = new Date('1995-12-17T03:24:00'), /*an arbitrary date that's
+                                                    guaranteed prior to any item
+                                                    creation date*/
+        sortorder = -1; // descending order
 
     if(typeof req.query.limit != "undefined"){
-        limit = parseInt(req.query.limit);
+        limitval = parseInt(req.query.limit);
     }
 
-    if(typeof req.query.offset != "undefined"){
-        offset = parseInt(req.query.offset);
+    if(typeof req.query.cursor != "undefined"){
+        cursor = Date.parse(req.query.cursor) ;
+        sortorder = 1; // ascending order
     }
 
-    var conditions = FILTER_CONDITION;
-    //if(typeof req.query.category != "undefined"){
-    //    conditions = {category: req.query.category};
-    //}
+    var find_condition = {}, sort_condition = {};
+
+    if(limitval >= 0) {
+        sort_condition = {created_on: sortorder};
+        find_condition = {created_on: {$gt: cursor}};
+    } else {
+        find_condition = {created_on: {$lt: cursor}};
+        sort_condition = {created_on: -1};
+    }
 
     AgniModel.
-        find(conditions).
-        sort({_id:1}).
+        find(FILTER_CONDITION).
+        find(find_condition).
+        sort(sort_condition).
+        limit(limitval).
         exec(function(err, quotes) {
-            if(limit == 0) {
-                limit = quotes.length;
-            }
-            if(offset == -1 ) {
-                offset = quotes.length > limit ? quotes.length - limit : 0;
-            }
             var quotelist = [];
-            for (var i = offset; i < quotes.length && limit > 0; i++, limit--) {
+            for (var i = 0; i < quotes.length; i++) {
                 quotelist.push({"t": quotes[i].text, /* text */
                                 "u": quotes[i].imageuri, /* image uri */
                                 "i":quotes[i].id, /* unique id */
