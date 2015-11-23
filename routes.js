@@ -207,6 +207,7 @@ exports.items = function(req, res, next) {
    cursor = somedate, limit not specified: return all items created after somedate
    cursor = somedate, limit = x: if (x < 0) return x items immediately before somedate
                                  OR if (x > 0) return x items immediately after somedate
+                                 OR if (x == 0) return all items immediately after somedate
 */
 exports.abbreviateditems = function(req, res, next) {
     var limitval = 0,
