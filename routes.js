@@ -214,7 +214,8 @@ exports.abbreviateditems = function(req, res, next) {
         cursor = new Date('1995-12-17T03:24:00'), /*an arbitrary date that's
                                                     guaranteed prior to any item
                                                     creation date*/
-        sortorder = -1; // descending order
+        sortorder = -1, // descending order
+        cursorInclusive = false;
 
     if(typeof req.query.limit != "undefined"){
         limitval = parseInt(req.query.limit);
@@ -225,11 +226,22 @@ exports.abbreviateditems = function(req, res, next) {
         sortorder = 1; // ascending order
     }
 
+    if(typeof req.query.cursorInclusive != "undefined" &&
+       req.query.cursorInclusive == "yes") {
+        cursorInclusive = true;
+    }
+
     var find_condition = {}, sort_condition = {};
 
     if(limitval >= 0) {
         sort_condition = {created_on: sortorder};
-        find_condition = {created_on: {$gt: cursor}};
+        if(cursorInclusive) {
+            find_condition = {created_on: {$gte: cursor}};
+        }
+        else {
+            find_condition = {created_on: {$gt: cursor}};
+        }
+
     } else {
         find_condition = {created_on: {$lt: cursor}};
         sort_condition = {created_on: -1};
