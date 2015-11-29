@@ -13,6 +13,8 @@ var AgniMailingListStatsModel = mongoose.model('AgniMailingListStats');
 // everytime the scheduler runs. To send an email once a day set this to 86400.
 var LAST_SENT_SECS = 60;
 var MAX_CAPTION_LENGTH = 40;
+// Do not email any hidden items to the user
+var FILTER_CONDITION = {category: {$ne: "hidden"}};
 
 // Helper to update the last time we sent users an email
 function UpdateMailingListSendTime(payload, timestamp) {
@@ -32,7 +34,7 @@ function UpdateMailingListSendTime(payload, timestamp) {
 exports.GetFresh = function() {
   var previous_time = 0;
   var current_time = Date.now();
-  AgniMailingListStatsModel.find().sort('-created_on').limit(1).exec(function(err, items) {
+  AgniMailingListStatsModel.find(FILTER_CONDITION).sort('-created_on').limit(1).exec(function(err, items) {
     if (items.length == 0) {
       UpdateMailingListSendTime('test', current_time);
       util.log('mailing stats db empty; creating first entry');
