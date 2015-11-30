@@ -34,7 +34,7 @@ function UpdateMailingListSendTime(payload, timestamp) {
 exports.GetFresh = function() {
   var previous_time = 0;
   var current_time = Date.now();
-  AgniMailingListStatsModel.find(FILTER_CONDITION).sort('-created_on').limit(1).exec(function(err, items) {
+  AgniMailingListStatsModel.sort('-created_on').limit(1).exec(function(err, items) {
     if (items.length == 0) {
       UpdateMailingListSendTime('test', current_time);
       util.log('mailing stats db empty; creating first entry');
@@ -44,7 +44,7 @@ exports.GetFresh = function() {
       util.log('Difference is ' + diff_secs);
       if (diff_secs > LAST_SENT_SECS) {
         var date_filter = { "created_on" : { $gte : new Date(previous_time) }};
-        AgniModel.find(date_filter).sort('-created_on').limit(10).exec(function(err, items) {
+        AgniModel.find(FILTER_CONDITION).find(date_filter).sort('-created_on').limit(10).exec(function(err, items) {
           if (items.length > 0) {
             // Now prepare an email to send ...
             util.log('Here are the newest posts we can mail users: ' + items);
