@@ -61,6 +61,7 @@ app.post('/s/:id', routes.share);
 app.post('/f/:id', routes.favorite);
 app.post('/uf/:id', routes.unfavorite);
 app.post('/hideitem', routes.hideitem);
+app.get('/install', routes.install);
 app.use(function(req, res) {
     util.log('Unable to find URI ' + req.url + ' redirecting back home');
     res.redirect('/');

@@ -370,3 +370,14 @@ exports.hideitem = function(req, res, next) {
         res.end();
     });
 }
+
+exports.install = function(req, res, next) {
+    var isAndroid = req.headers['user-agent'].match(/android/i);
+
+    if(isAndroid) {
+        res.redirect("market://details?id=co.wompwomp.sunshine");
+    }
+    else {
+        res.redirect("http://play.google.com/store/apps/details?id=co.wompwomp.sunshine");
+    }
+}
