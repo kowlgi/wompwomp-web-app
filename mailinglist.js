@@ -34,7 +34,7 @@ function UpdateMailingListSendTime(payload, timestamp) {
 exports.GetFresh = function() {
   var previous_time = 0;
   var current_time = Date.now();
-  AgniMailingListStatsModel.sort('-created_on').limit(1).exec(function(err, items) {
+  AgniMailingListStatsModel.find().sort('-created_on').limit(1).exec(function(err, items) {
     if (items.length == 0) {
       UpdateMailingListSendTime('test', current_time);
       util.log('mailing stats db empty; creating first entry');

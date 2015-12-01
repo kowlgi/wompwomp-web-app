@@ -21,7 +21,8 @@ exports.index = function(req, res, next) {
         google_tracking_code   : App.google_tracking_code,
         app_store_link         : getAppStoreLink(req.headers['user-agent']),
         display_headline       : true,
-        ctapinning             : true
+        ctapinning             : true,
+        metaDescription        : "Your funniest minute every day. Mobile friendly. No sign up required."
     });
   });
 };
@@ -289,7 +290,8 @@ exports.viewitem = function(req, res, next) {
           items: [ item ],
           google_tracking_code   : App.google_tracking_code,
           display_home_button    : true,
-          app_store_link         : getAppStoreLink(req.headers['user-agent'])
+          app_store_link         : getAppStoreLink(req.headers['user-agent']),
+          metaDescription        : item.text
         });
     });
 }
