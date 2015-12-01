@@ -22,7 +22,7 @@ exports.index = function(req, res, next) {
         app_store_link         : getAppStoreLink(req.headers['user-agent']),
         display_headline       : true,
         ctapinning             : true,
-        metaDescription        : "Your funniest minute every day. Mobile friendly. No sign up required."
+        metaDescription        : "Your funniest minute every day. Mobile friendly."
     });
   });
 };
