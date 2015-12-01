@@ -15,10 +15,19 @@ var MAX_EMAIL_LENGTH = 128;
 exports.index = function(req, res, next) {
   // Show the top 20 most recent items on the home page
   AgniModel.find(FILTER_CONDITION).sort('-created_on').limit(20).exec(function(err, items) {
+    var isAndroid = req.headers['user-agent'].match(/android/i);
+
+    if(isAndroid) {
+        appStoreLink = "market://details?id=co.wompwomp.sunshine";
+    }
+    else {
+        appStoreLink = "http://play.google.com/store/apps/details?id=co.wompwomp.sunshine";
+    }
     res.render(
       'showall', {
         items: items,
-        google_tracking_code   : App.google_tracking_code
+        google_tracking_code   : App.google_tracking_code,
+        app_store_link         : appStoreLink
     });
   });
 };
