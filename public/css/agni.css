@@ -4,10 +4,12 @@
  * Copyright 2015–2015, Hatching Amazing Labs
  */
 
-@import url(https://fonts.googleapis.com/css?family=Comfortaa:400,700);
-
 .theme-background {
     background-color: #6985EC;
+}
+
+.theme-color-text {
+    color: #6985EC;
 }
 
 .theme-text {
@@ -27,9 +29,8 @@
 }
 
 .brand {
-    font-weight: 700;
+    font-weight: 600;
     font-size: 3em;
-    font-family: 'Comfortaa', cursive;
 }
 
 .tagline {
@@ -38,20 +39,13 @@
 }
 
 .tiny-text {
-    font-size: 0.5em;
+    font-size: 0.6em;
 }
 
 /* to prevent unwanted horizontal scrolling */
 html, body {
     max-width: 100%;
     overflow-x: hidden;
-}
-
-#logo, .modal-trigger {
-    margin: 0 auto;
-    height: 45px;
-    width: 139px;
-    vertical-align: middle;
 }
 
 .fixed-top {
@@ -113,4 +107,13 @@ input[type=email] {
 
 .closebutton {
     font-size:1.5em;
+}
+
+#icon-middle {
+    vertical-align: middle;
+}
+
+.btn {
+    height: unset;
+    line-height: unset;
 }

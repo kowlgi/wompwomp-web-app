@@ -15,19 +15,13 @@ var MAX_EMAIL_LENGTH = 128;
 exports.index = function(req, res, next) {
   // Show the top 20 most recent items on the home page
   AgniModel.find(FILTER_CONDITION).sort('-created_on').limit(20).exec(function(err, items) {
-    var isAndroid = req.headers['user-agent'].match(/android/i);
-
-    if(isAndroid) {
-        appStoreLink = "market://details?id=co.wompwomp.sunshine";
-    }
-    else {
-        appStoreLink = "http://play.google.com/store/apps/details?id=co.wompwomp.sunshine";
-    }
     res.render(
       'showall', {
         items: items,
         google_tracking_code   : App.google_tracking_code,
-        app_store_link         : appStoreLink
+        app_store_link         : getAppStoreLink(req.headers['user-agent']),
+        display_headline       : true,
+        ctapinning             : true
     });
   });
 };
@@ -293,7 +287,9 @@ exports.viewitem = function(req, res, next) {
           // To simplify the rendering logic for showing one item and multiple items, we'll stick
           // the item into an array.
           items: [ item ],
-          google_tracking_code   : App.google_tracking_code
+          google_tracking_code   : App.google_tracking_code,
+          display_home_button    : true,
+          app_store_link         : getAppStoreLink(req.headers['user-agent'])
         });
     });
 }
@@ -381,12 +377,17 @@ exports.hideitem = function(req, res, next) {
 }
 
 exports.install = function(req, res, next) {
-    var isAndroid = req.headers['user-agent'].match(/android/i);
+    appStoreLink = getAppStoreLink(req.headers['user-agent']);
+    res.redirect(appStoreLink);
+}
+
+function getAppStoreLink(userAgent) {
+    var isAndroid = userAgent.match(/android/i);
 
     if(isAndroid) {
-        res.redirect("market://details?id=co.wompwomp.sunshine");
+        return "market://details?id=co.wompwomp.sunshine";
     }
     else {
-        res.redirect("http://play.google.com/store/apps/details?id=co.wompwomp.sunshine");
+        return "http://play.google.com/store/apps/details?id=co.wompwomp.sunshine";
     }
 }

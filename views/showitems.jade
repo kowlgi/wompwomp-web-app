@@ -1,5 +1,22 @@
+script.
+    var wompwomppinning = #{ctapinning}
 div.container-fluid(id="main")
-  div(class="section")
+  if display_headline
+      div.section.center
+          h4.theme-color-text
+              |Top Trending Content
+          h6
+              |For the complete experience install the
+              |&nbsp;
+              a(href=app_store_link) app
+  if display_home_button
+      div.section
+          div.row
+              div.col.l4.offset-l4
+                  a(href="/")
+                      i.material-icons(id="icon-middle") navigate_before
+                      |Home
+  div.section
       each item in items
           div(class="row")
             div(class="col l4 offset-l4")
