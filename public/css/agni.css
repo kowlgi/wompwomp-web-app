@@ -116,4 +116,5 @@ input[type=email] {
 .btn {
     height: unset;
     line-height: unset;
+    padding: 0 0.5rem;
 }
