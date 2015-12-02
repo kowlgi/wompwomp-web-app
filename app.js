@@ -80,7 +80,7 @@ var rule = new schedule.RecurrenceRule();
 if (ops.scheduler_frequency == 'lazy') {
   util.log('Running the scheduler every day at 6AM');
   rule.dayOfWeek = [new schedule.Range(0, 6)];
-  rule.hour = 6;
+  rule.hour = 10;
   rule.minute = 0;
 } else {
   util.log('Running the scheduler in the first second of every minute');
