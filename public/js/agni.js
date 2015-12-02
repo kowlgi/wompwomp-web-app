@@ -27,31 +27,31 @@ $(document).ready(function() {
             if(!docCookies.hasItem("nopininstall")) {
                 $('#install').addClass('fixed-top');
                 $('#install_placeholder').css({display: 'block'});
-                $('#pinnedinstallclosebutton').css({display: 'block'});
+                $('#pinnedinstallclosebutton').css({visibility: 'visible'});
             }
 
             if(!docCookies.hasItem("nopinsubscribe")) {
                 $('#subscribe').addClass('fixed-bottom');
                 $('#subscribe_placeholder').css({display: 'block'});
-                $('#pinnedsubscribeclosebutton').css({display: 'block'});
+                $('#pinnedsubscribeclosebutton').css({visibility: 'visible'});
             }
         }
         else
         {
             $('#install').removeClass('fixed-top');
             $('#install_placeholder').css({display: 'none'});
-            $('#pinnedinstallclosebutton').css({display: 'none'});
+            $('#pinnedinstallclosebutton').css({visibility: 'hidden'});
 
             $('#subscribe').removeClass('fixed-bottom');
             $('#subscribe_placeholder').css({display: 'none'});
-            $('#pinnedsubscribeclosebutton').css({display: 'none'});
+            $('#pinnedsubscribeclosebutton').css({visibility: 'hidden'});
         }
 
         if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-            $('#pinnedsubscribeclosebutton').css({display: 'none'});
+            $('#pinnedsubscribeclosebutton').css({visibility: 'hidden'});
         }
         else if(!docCookies.hasItem("nopinsubscribe")) {
-            $('#pinnedsubscribeclosebutton').css({display: 'block'});
+            $('#pinnedsubscribeclosebutton').css({visibility: 'visible'});
         }
     });
 

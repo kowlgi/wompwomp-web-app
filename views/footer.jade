@@ -1,16 +1,15 @@
 div(id="subscribe_placeholder")
 div(id="subscribe")
-    div.theme-background
-        div.right
-            a(id="pinnedsubscribeclosebutton", href="")
-                i.material-icons.theme-background.theme-text.closebutton close
+    div.container-fluid.theme-background
         div.section
-            div.container-fluid
-                div.theme-text.center
-                    |Get wompwomp beamed to you weekly &nbsp;
-                    = " "
-                    button(class="btn modal-trigger theme-dark",
-                        data-target="subscribemodal") Subscribe
+            div.right
+                a(id="pinnedsubscribeclosebutton", href="")
+                    i.material-icons.theme-background.theme-text.closebutton close
+            div.theme-text.center
+                |Get our weekly email &nbsp;
+                = " "
+                button(class="btn modal-trigger theme-dark",
+                    data-target="subscribemodal") Subscribe
 include subscribemodal.jade
 script(src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js")
 script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.2/js/materialize.min.js")

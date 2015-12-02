@@ -102,11 +102,12 @@ input[type=email] {
 }
 
 #pinnedinstallclosebutton, #pinnedsubscribeclosebutton {
-    display:none;
+    visibility: hidden;
 }
 
 .closebutton {
     font-size:1.5em;
+    padding-right: 5px;
 }
 
 #icon-middle {
