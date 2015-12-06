@@ -54,9 +54,9 @@ exports.GetFresh = function() {
             if (caption.length > MAX_CAPTION_LENGTH) {
               caption = caption.substring(0, MAX_CAPTION_LENGTH) + '...';
             }
-            var subject = caption + ' and other steaming hot posts on WompWomp.co';
+            var subject = '\'' + caption + '\' and other steaming hot posts on wompwomp.co';
             if (items.length == 1) {
-              subject = 'Steaming hot post on WompWomp.co: ' + caption;
+              subject = 'Steaming hot post on wompwomp.co: \'' + caption + '\'';
             }
             Mail.sendHtmlEmail(App.mailgun, App.MAILING_LIST, subject, '', html, current_time, UpdateMailingListSendTime);
           } else {

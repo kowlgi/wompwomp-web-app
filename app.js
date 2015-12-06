@@ -78,7 +78,7 @@ var rule = new schedule.RecurrenceRule();
 // TODO(hnag): Eventually when all the mailinglist code is complete don't run
 // the scheduler so aggressively.
 if (ops.scheduler_frequency == 'lazy') {
-  util.log('Running the scheduler every day at 6AM');
+  util.log('Running the scheduler every day at 10AM ET');
   rule.dayOfWeek = [new schedule.Range(0, 6)];
   rule.hour = 10;
   rule.minute = 0;
