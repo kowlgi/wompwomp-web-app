@@ -20,8 +20,6 @@ $(document).ready(function() {
 
     var triggerPosition = $('#install').offset().top;
     $(window).scroll(function() {
-        if(!wompwomppinning) return;
-
         if($(window).scrollTop() > triggerPosition)
         {
             if(!docCookies.hasItem("nopininstall")) {

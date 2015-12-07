@@ -21,7 +21,6 @@ exports.index = function(req, res, next) {
         google_tracking_code   : App.google_tracking_code,
         app_store_link         : getAppStoreLink(req.headers['user-agent']),
         display_headline       : true,
-        ctapinning             : true,
         metaDescription        : "Your funniest minute every day. Mobile friendly."
     });
   });
