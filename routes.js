@@ -382,19 +382,6 @@ exports.install = function(req, res, next) {
     res.redirect(appStoreLink);
 }
 
-exports.showallitems = function(req, res, next) {
-    AgniModel.find(FILTER_CONDITION).sort('-created_on').exec(function(err, items) {
-      res.render(
-        'showall', {
-          items: items,
-          google_tracking_code   : App.google_tracking_code,
-          app_store_link         : getAppStoreLink(req.headers['user-agent']),
-          display_headline       : true,
-          metaDescription        : "Your funniest minute every day. Mobile friendly."
-      });
-    });
-}
-
 function getAppStoreLink(userAgent) {
     var isAndroid = userAgent.match(/android/i);
 
