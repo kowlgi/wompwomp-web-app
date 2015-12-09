@@ -1,4 +1,4 @@
-div.container-fluid(id="main")
+div.container-fluid
   if display_headline
       div.section.center
           h4.theme-color-text
@@ -16,9 +16,19 @@ div.container-fluid(id="main")
                       i.material-icons(id="icon-middle") navigate_before
                       |See new funny posts
   div.section
+      div.row
+          div.col.l4.offset-l4
+              if display_buffered_item_meta_data
+                  if items.length > 0
+                      h4 Buffered Items
+                  else
+                      h4 wompwomp for real :(
+                      |Don't sit on yo ass. Submit an item quick or eat only samosas for the rest of your life
       each item in items
-          div(class="row")
-            div(class="col l4 offset-l4")
+          div.row
+            div.col.l4.offset-l4
+              if display_buffered_item_meta_data
+                  include buffered_item_meta_data.jade
               div(class="card hoverable")
                 a(href="/v/"+ item.id, class="card-image")
                   img(src="#{item.imageuri}")
@@ -34,7 +44,7 @@ div.container-fluid(id="main")
                             data-action="share/whatsapp/share")
                             img(src="images/share-icon.png" height="24px", width="24px")
                     p.em.small.grey-text
-                        =moment(item.created_on).fromNow()
+                        =moment_local(item.created_on).fromNow()
         - itemcount++
   div.bottom.center.tiny-text
       |a hatching amazing labs creation &copy; 2015&nbsp;

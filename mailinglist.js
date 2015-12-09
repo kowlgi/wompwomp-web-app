@@ -14,7 +14,7 @@ var AgniMailingListStatsModel = mongoose.model('AgniMailingListStats');
 var LAST_SENT_SECS = 60;
 var MAX_CAPTION_LENGTH = 40;
 // Do not email any hidden items to the user
-var FILTER_CONDITION = {category: {$ne: "hidden"}};
+var NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and: [{category: {$ne: "hidden"}}, {category: {$ne: "buffered"}}] };
 
 // Helper to update the last time we sent users an email
 function UpdateMailingListSendTime(payload, timestamp) {
@@ -44,7 +44,12 @@ exports.GetFresh = function() {
       util.log('Difference is ' + diff_secs);
       if (diff_secs > LAST_SENT_SECS) {
         var date_filter = { "created_on" : { $gte : new Date(previous_time) }};
-        AgniModel.find(FILTER_CONDITION).find(date_filter).sort('-created_on').limit(10).exec(function(err, items) {
+        AgniModel.
+            find(NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY).
+            find(date_filter).
+            sort('-created_on').
+            limit(10).
+            exec(function(err, items) {
           if (items.length > 0) {
             // Now prepare an email to send ...
             util.log('Here are the newest posts we can mail users: ' + items);

@@ -7,14 +7,22 @@ var Mail = require('./mail');
 var Shortid = require('shortid');
 var Vibrant = require('node-vibrant');
 var App = require('./app');
+var Moment = require('moment-timezone');
+var CronParser = require('cron-parser');
+var Config = require('./config');
+var AgniPushNotificationStatsModel = mongoose.model('AgniPushNotificationStats');
 
 var MAX_TEXT_LENGTH = 500;
-var FILTER_CONDITION = {category: {$ne: "hidden"}};
+var NOT_HIDDEN_CATEGORY = {category: {$ne: "hidden"}};
+var IS_BUFFERED_CATEGORY = {category: "buffered"};
+var NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and: [{category: {$ne: "hidden"}}, {category: {$ne: "buffered"}}] };
 var MAX_EMAIL_LENGTH = 128;
 
 exports.index = function(req, res, next) {
-  // Show the top 20 most recent items on the home page
-  AgniModel.find(FILTER_CONDITION).sort('-created_on').limit(20).exec(function(err, items) {
+  AgniModel.
+      find(NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY).
+      sort('-created_on').limit(20).
+      exec(function(err, items) {
     res.render(
       'showall', {
         items: items,
@@ -84,22 +92,24 @@ exports.submit = function(req, res, next) {
             util.error(err);
             return next(err);
         }
-        util.log('/submit: received an item and submitted into db');
-        try {
+
+        if(agniquote.category != "buffered" && agniquote.category != "hidden") {
+            util.log("Pushing notification at submit time for: " + agniquote);
             // send notification to notify phone app to sync feed
             sendNotification("/topics/sync");
 
             if(req.body.notifyuser == "content") {
                 sendNotification("/topics/content",
-                    req.body.text.substring(0, MAX_TEXT_LENGTH),
-                    req.body.imageuri.substring(0, MAX_TEXT_LENGTH),
+                    agniquote.text,
+                    agniquote.imageuri,
                     agniquote.id);
             }
-        } catch(err) {
-            util.error(err);
-        } finally {
-            res.end();
         }
+        else {
+            util.log("Either buffered or hidden submit: " + agniquote);
+        }
+
+        res.end();
     });
 };
 
@@ -174,7 +184,7 @@ exports.items = function(req, res, next) {
         offset = parseInt(req.query.offset);
     }
 
-    var conditions = FILTER_CONDITION;
+    var conditions = NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY;
     //if(typeof req.query.category != "undefined"){
     //    conditions = {category: req.query.category};
     //}
@@ -251,7 +261,7 @@ exports.abbreviateditems = function(req, res, next) {
     }
 
     AgniModel.
-        find(FILTER_CONDITION).
+        find(NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY).
         find(find_condition).
         sort(sort_condition).
         limit(limitval).
@@ -380,6 +390,116 @@ exports.hideitem = function(req, res, next) {
 exports.install = function(req, res, next) {
     appStoreLink = getAppStoreLink(req.headers['user-agent']);
     res.redirect(appStoreLink);
+}
+
+exports.releaseBufferedContent = function() {
+    util.log("releaseBufferedContent() called at " + Moment().format());
+    AgniModel.
+        find(IS_BUFFERED_CATEGORY).
+        sort({created_on: 1}).
+        limit(1).
+        exec(function(err, quotes){
+            if(err) {
+                return next(err);
+            }
+
+            if(quotes.length > 0) {
+                quotes[0].category[0] = "";
+                quotes[0].created_on = Date.now();
+                quotes[0].markModified('category');
+                quotes[0].markModified('created_on');
+                quotes[0].save();
+
+                util.log("Release scheduled content: " + quotes[0]);
+                // send notification to notify phone app to sync feed
+                sendNotification("/topics/sync");
+            }
+        });
+}
+
+exports.pushContentNotification = function() {
+    util.log("pushContentNotification() called at " + Moment().format());
+    AgniModel.
+        find(NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY).
+        sort({created_on: -1}).
+        limit(1).
+        exec(function(err, quotes){
+            if(err) {
+                return next(err);
+            }
+
+            if(quotes.length > 0) {
+                AgniPushNotificationStatsModel.
+                    find().
+                    sort({created_on: -1}).
+                    limit(1).
+                    exec(function(err, previousNotification) {
+                        if(err) {
+                            return next(err);
+                        }
+
+                        util.log("previous notification: " + previousNotification[0].created_on);
+                        util.log("newest item created on: " + quotes[0].created_on);
+
+                        if(previousNotification.length < 1 ||
+                            previousNotification[0].created_on < quotes[0].created_on) {
+                            util.log("Pushing scheduled notification: " + quotes[0]);
+
+                            sendNotification("/topics/content",
+                                quotes[0].text,
+                                quotes[0].imageuri,
+                                quotes[0].id);
+
+                            var newPushNotification = new AgniPushNotificationStatsModel({
+                                item_id    : quotes[0].id,
+                                created_on : Date.now()
+                            }).save(function(err, pushNotificationStat) {
+                                if(err) {
+                                    util.log(err);
+                                    return next(err);
+                                }
+
+                                util.log("just pushed this stat: " + pushNotificationStat);
+                            });
+                        }
+                        else {
+                            util.log("No new items for push notification");
+                        }
+                    });
+            }
+        });
+}
+
+exports.showBufferedContent = function(req, res, next) {
+    var release_interval = CronParser.parseExpression(Config.release_content_scheduler_frequency);
+    var notification_interval = CronParser.parseExpression(Config.push_notification_scheduler_frequency);
+    var mailing_list_interval = CronParser.parseExpression(Config.mailing_list_scheduler_frequency);
+
+    AgniModel.
+        find(IS_BUFFERED_CATEGORY).
+        sort({created_on: 1}).
+        exec(function(err, quotes){
+            if(err) {
+                return next(err);
+            }
+
+            endtime = new Date('1982-12-17T03:10:10');
+            for(i = 0; i < quotes.length; i++) {
+                endtime = release_interval.next();
+            }
+
+            res.render('buffereditems', {
+                items                           : quotes,
+                starttime                       : release_interval,
+                endtime                         : endtime,
+                pushNotificationTime            : notification_interval,
+                mailingListTime                 : mailing_list_interval,
+                google_tracking_code            : App.google_tracking_code,
+                app_store_link                  : getAppStoreLink(req.headers['user-agent']),
+                metaDescription                 : "",
+                display_buffered_item_meta_data : true
+            });
+        });
 }
 
 function getAppStoreLink(userAgent) {

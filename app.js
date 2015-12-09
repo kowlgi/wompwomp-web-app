@@ -18,8 +18,6 @@ var ops = stdio.getopt({
         {key: 'e', args: 1, description: 'The deckrank email domain. Invalid domain = no email notifications', mandatory: false},
     'mailing_list':
         {key: 'l', args: 1, description: 'Who to send the mail to', default: 'fun@mg.wompwomp.co', mandatory: false},
-    'scheduler_frequency':
-        {key: 's', args: 1, description: 'How frequently should we run the mailing list scheduler (lazy|aggressive)', default: 'lazy', mandatory: false},
     });
 
 var app = express();
@@ -32,7 +30,7 @@ app.set('view engine', 'jade');
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-app.locals.moment = require('moment');
+app.locals.moment_local = require('moment-timezone');
 
 // database setup
 require('./db').init(config.db);
@@ -62,6 +60,7 @@ app.post('/f/:id', routes.favorite);
 app.post('/uf/:id', routes.unfavorite);
 app.post('/hideitem', routes.hideitem);
 app.get('/install', routes.install);
+app.get('/buffer', routes.showBufferedContent);
 app.use(function(req, res) {
     util.log('Unable to find URI ' + req.url + ' redirecting back home');
     res.redirect('/');
@@ -74,19 +73,9 @@ var MAILING_LIST = ops.mailing_list;
 var mg = require('mailgun-js')({apiKey: ops.mailgun_api, domain: ops.email_domain});
 
 var mailinglist = require('./mailinglist');
-var rule = new schedule.RecurrenceRule();
-// TODO(hnag): Eventually when all the mailinglist code is complete don't run
-// the scheduler so aggressively.
-if (ops.scheduler_frequency == 'lazy') {
-  util.log('Running the scheduler every day at 10AM ET');
-  rule.dayOfWeek = [new schedule.Range(0, 6)];
-  rule.hour = 10;
-  rule.minute = 0;
-} else {
-  util.log('Running the scheduler in the first second of every minute');
-  rule.second = 1;
-}
-schedule.scheduleJob(rule, mailinglist.GetFresh);
+schedule.scheduleJob(config.mailing_list_scheduler_frequency, mailinglist.GetFresh);
+schedule.scheduleJob(config.release_content_scheduler_frequency, routes.releaseBufferedContent);
+schedule.scheduleJob(config.push_notification_scheduler_frequency, routes.pushContentNotification);
 
 // Start server
 http.createServer(app).listen(app.get('port'), function() {
