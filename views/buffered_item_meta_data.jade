@@ -1,0 +1,11 @@
+- var liveTime = starttime.next()
+p
+    |Going live
+    =" "
+    span.theme-color-text
+        =" "
+        =moment_local(liveTime).fromNow()
+    =" "
+    |on
+    =" "
+    =moment_local(liveTime).tz('America/New_York').format('MMM D, h:mma z')

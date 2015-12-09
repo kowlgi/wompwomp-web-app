@@ -1,0 +1,68 @@
+include head.jade
+body
+    include header.jade
+    div.container-fluid
+      div.section
+          div.row
+              div.col.l4.offset-l4
+                  h4 Stats
+                  p
+                      span.theme-color-text
+                          =items.length
+                      =" "
+                      if items.length == 1
+                          |item
+                      else
+                          |items
+                      =" "
+                      |buffered
+                  p
+                      |Next item live
+                      =" "
+                      span.theme-color-text
+                          =" "
+                          - starttime.reset()
+                          =moment_local(starttime.next()).fromNow()
+                          - starttime.reset()
+                      =" "
+                      |on
+                      =" "
+                      - starttime.reset()
+                      =moment_local(starttime.next()).tz('America/New_York').format('MMM D, h:mm:ssa z')
+                      - starttime.reset()
+                  p
+                      |Notification
+                      =" "
+                      span.theme-color-text
+                          =" "
+                          - pushNotificationTime.reset()
+                          =moment_local(pushNotificationTime.next()).fromNow()
+                          - pushNotificationTime.reset()
+                      =" "
+                      |on
+                      =" "
+                      - pushNotificationTime.reset()
+                      =moment_local(pushNotificationTime.next()).tz('America/New_York').format('MMM D, h:mm:ssa z')
+                      - pushNotificationTime.reset()
+                  p
+                      |Buffer empty
+                      =" "
+                      span.theme-color-text
+                          =" "
+                          =moment_local(endtime).fromNow()
+                      =" "
+                      |on
+                      =" "
+                      =moment_local(endtime).tz('America/New_York').format('MMM D, h:mma z')
+                  p
+                      |Email
+                      =" "
+                      span.theme-color-text
+                          =" "
+                          =moment_local(mailingListTime.next()).fromNow()
+                      =" "
+                      |on
+                      =" "
+                      =moment_local(mailingListTime.next()).tz('America/New_York').format('MMM D, YYYY h:mma z')
+    include showitems.jade
+    include footer.jade
