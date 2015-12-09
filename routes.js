@@ -438,7 +438,6 @@ exports.pushContentNotification = function() {
                             return next(err);
                         }
 
-                        util.log("previous notification: " + previousNotification[0].created_on);
                         util.log("newest item created on: " + quotes[0].created_on);
 
                         if(previousNotification.length < 1 ||
