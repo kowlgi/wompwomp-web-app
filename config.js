@@ -5,9 +5,9 @@ config.submitkey = "hellno";
 config.pushnotificationkey = "inyoface";
 config.db = "agnitest";
 config.mailing_list_scheduler_frequency = "0 0 10 * * *";
-config.release_content_scheduler_frequency = "0 0 */3 * * *";
+config.release_content_scheduler_frequency = "0 0 1,3,6,9,13,17,21,23 * * *";
 
-/* just in case release time overlaps, give ~10 seconds for buffered content
+/* in cases where release time overlaps, give ~10 seconds for buffered content
    to be released  */
 config.push_notification_scheduler_frequency = "10 0 1,13,17,21 * * *";
 
