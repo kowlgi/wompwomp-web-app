@@ -1,5 +1,7 @@
 $(document).ready(function() {
-    setupGoogleAnalytics();
+    if(typeof ReportAnalytics == "undefined" || ReportAnalytics) {
+        setupGoogleAnalytics();
+    }
 
     //http://stackoverflow.com/questions/10118172/setting-div-width-and-height-in-javascript
     var installHeightInPixels = String($('#install').height())+"px";
