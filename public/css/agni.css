@@ -119,3 +119,7 @@ input[type=email] {
     line-height: unset;
     padding: 0 0.5rem;
 }
+
+ul {
+    padding-left: 40px;
+}

@@ -1,4 +1,5 @@
 include head.jade
+link(rel="stylesheet", href="css/flags.css")
 script.
     var ReportAnalytics = false;
 body
@@ -33,6 +34,7 @@ body
                       =moment_local(starttime.next()).tz('America/New_York').format('MMM D, h:mm:ssa z')
                       - starttime.reset()
                   p
+                      i.material-icons.tiny alarm
                       |Notification
                       =" "
                       span.theme-color-text
@@ -42,10 +44,31 @@ body
                           - pushNotificationTime.reset()
                       =" "
                       |on
-                      =" "
-                      - pushNotificationTime.reset()
-                      =moment_local(pushNotificationTime.next()).tz('America/New_York').format('MMM D, h:mm:ssa z')
-                      - pushNotificationTime.reset()
+                      ul
+                          li
+                              img(class="flag flag-us")
+                              =" "
+                              - pushNotificationTime.reset()
+                              =moment_local(pushNotificationTime.next()).tz('America/New_York').format('MMM D, h:mm:ssa z')
+                              - pushNotificationTime.reset()
+                          li
+                              img(class="flag flag-us")
+                              =" "
+                              - pushNotificationTime.reset()
+                              =moment_local(pushNotificationTime.next()).tz('America/Los_Angeles').format('MMM D, h:mm:ssa z')
+                              - pushNotificationTime.reset()
+                          li
+                              img(class="flag flag-in")
+                              =" "
+                              - pushNotificationTime.reset()
+                              =moment_local(pushNotificationTime.next()).tz('Asia/Kolkata').format('MMM D, h:mm:ssa z')
+                              - pushNotificationTime.reset()
+                          li
+                              img(class="flag flag-br" )
+                              =" "
+                              - pushNotificationTime.reset()
+                              =moment_local(pushNotificationTime.next()).tz('America/Sao_Paulo').format('MMM D, h:mm:ssa z')
+                              - pushNotificationTime.reset()
                   p
                       |Buffer empty
                       =" "
