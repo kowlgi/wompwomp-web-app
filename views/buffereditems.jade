@@ -29,10 +29,13 @@ body
                           - starttime.reset()
                       =" "
                       |on
-                      =" "
-                      - starttime.reset()
-                      =moment_local(starttime.next()).tz('America/New_York').format('MMM D, h:mm:ssa z')
-                      - starttime.reset()
+                      ul
+                          li
+                              img(class="flag flag-us")
+                              =" "
+                              - starttime.reset()
+                              =moment_local(starttime.next()).tz('America/New_York').format('MMM D, h:mm:ss A z')
+                              - starttime.reset()
                   p
                       i.material-icons.tiny alarm
                       |Notification
@@ -49,25 +52,31 @@ body
                               img(class="flag flag-us")
                               =" "
                               - pushNotificationTime.reset()
-                              =moment_local(pushNotificationTime.next()).tz('America/New_York').format('MMM D, h:mm:ssa z')
+                              =moment_local(pushNotificationTime.next()).tz('America/New_York').format('MMM D, h:mm:ss A z')
                               - pushNotificationTime.reset()
                           li
                               img(class="flag flag-us")
                               =" "
                               - pushNotificationTime.reset()
-                              =moment_local(pushNotificationTime.next()).tz('America/Los_Angeles').format('MMM D, h:mm:ssa z')
+                              =moment_local(pushNotificationTime.next()).tz('America/Los_Angeles').format('MMM D, h:mm:ss A z')
                               - pushNotificationTime.reset()
                           li
                               img(class="flag flag-in")
                               =" "
                               - pushNotificationTime.reset()
-                              =moment_local(pushNotificationTime.next()).tz('Asia/Kolkata').format('MMM D, h:mm:ssa z')
+                              =moment_local(pushNotificationTime.next()).tz('Asia/Kolkata').format('MMM D, h:mm:ss A z')
                               - pushNotificationTime.reset()
                           li
                               img(class="flag flag-br" )
                               =" "
                               - pushNotificationTime.reset()
-                              =moment_local(pushNotificationTime.next()).tz('America/Sao_Paulo').format('MMM D, h:mm:ssa z')
+                              =moment_local(pushNotificationTime.next()).tz('America/Sao_Paulo').format('MMM D, h:mm:ss A z')
+                              - pushNotificationTime.reset()
+                          li
+                              img(class="flag flag-gb" )
+                              =" "
+                              - pushNotificationTime.reset()
+                              =moment_local(pushNotificationTime.next()).tz('Europe/London').format('MMM D, h:mm:ss A z')
                               - pushNotificationTime.reset()
                   p
                       |Buffer empty
@@ -77,8 +86,11 @@ body
                           =moment_local(endtime).fromNow()
                       =" "
                       |on
-                      =" "
-                      =moment_local(endtime).tz('America/New_York').format('MMM D, h:mma z')
+                      ul
+                          li
+                              img(class="flag flag-us")
+                              =" "
+                              =moment_local(endtime).tz('America/New_York').format('MMM D, h:mm A z')
                   p
                       |Email
                       =" "
@@ -87,7 +99,10 @@ body
                           =moment_local(mailingListTime.next()).fromNow()
                       =" "
                       |on
-                      =" "
-                      =moment_local(mailingListTime.next()).tz('America/New_York').format('MMM D, YYYY h:mma z')
+                      ul
+                          li
+                              img(class="flag flag-us")
+                              =" "
+                              =moment_local(mailingListTime.next()).tz('America/New_York').format('MMM D, YYYY h:mm A z')
     include showitems.jade
     include footer.jade
