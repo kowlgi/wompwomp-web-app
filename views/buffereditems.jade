@@ -97,6 +97,7 @@ body
                       span.theme-color-text
                           =" "
                           =moment_local(mailingListTime.next()).fromNow()
+                          - mailingListTime.reset()
                       =" "
                       |on
                       ul

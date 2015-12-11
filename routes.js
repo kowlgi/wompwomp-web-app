@@ -400,7 +400,8 @@ exports.releaseBufferedContent = function() {
         limit(1).
         exec(function(err, quotes){
             if(err) {
-                return next(err);
+                util.error(err);
+                return;
             }
 
             if(quotes.length > 0) {
@@ -425,7 +426,8 @@ exports.pushContentNotification = function() {
         limit(1).
         exec(function(err, quotes){
             if(err) {
-                return next(err);
+                util.error(err);
+                return;
             }
 
             if(quotes.length > 0) {
@@ -435,7 +437,8 @@ exports.pushContentNotification = function() {
                     limit(1).
                     exec(function(err, previousNotification) {
                         if(err) {
-                            return next(err);
+                            util.error(err);
+                            return;
                         }
 
                         util.log("newest item created on: " + quotes[0].created_on);
@@ -455,7 +458,7 @@ exports.pushContentNotification = function() {
                             }).save(function(err, pushNotificationStat) {
                                 if(err) {
                                     util.log(err);
-                                    return next(err);
+                                    return;
                                 }
 
                                 util.log("just pushed this stat: " + pushNotificationStat);
