@@ -7,11 +7,6 @@ var mongoose = require('mongoose'),
 var AgniModel = mongoose.model('Agni');
 var AgniMailingListModel = mongoose.model('AgniMailingList');
 var AgniMailingListStatsModel = mongoose.model('AgniMailingListStats');
-
-// If there are new updates, push an email after these many seconds.
-// Value of 60 is aggressive. Basically this means sending an email
-// everytime the scheduler runs. To send an email once a day set this to 86400.
-var LAST_SENT_SECS = 60;
 var MAX_CAPTION_LENGTH = 40;
 // Do not email any hidden items to the user
 var NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and: [{category: {$ne: "hidden"}}, {category: {$ne: "buffered"}}] };
@@ -34,33 +29,31 @@ function UpdateMailingListSendTime(payload, timestamp) {
 exports.GetFresh = function() {
   var previous_time = 0;
   var current_time = Date.now();
-  AgniMailingListStatsModel.find().sort('-created_on').limit(1).exec(function(err, items) {
-    if (items.length == 0) {
+  AgniMailingListStatsModel.find().sort('-created_on').limit(1).exec(function(err, stats) {
+    if (stats.length == 0) {
       UpdateMailingListSendTime('test', current_time);
       util.log('mailing stats db empty; creating first entry');
     } else {
-      previous_time = items[0].created_on;
-      var diff_secs = Math.abs(current_time - previous_time)/1000;
-      util.log('Difference is ' + diff_secs);
-      if (diff_secs > LAST_SENT_SECS) {
-        var date_filter = { "created_on" : { $gte : new Date(previous_time) }};
+        previous_time = stats[0].created_on;
+        var date_filter = { "created_on" : { $gt : new Date(previous_time) }};
         AgniModel.
             find(NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY).
             find(date_filter).
-            sort('-created_on').
+            sort('-numfavorites').
+            sort('-numshares').
             limit(10).
-            exec(function(err, items) {
-          if (items.length > 0) {
+            exec(function(err, content) {
+          if (content.length > 0) {
             // Now prepare an email to send ...
-            util.log('Here are the newest posts we can mail users: ' + items);
-            var meat_html = jade.renderFile('views/email.jade', {items: items});
+            util.log('Here are the newest posts we can mail users: ' + content);
+            var meat_html = jade.renderFile('views/email.jade', {items: content});
             var html = fs.readFileSync('views/email_above.jade').toString() + meat_html + fs.readFileSync('views/email_below.jade').toString();
-            var caption = items[0].text;
+            var caption = content[0].text;
             if (caption.length > MAX_CAPTION_LENGTH) {
               caption = caption.substring(0, MAX_CAPTION_LENGTH) + '...';
             }
             var subject = '\'' + caption + '\' and other steaming hot posts on wompwomp.co';
-            if (items.length == 1) {
+            if (content.length == 1) {
               subject = 'Steaming hot post on wompwomp.co: \'' + caption + '\'';
             }
             Mail.sendHtmlEmail(App.mailgun, App.MAILING_LIST, subject, '', html, current_time, UpdateMailingListSendTime);
@@ -68,7 +61,6 @@ exports.GetFresh = function() {
             util.log('There are no new items to mail our users');
           }
         });
-      }
     }
   });
 };

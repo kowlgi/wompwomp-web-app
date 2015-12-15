@@ -9,7 +9,7 @@ config.db = "agnitest";
    0th second of every minute */
 //config.mailing_list_scheduler_frequency = "0 */1 * * * * ";
 
-config.mailing_list_scheduler_frequency = "0 0 10 * * *";
+config.mailing_list_scheduler_frequency = "0 0 10 * * 3,6";
 config.release_content_scheduler_frequency = "0 0 1,3,6,10,13,17,21,23 * * *";
 
 /* in cases where release time overlaps, give ~10 seconds for buffered content
