@@ -39,13 +39,11 @@ exports.GetFresh = function() {
         AgniModel.
             find(NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY).
             find(date_filter).
-            sort('-numfavorites').
-            sort('-numshares').
-            limit(10).
             exec(function(err, content) {
           if (content.length > 0) {
+            content.sort(compare);
+            content = content.slice(0,10);
             // Now prepare an email to send ...
-            util.log('Here are the newest posts we can mail users: ' + content);
             var meat_html = jade.renderFile('views/email.jade', {items: content});
             var html = fs.readFileSync('views/email_above.jade').toString() + meat_html + fs.readFileSync('views/email_below.jade').toString();
             var caption = content[0].text;
@@ -64,3 +62,11 @@ exports.GetFresh = function() {
     }
   });
 };
+
+function compare(a,b) {
+    if (a.numfavorites + a.numshares < b.numfavorites + b.numshares)
+        return 1;
+    if (a.numfavorites + a.numshares > b.numfavorites + b.numshares)
+        return -1;
+    return 0;
+}
