@@ -19,6 +19,7 @@
     "compression": "^1.6.0",
     "cron-parser": "^1.0.2",
     "express": "^4.13.3",
+    "geoip-lite": "^1.1.6",
     "jade": "^1.11.0",
     "mailcomposer": "^2.1.0",
     "mailgun-js": "^0.7.5",

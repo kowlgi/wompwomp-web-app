@@ -61,6 +61,7 @@ app.post('/uf/:id', routes.unfavorite);
 app.post('/hideitem', routes.hideitem);
 app.get('/install', routes.install);
 app.get('/buffer', routes.showBufferedContent);
+app.get('/userstats', routes.userstats);
 app.use(function(req, res) {
     util.log('Unable to find URI ' + req.url + ' redirecting back home');
     res.redirect('/');

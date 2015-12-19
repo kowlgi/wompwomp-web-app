@@ -11,12 +11,21 @@ var Moment = require('moment-timezone');
 var CronParser = require('cron-parser');
 var Config = require('./config');
 var AgniPushNotificationStatsModel = mongoose.model('AgniPushNotificationStats');
+var AgniUserStatsModel = mongoose.model('AgniUserStats');
+var geoip = require('geoip-lite');
 
 var MAX_TEXT_LENGTH = 500;
 var NOT_HIDDEN_CATEGORY = {category: {$ne: "hidden"}};
 var IS_BUFFERED_CATEGORY = {category: "buffered"};
 var NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and: [{category: {$ne: "hidden"}}, {category: {$ne: "buffered"}}] };
 var MAX_EMAIL_LENGTH = 128;
+
+/* User actions */
+var REFRESH_TOP = "Refresh_top";
+var REFRESH_BOTTOM = "Refresh_bottom";
+var LIKE = "Like";
+var SHARE = "Share";
+var UNLIKE = "Unlike";
 
 exports.index = function(req, res, next) {
   AgniModel.
@@ -278,6 +287,15 @@ exports.abbreviateditems = function(req, res, next) {
             var response = quotelist;
             res.contentType('application/json');
             res.send(JSON.stringify(response));
+
+            var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+            var agniuserstat = new AgniUserStatsModel({
+                ip_address     : ip,
+                timestamp      : Date.now(),
+                action         : limitval < 0 ? REFRESH_BOTTOM : REFRESH_TOP,
+                content_id     : ""
+            }).save();
         });
 }
 
@@ -320,6 +338,15 @@ exports.share = function(req, res, next) {
         item.numshares += 1;
         item.save();
         res.end();
+
+        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+        var agniuserstat = new AgniUserStatsModel({
+            ip_address     : ip,
+            timestamp      : Date.now(),
+            action         : SHARE,
+            content_id     : item.id
+        }).save();
     });
 }
 
@@ -338,6 +365,15 @@ exports.favorite = function(req, res, next) {
         item.numfavorites += 1;
         item.save();
         res.end();
+
+        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+        var agniuserstat = new AgniUserStatsModel({
+            ip_address     : ip,
+            timestamp      : Date.now(),
+            action         : LIKE,
+            content_id     : item.id
+        }).save();
     });
 }
 
@@ -359,6 +395,15 @@ exports.unfavorite = function(req, res, next) {
 
         item.save();
         res.end();
+
+        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+        var agniuserstat = new AgniUserStatsModel({
+            ip_address     : ip,
+            timestamp      : Date.now(),
+            action         : UNLIKE,
+            content_id     : item.id
+        }).save();
     });
 }
 
@@ -500,6 +545,31 @@ exports.showBufferedContent = function(req, res, next) {
                 app_store_link                  : getAppStoreLink(req.headers['user-agent']),
                 metaDescription                 : "",
                 display_buffered_item_meta_data : true
+            });
+        });
+}
+
+exports.userstats = function(req, res, next) {
+    AgniUserStatsModel.
+        aggregate(
+            {
+                $group: {
+                    _id    : '$ip_address',
+                    stats  : {$push: '$$ROOT'},
+                }
+            }, function(err, userlist){
+            if(err) {
+                util.error(err);
+                return next(err);
+            }
+
+            for(i = 0; i < userlist.length; i++) {
+                var geo = geoip.lookup(userlist[i]._id) || {city: "simple", region: "nether", country: "hillbilly"};
+                userlist[i].location = geo.city + ", " + geo.region + ", " + geo.country;
+            }
+
+            res.render('userstats', {
+                users: userlist
             });
         });
 }
