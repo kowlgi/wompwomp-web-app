@@ -288,7 +288,7 @@ exports.abbreviateditems = function(req, res, next) {
             res.contentType('application/json');
             res.send(JSON.stringify(response));
 
-            var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            var ip = req.connection.remoteAddress;
 
             var agniuserstat = new AgniUserStatsModel({
                 ip_address     : ip,
@@ -339,7 +339,7 @@ exports.share = function(req, res, next) {
         item.save();
         res.end();
 
-        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        var ip = req.connection.remoteAddress;
 
         var agniuserstat = new AgniUserStatsModel({
             ip_address     : ip,
@@ -366,7 +366,7 @@ exports.favorite = function(req, res, next) {
         item.save();
         res.end();
 
-        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        var ip = req.connection.remoteAddress;
 
         var agniuserstat = new AgniUserStatsModel({
             ip_address     : ip,
@@ -396,7 +396,7 @@ exports.unfavorite = function(req, res, next) {
         item.save();
         res.end();
 
-        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        var ip = req.connection.remoteAddress;
 
         var agniuserstat = new AgniUserStatsModel({
             ip_address     : ip,
