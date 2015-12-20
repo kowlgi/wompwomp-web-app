@@ -12,7 +12,7 @@ var CronParser = require('cron-parser');
 var Config = require('./config');
 var AgniPushNotificationStatsModel = mongoose.model('AgniPushNotificationStats');
 var AgniUserStatsModel = mongoose.model('AgniUserStats');
-//var geoip = require('geoip-lite');
+var geoip = require('geoip-lite');
 
 var MAX_TEXT_LENGTH = 500;
 var NOT_HIDDEN_CATEGORY = {category: {$ne: "hidden"}};
@@ -563,9 +563,19 @@ exports.userstats = function(req, res, next) {
             }
 
             for(i = 0; i < userlist.length; i++) {
-                // FIX THIS: geoip.lookup(userlist[i]._id) ||
-                var geo = {city: "XX", region: "XX", country: "XX"};
-                userlist[i].location = geo.city + ", " + geo.region + ", " + geo.country;
+        		var geo = geoip.lookup(userlist[i]._id) ||
+                    {city: "XX", region: "XX", country: "XX"};
+                    
+                if(geo.city != '') {
+                    userlist[i].location = geo.city + ", ";
+                }
+                else {
+                    userlist[i].location = '';
+        		}
+
+                if(geo.country != '') {
+                    userlist[i].location += geo.country;
+                }
             }
 
             res.render('userstats', {
