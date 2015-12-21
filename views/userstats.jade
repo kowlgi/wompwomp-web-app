@@ -6,44 +6,47 @@ body
     include header.jade
     div.container-fluid
       div.section
-          div.row
-              div.col.s12.l4.offset-l4
-                  a(href="/userstats?date="+ moment_local(today).add(-1, 'days').format('MM-DD-YYYY')).left
-                      i.material-icons(id="icon-middle") navigate_before
-                      |Previous day
-                  a(href="/userstats?date=" + moment_local(today).add(1, 'days').format('MM-DD-YYYY')).right
-                      |Next day
-                      i.material-icons(id="icon-middle") navigate_next
           div.row.center
               div.col.l4.offset-l4
-                  h5 User stats on
+                  h5 Stats for user in
                      =" "
-                     =moment_local(today).format('MMM DD, YYYY')
+                     =location
+                     =" "
+                     |with IP
+                     =" "
+                     =ip_address
                   div(class="table-responsive")
-                    table(class="table" id="userstats")
+                    table(class="table")
                       thead
                           tr.trhideclass
-                              th User IP address
-                              th Stats
+                              th No.
+                              th Date
+                              th Events
                           tbody
-                              each user in users
+                              - var i = 0
+                              each day in days
+                                - i++
                                 tr.trhideclass
                                   td
-                                    = user.location
-                                    br
-                                    em.grey-text
-                                        = user._id
+                                    = i
+                                  td
+                                    a(href="/dailystats?date="+day._id.month+"-"+day._id.day+"-"+day._id.year)
+                                        =day._id.month
+                                        ="-"
+                                        =day._id.day
+                                        ="-"
+                                        =day._id.year
                                   td
                                     ol
-                                      each stat in user.stats
+                                      each event in day.events
                                         li
-                                            =stat.action
+                                            =event.action
                                             =" "
-                                            if(stat.content_id != "")
-                                                a(href="http://wompwomp.co/v/"+stat.content_id)
-                                                     =stat.content_id
+                                            if(event.content_id != "")
+                                                a(href="http://wompwomp.co/v/"+event.content_id)
+                                                     =event.content_id
                                             =" "
                                             |at
                                             =" "
-                                            =moment_local(stat.timestamp).tz(user.timezone).format('h:mm A z')
+                                            =moment_local(event.timestamp).tz(timezone).format('h:mm A z')
     include footer.jade

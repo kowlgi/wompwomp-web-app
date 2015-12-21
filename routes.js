@@ -555,7 +555,7 @@ exports.showBufferedContent = function(req, res, next) {
         });
 }
 
-exports.userstats = function(req, res, next) {
+exports.dailystats = function(req, res, next) {
     var lowerDateBound = new Date();
     lowerDateBound.setHours(0,0,0,0);
     var upperDateBound = new Date(lowerDateBound.getTime() + 86400000);
@@ -570,11 +570,13 @@ exports.userstats = function(req, res, next) {
             [
                 {$match: {
                     timestamp : {"$gte": lowerDateBound, "$lt": upperDateBound}
-                }},
+                    }
+                },
                 {$group: {
                     _id   : '$ip_address',
                     stats : {$push: '$$ROOT'},
-                }}
+                    }
+                }
             ], function(err, userlist){
             if(err) {
                 util.error(err);
@@ -600,9 +602,63 @@ exports.userstats = function(req, res, next) {
                     'America/New_York';
             }
 
-            res.render('userstats', {
+            res.render('dailystats', {
                 users: userlist,
                 today: lowerDateBound
+            });
+        });
+}
+
+exports.userstats = function(req, res, next) {
+    var user_ip = " ";
+    if(typeof req.query.ip !== 'undefined') {
+        user_ip = req.query.ip;
+    }
+
+    AgniUserStatsModel.
+        aggregate(
+            [
+                {$match: {
+                    ip_address : user_ip
+                    }
+                },
+                {$group: {
+                    _id : {
+                        year : {$year       : "$timestamp"},
+                        month: {$month      : "$timestamp"},
+                        day  : {$dayOfMonth : "$timestamp"},
+                    },
+                    events : {$push: '$$ROOT'},
+                    }
+                }
+            ], function(err, datelist){
+            if(err) {
+                util.error(err);
+                return next(err);
+            }
+
+            var geo = geoip.lookup(user_ip) ||
+                {city: "XX", region: "XX", country: "XX"};
+
+            if(geo.city != '') {
+                user_location = geo.city + ", ";
+            }
+            else {
+                user_location = '';
+            }
+
+            if(geo.country != '') {
+                user_location += geo.country;
+            }
+
+            user_timezone = timezone_lookup(geo.country, geo.region) ||
+                'America/New_York';
+
+            res.render('userstats', {
+                days: datelist,
+                location: user_location,
+                timezone: user_timezone,
+                ip_address: user_ip
             });
         });
 }

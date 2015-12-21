@@ -1,0 +1,55 @@
+include head.jade
+link(rel="stylesheet", href="css/flags.css")
+script.
+    var ReportAnalytics = false;
+body
+    include header.jade
+    div.container-fluid
+      div.section
+          div.row
+              div.col.s12.l4.offset-l4
+                  a(href="/dailystats?date="+ moment_local(today).add(-1, 'days').format('MM-DD-YYYY')).left
+                      i.material-icons(id="icon-middle") navigate_before
+                      |Previous day
+                  a(href="/dailystats?date=" + moment_local(today).add(1, 'days').format('MM-DD-YYYY')).right
+                      |Next day
+                      i.material-icons(id="icon-middle") navigate_next
+          div.row.center
+              div.col.l4.offset-l4
+                  h5 User stats on
+                     =" "
+                     =moment_local(today).format('MMM DD, YYYY')
+                  div(class="table-responsive")
+                    table(class="table")
+                      thead
+                          tr.trhideclass
+                              th No.
+                              th User
+                              th Events
+                          tbody
+                              - var i = 0
+                              each user in users
+                                - i++
+                                tr.trhideclass
+                                  td
+                                    = i
+                                  td
+                                    = user.location
+                                    br
+                                    a(href="/userstats?ip="+user._id)
+                                        em
+                                            = user._id
+                                  td
+                                    ol
+                                      each stat in user.stats
+                                        li
+                                            =stat.action
+                                            =" "
+                                            if(stat.content_id != "")
+                                                a(href="http://wompwomp.co/v/"+stat.content_id)
+                                                     =stat.content_id
+                                            =" "
+                                            |at
+                                            =" "
+                                            =moment_local(stat.timestamp).tz(user.timezone).format('h:mm A z')
+    include footer.jade
