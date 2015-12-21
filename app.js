@@ -63,10 +63,38 @@ app.get('/install', routes.install);
 app.get('/buffer', routes.showBufferedContent);
 app.get('/dailystats', routes.dailystats);
 app.get('/userstats', routes.userstats);
-app.use(function(req, res) {
-    util.log('Unable to find URI ' + req.url + ' redirecting back home');
-    res.redirect('/');
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+    var err = new Error("http://wompwomp.co"+ req.url + ' wasn\'t found. Could you check the URL again?');
+    err.status = 404;
+    next(err);
 });
+
+// error handlers
+
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
+    });
+}
+else {
+    // production error handler
+    // no stacktraces leaked to user
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: {}
+        });
+    });
+}
 
 app.set('port', config.port);
 

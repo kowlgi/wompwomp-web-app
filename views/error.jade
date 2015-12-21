@@ -1,0 +1,13 @@
+include head.jade
+body
+    div.container-fluid
+        div.section
+            div.row.center
+                h4 Something isn't right :|
+            div.row
+                  div.center
+                      h6.red-text
+                          = message
+                  div.col.s10.offset-s1
+                      p= error.status
+                      pre #{error.stack}
