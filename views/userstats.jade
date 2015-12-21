@@ -50,8 +50,5 @@ body
                                             =" "
                                             |at
                                             =" "
-                                            if stat.timezone
-                                                =moment_local(stat.timestamp).tz(stat.timezone).format('h:mm A z')
-                                            else
-                                                =moment_local(stat.timestamp).tz('America/New_York').format('h:mm A z')
+                                            =moment_local(stat.timestamp).tz(user.timezone).format('h:mm A z')
     include footer.jade

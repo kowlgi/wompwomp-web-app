@@ -565,13 +565,11 @@ exports.userstats = function(req, res, next) {
             res.render('userstats', {
                 users: [],
                 showvalidationerror: true,
-                today: new Date(),
-                city: 'Los Angeles'
+                today: new Date()
             });
-            util.log("error format");
             return;
         }
-        util.log("good format");
+
         lowerDateBound = new Date(req.query.date);
         upperDateBound = new Date(lowerDateBound.getTime() + 86400000);
     }
@@ -607,14 +605,14 @@ exports.userstats = function(req, res, next) {
                     userlist[i].location += geo.country;
                 }
 
-                userlist[i].timezone = timezone_lookup(geo.country, geo.region);
+                userlist[i].timezone = timezone_lookup(geo.country, geo.region) ||
+                    'America/New_York';
             }
 
             res.render('userstats', {
                 users: userlist,
                 showvalidationerror: false,
-                today: lowerDateBound,
-                city: 'Los Angeles'
+                today: lowerDateBound
             });
         });
 }
