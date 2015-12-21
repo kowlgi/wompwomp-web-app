@@ -123,3 +123,6 @@ input[type=email] {
 ul {
     padding-left: 40px;
 }
+
+tr:nth-child(odd)  { background-color:#fafafa; }
+tr:nth-child(even) { background-color:#eeeeee; }

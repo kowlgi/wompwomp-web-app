@@ -13,6 +13,7 @@ var Config = require('./config');
 var AgniPushNotificationStatsModel = mongoose.model('AgniPushNotificationStats');
 var AgniUserStatsModel = mongoose.model('AgniUserStats');
 var geoip = require('geoip-lite');
+var validator = require('validator');
 
 var MAX_TEXT_LENGTH = 500;
 var NOT_HIDDEN_CATEGORY = {category: {$ne: "hidden"}};
@@ -290,12 +291,18 @@ exports.abbreviateditems = function(req, res, next) {
 
             var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
 
-            var agniuserstat = new AgniUserStatsModel({
-                ip_address     : ip,
-                timestamp      : Date.now(),
-                action         : limitval < 0 ? REFRESH_BOTTOM : REFRESH_TOP,
-                content_id     : ""
-            }).save();
+            /* We don't want to record auto background sync
+               in user stats. Assumption here is that cursorInclusive flag
+               is true only in the auto background sync case.
+            */
+            if(!cursorInclusive) {
+                var agniuserstat = new AgniUserStatsModel({
+                    ip_address     : ip,
+                    timestamp      : Date.now(),
+                    action         : limitval < 0 ? REFRESH_BOTTOM : REFRESH_TOP,
+                    content_id     : ""
+                }).save();
+            }
         });
 }
 
@@ -549,14 +556,37 @@ exports.showBufferedContent = function(req, res, next) {
 }
 
 exports.userstats = function(req, res, next) {
+    var lowerDateBound = new Date();
+    lowerDateBound.setHours(0,0,0,0);
+    var upperDateBound = new Date(lowerDateBound.getTime() + 86400000);
+
+    if(typeof req.query.date !== 'undefined'){
+        if(!validator.isDate(req.query.date)){
+            res.render('userstats', {
+                users: [],
+                showvalidationerror: true,
+                today: new Date(),
+                city: 'Los Angeles'
+            });
+            util.log("error format");
+            return;
+        }
+        util.log("good format");
+        lowerDateBound = new Date(req.query.date);
+        upperDateBound = new Date(lowerDateBound.getTime() + 86400000);
+    }
+
     AgniUserStatsModel.
         aggregate(
-            {
-                $group: {
-                    _id    : '$ip_address',
-                    stats  : {$push: '$$ROOT'},
-                }
-            }, function(err, userlist){
+            [
+                {$match: {
+                    timestamp : {"$gte": lowerDateBound, "$lt": upperDateBound}
+                }},
+                {$group: {
+                    _id   : '$ip_address',
+                    stats : {$push: '$$ROOT'},
+                }}
+            ], function(err, userlist){
             if(err) {
                 util.error(err);
                 return next(err);
@@ -565,7 +595,7 @@ exports.userstats = function(req, res, next) {
             for(i = 0; i < userlist.length; i++) {
         		var geo = geoip.lookup(userlist[i]._id) ||
                     {city: "XX", region: "XX", country: "XX"};
-                    
+
                 if(geo.city != '') {
                     userlist[i].location = geo.city + ", ";
                 }
@@ -576,10 +606,15 @@ exports.userstats = function(req, res, next) {
                 if(geo.country != '') {
                     userlist[i].location += geo.country;
                 }
+
+                userlist[i].timezone = timezone_lookup(geo.country, geo.region);
             }
 
             res.render('userstats', {
-                users: userlist
+                users: userlist,
+                showvalidationerror: false,
+                today: lowerDateBound,
+                city: 'Los Angeles'
             });
         });
 }
@@ -594,3 +629,10 @@ function getAppStoreLink(userAgent) {
         return "http://play.google.com/store/apps/details?id=co.wompwomp.sunshine";
     }
 }
+
+var timezone = {};
+timezone.data = require('./data/tz.json');
+
+function timezone_lookup(country, region) {
+    return timezone.data[[country, region].join('_')] || timezone.data[[country, ''].join('_')];
+};
