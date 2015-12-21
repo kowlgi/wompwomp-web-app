@@ -3,7 +3,6 @@ link(rel="stylesheet", href="css/flags.css")
 script.
     var ReportAnalytics = false;
 body
-    include header.jade
     div.container-fluid
       div.section
           div.row
@@ -52,4 +51,3 @@ body
                                             |at
                                             =" "
                                             =moment_local(stat.timestamp).tz(user.timezone).format('h:mm A z')
-    include footer.jade

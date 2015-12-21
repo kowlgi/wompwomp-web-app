@@ -3,7 +3,6 @@ link(rel="stylesheet", href="css/flags.css")
 script.
     var ReportAnalytics = false;
 body
-    include header.jade
     div.container-fluid
       div.section
           div.row
@@ -106,4 +105,3 @@ body
                               =" "
                               =moment_local(mailingListTime.next()).tz('America/New_York').format('MMM D, YYYY h:mm A z')
     include showitems.jade
-    include footer.jade
