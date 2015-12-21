@@ -560,16 +560,7 @@ exports.userstats = function(req, res, next) {
     lowerDateBound.setHours(0,0,0,0);
     var upperDateBound = new Date(lowerDateBound.getTime() + 86400000);
 
-    if(typeof req.query.date !== 'undefined'){
-        if(!validator.isDate(req.query.date)){
-            res.render('userstats', {
-                users: [],
-                showvalidationerror: true,
-                today: new Date()
-            });
-            return;
-        }
-
+    if(typeof req.query.date !== 'undefined' && validator.isDate(req.query.date)){
         lowerDateBound = new Date(req.query.date);
         upperDateBound = new Date(lowerDateBound.getTime() + 86400000);
     }
@@ -611,7 +602,6 @@ exports.userstats = function(req, res, next) {
 
             res.render('userstats', {
                 users: userlist,
-                showvalidationerror: false,
                 today: lowerDateBound
             });
         });

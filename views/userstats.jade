@@ -6,19 +6,14 @@ body
     include header.jade
     div.container-fluid
       div.section
-          if showvalidationerror
-              div.row.center
-                  h4.deep-orange-text
-                      |Please correct the format of the date parameter in the URL to mm-dd-yyyy
-          else
-              div.row
-                  div.col.l4.offset-l4
-                      a(href="/userstats?date="+ moment_local(today).add(-1, 'days').format('MM-DD-YYYY')).left
-                          i.material-icons(id="icon-middle") navigate_before
-                          |Previous day
-                      a(href="/userstats?date=" + moment_local(today).add(1, 'days').format('MM-DD-YYYY')).right
-                          |Next day
-                          i.material-icons(id="icon-middle") navigate_next
+          div.row
+              div.col.l4.offset-l4
+                  a(href="/userstats?date="+ moment_local(today).add(-1, 'days').format('MM-DD-YYYY')).left
+                      i.material-icons(id="icon-middle") navigate_before
+                      |Previous day
+                  a(href="/userstats?date=" + moment_local(today).add(1, 'days').format('MM-DD-YYYY')).right
+                      |Next day
+                      i.material-icons(id="icon-middle") navigate_next
           div.row.center
               div.col.l4.offset-l4
                   h5 User stats on
