@@ -28,7 +28,7 @@ div.container-fluid
           div.row
             div.col.l4.offset-l4
               if display_buffered_item_meta_data
-                  include buffered_item_meta_data.jade
+                  include private/buffered_item_meta_data.jade
               div(class="card hoverable")
                 a(href="/v/"+ item.id, class="card-image")
                   img(src="#{item.imageuri}")

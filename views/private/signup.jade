@@ -1,0 +1,20 @@
+extends layout
+
+block content
+    .container-fluid
+        div.section
+            div.row
+                div.col.l4.offset-l4
+                    h1 Sign Up
+                    p.lead It's been free since the ice age
+                    br
+                    form(role='form', action="/signup",method="post", style='max-width: 300px;')
+                        .form-group
+                            input.form-control(type='text', name="username", placeholder='Enter a username')
+                        .form-group
+                            input.form-control(type='email', name="email", placeholder='Enter your email')
+                        .form-group
+                            input.form-control(type='password', name="password", placeholder='Password')
+                        button.btn.btn-default(type='submit') Sign Up
+                    br
+                    h4= info

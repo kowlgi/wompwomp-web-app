@@ -1,8 +1,6 @@
-include head.jade
-link(rel="stylesheet", href="css/flags.css")
-script.
-    var ReportAnalytics = false;
-body
+extends layout
+
+block content
     div.container-fluid
       div.section
           div.row
@@ -104,4 +102,4 @@ body
                               img(class="flag flag-us")
                               =" "
                               =moment_local(mailingListTime.next()).tz('America/New_York').format('MMM D, YYYY h:mm A z')
-    include showitems.jade
+    include ../showitems.jade

@@ -1,19 +1,22 @@
 var mongoose = require('mongoose');
-var AgniModel = mongoose.model('Agni');
-var AgniMailingListModel = mongoose.model('AgniMailingList');
 var gcm = require('node-gcm');
 var util = require('util');
 var Mail = require('./mail');
 var Shortid = require('shortid');
 var Vibrant = require('node-vibrant');
-var App = require('./app');
 var Moment = require('moment-timezone');
 var CronParser = require('cron-parser');
 var Config = require('./config');
-var AgniPushNotificationStatsModel = mongoose.model('AgniPushNotificationStats');
-var AgniUserStatsModel = mongoose.model('AgniUserStats');
+var App = require('./app');
+var AgniModel = App.contentdb.model('Agni');
+var AgniMailingListModel = App.contentdb.model('AgniMailingList');
+var AgniPushNotificationStatsModel = App.contentdb.model('AgniPushNotificationStats');
+var AgniUserStatsModel = App.contentdb.model('AgniUserStats');
 var geoip = require('geoip-lite');
 var validator = require('validator');
+var Express = require('express');
+var Router = Express.Router();
+var Account = App.logindb.model('Accounts');
 
 var MAX_TEXT_LENGTH = 500;
 var NOT_HIDDEN_CATEGORY = {category: {$ne: "hidden"}};
@@ -28,7 +31,7 @@ var LIKE = "Like";
 var SHARE = "Share";
 var UNLIKE = "Unlike";
 
-exports.index = function(req, res, next) {
+Router.get('/', function(req, res, next) {
   AgniModel.
       find(NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY).
       sort('-created_on').limit(20).
@@ -42,9 +45,9 @@ exports.index = function(req, res, next) {
         metaDescription        : "Your funniest minute every day. Mobile friendly."
     });
   });
-};
+});
 
-exports.subscribe = function(req, res, next) {
+Router.post('/subscribe', function(req, res, next) {
   if(typeof req.body.email == 'undefined'){
       util.log("missing email param for subscribe()")
       res.end();
@@ -71,9 +74,9 @@ exports.subscribe = function(req, res, next) {
         res.end();
     });
   });
-};
+});
 
-exports.submit = function(req, res, next) {
+Router.post('/submit', function(req, res, next) {
     if(typeof req.body.text == 'undefined' ||
        typeof req.body.imageuri == 'undefined' ||
        typeof req.body.sourceuri == 'undefined' ||
@@ -121,9 +124,9 @@ exports.submit = function(req, res, next) {
 
         res.end();
     });
-};
+});
 
-exports.pushCTA= function(req, res, next) {
+Router.post('/pushcta', function(req, res, next) {
     if(req.body.submitkey != App.submit_key) {
         util.log("wrong submit key")
         res.end();
@@ -144,23 +147,7 @@ exports.pushCTA= function(req, res, next) {
     } finally {
         res.end();
     }
-}
-
-exports.removeAllPrompts = function(req, res, next) {
-    if(req.body.submitkey != App.submit_key) {
-        util.log("wrong submit key")
-        res.end();
-        return;
-    }
-
-    try {
-        sendNotification("/topics/remove_all_prompts");
-    } catch(err) {
-        util.error(err);
-    } finally {
-        res.end();
-    }
-}
+});
 
 function sendNotification(topicString, notificationText, imageuri, itemid) {
     var message = new gcm.Message();
@@ -183,7 +170,7 @@ function sendNotification(topicString, notificationText, imageuri, itemid) {
     sender.sendNoRetry(message, { topic: topicString });
 }
 
-exports.items = function(req, res, next) {
+Router.get('/items', function(req, res, next) {
     var limit = 0,  offset = 0;
 
     if(typeof req.query.limit != "undefined"){
@@ -222,7 +209,7 @@ exports.items = function(req, res, next) {
             res.contentType('application/json');
             res.send(JSON.stringify(response));
         });
-}
+});
 
 /* Here's how this works:
    cursor not specified, limit not specified: return all items
@@ -232,7 +219,7 @@ exports.items = function(req, res, next) {
                                  OR if (x > 0) return x items immediately after somedate
                                  OR if (x == 0) return all items immediately after somedate
 */
-exports.abbreviateditems = function(req, res, next) {
+Router.get('/i', function(req, res, next) {
     var limitval = 0,
         cursor = new Date('1995-12-17T03:24:00'), /*an arbitrary date that's
                                                     guaranteed prior to any item
@@ -304,9 +291,9 @@ exports.abbreviateditems = function(req, res, next) {
                 }).save();
             }
         });
-}
+});
 
-exports.viewitem = function(req, res, next) {
+Router.get('/v/:id', function(req, res, next) {
     AgniModel.findOne({id : req.params.id}, function(err, item) {
         if(err) {
             res.render ('404', {url:req.url});
@@ -328,9 +315,9 @@ exports.viewitem = function(req, res, next) {
           metaDescription        : item.text
         });
     });
-}
+});
 
-exports.share = function(req, res, next) {
+Router.post('/s/:id', function(req, res, next) {
     AgniModel.findOne({id : req.params.id}, function(err, item) {
         if(err) {
             res.render ('404', {url:req.url});
@@ -354,9 +341,9 @@ exports.share = function(req, res, next) {
             content_id     : item.id
         }).save();
     });
-}
+});
 
-exports.favorite = function(req, res, next) {
+Router.post('/f/:id', function(req, res, next) {
     AgniModel.findOne({id : req.params.id}, function(err, item) {
         if(err) {
             res.render ('404', {url:req.url});
@@ -381,9 +368,9 @@ exports.favorite = function(req, res, next) {
             content_id     : item.id
         }).save();
     });
-}
+});
 
-exports.unfavorite = function(req, res, next) {
+Router.post('/uf/:id', function(req, res, next) {
     AgniModel.findOne({id : req.params.id}, function(err, item) {
         if(err) {
             res.render ('404', {url:req.url});
@@ -411,9 +398,9 @@ exports.unfavorite = function(req, res, next) {
             content_id     : item.id
         }).save();
     });
-}
+});
 
-exports.hideitem = function(req, res, next) {
+Router.post('/hideitem', function(req, res, next) {
     if(req.body.submitkey != App.submit_key) {
         util.log("wrong submit key")
         res.end();
@@ -436,12 +423,12 @@ exports.hideitem = function(req, res, next) {
         item.save();
         res.end();
     });
-}
+});
 
-exports.install = function(req, res, next) {
+Router.get('/install', function(req, res, next) {
     appStoreLink = getAppStoreLink(req.headers['user-agent']);
     res.redirect(appStoreLink);
-}
+});
 
 exports.releaseBufferedContent = function() {
     util.log("releaseBufferedContent() called at " + Moment().format());
@@ -523,7 +510,7 @@ exports.pushContentNotification = function() {
         });
 }
 
-exports.showBufferedContent = function(req, res, next) {
+Router.get('/buffer', App.user.can('access admin page'), function(req, res, next) {
     var release_interval = CronParser.parseExpression(Config.release_content_scheduler_frequency);
     var notification_interval = CronParser.parseExpression(Config.push_notification_scheduler_frequency);
     var mailing_list_interval = CronParser.parseExpression(Config.mailing_list_scheduler_frequency);
@@ -541,7 +528,7 @@ exports.showBufferedContent = function(req, res, next) {
                 endtime = release_interval.next();
             }
 
-            res.render('buffereditems', {
+            res.render('private/buffereditems', {
                 items                           : quotes,
                 starttime                       : release_interval,
                 endtime                         : endtime,
@@ -550,12 +537,13 @@ exports.showBufferedContent = function(req, res, next) {
                 google_tracking_code            : App.google_tracking_code,
                 app_store_link                  : getAppStoreLink(req.headers['user-agent']),
                 metaDescription                 : "",
-                display_buffered_item_meta_data : true
+                display_buffered_item_meta_data : true,
+                user                            : req.user
             });
         });
-}
+});
 
-exports.dailystats = function(req, res, next) {
+Router.get('/dailystats', App.user.can('access admin page'), function(req, res, next) {
     var lowerDateBound = new Date();
     lowerDateBound.setHours(0,0,0,0);
     var upperDateBound = new Date(lowerDateBound.getTime() + 86400000);
@@ -602,14 +590,15 @@ exports.dailystats = function(req, res, next) {
                     'America/New_York';
             }
 
-            res.render('dailystats', {
+            res.render('private/dailystats', {
                 users: userlist,
-                today: lowerDateBound
+                today: lowerDateBound,
+                user: req.user
             });
         });
-}
+});
 
-exports.userstats = function(req, res, next) {
+Router.get('/userstats', App.user.can('access admin page'), function(req, res, next) {
     var user_ip = " ";
     if(typeof req.query.ip !== 'undefined') {
         user_ip = req.query.ip;
@@ -654,13 +643,92 @@ exports.userstats = function(req, res, next) {
             user_timezone = timezone_lookup(geo.country, geo.region) ||
                 'America/New_York';
 
-            res.render('userstats', {
+            res.render('private/userstats', {
                 days: datelist,
                 location: user_location,
                 timezone: user_timezone,
-                ip_address: user_ip
+                ip_address: user_ip,
+                user: req.user
             });
         });
+});
+
+Router.get('/post', App.user.can('access private page'), function(req, res, next) {
+    res.render('private/post', {user: req.user});
+});
+
+Router.get('/dashboard', function(req, res, next) {
+    res.render('private/dashboard', {user: req.user});
+});
+
+Router.get('/signin', isNotLoggedIn, function(req, res, next) {
+    res.render('private/signin', {user: req.user});
+});
+
+Router.post('/signin', isNotLoggedIn, passport.authenticate('local'), function(req, res, next) {
+    req.session.save(function (err) {
+        if (err) {
+            return next(err);
+        }
+        res.redirect('/dashboard');
+    });
+});
+
+Router.get('/signout', isLoggedIn, function(req, res, next) {
+    req.logout();
+    req.session.save(function (err) {
+        if (err) {
+            return next(err);
+        }
+        res.redirect('/dashboard');
+    });
+});
+
+Router.get('/signup', isNotLoggedIn, function(req, res, next) {
+    res.render('private/signup');
+});
+
+Router.post('/signup', function(req, res, next) {
+    Account.register(new Account({
+                    username : req.body.username,
+                    email: req.body.email,
+                    role : "contributor" }),
+                 req.body.password, function(err, account) {
+        if (err) {
+          return res.render("signup", {info: "Sorry. That username already exists. Try again."});
+        }
+
+        passport.authenticate('local')(req, res, function () {
+            req.session.save(function (err) {
+                if (err) {
+                    return next(err);
+                }
+                res.redirect('/dashboard');
+            });
+        });
+    });
+});
+
+// route middleware to make sure a user is logged in
+function isLoggedIn(req, res, next) {
+
+    // if user is authenticated in the session, carry on
+    if (req.isAuthenticated())
+        return next();
+
+    // if they aren't redirect them to the signin page
+    res.redirect('/signin');
+}
+
+// route middleware to make sure a user isn't logged in
+function isNotLoggedIn(req, res, next) {
+
+    // if user is not authenticated in the session, carry on
+    if (!req.isAuthenticated())
+        return next();
+
+    // if they aren't redirect them to the dashboard
+    res.redirect('/dashboard');
 }
 
 function getAppStoreLink(userAgent) {
@@ -680,3 +748,5 @@ timezone.data = require('./data/tz.json');
 function timezone_lookup(country, region) {
     return timezone.data[[country, region].join('_')] || timezone.data[[country, ''].join('_')];
 };
+
+exports.router = Router;

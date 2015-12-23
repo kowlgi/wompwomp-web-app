@@ -7,7 +7,13 @@ var stdio = require('stdio'),
     schedule = require('node-schedule'),
     http = require('http'),
     express = require('express'),
-    config = require('./config');
+    config = require('./config'),
+    logger = require('morgan');
+    cookieParser = require('cookie-parser'),
+    mongoose = require('mongoose'),
+    passport = require('passport'),
+    LocalStrategy = require('passport-local').Strategy,
+    ConnectRoles = require('connect-roles');
 
 var ops = stdio.getopt({
     'updatedb':
@@ -27,13 +33,10 @@ app.set('port', process.env.PORT || 3000);
 app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.png')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
 app.locals.moment_local = require('moment-timezone');
 
-// database setup
-require('./db').init(config.db);
+exports.contentdb = mongoose.createConnection('mongodb://localhost/' + config.db);
+require('./content').init(exports.contentdb);
 update_db = require('./update_db');
 if(ops.updatedb) {
     func = "update_db_" + ops.updatedb;
@@ -42,36 +45,91 @@ if(ops.updatedb) {
     }
 }
 
+var FileStreamRotator = require('file-stream-rotator')
+var fs = require('fs')
+var logDirectory = __dirname + '/log'
+// ensure log directory exists
+fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
+// create a rotating write stream
+var accessLogStream = FileStreamRotator.getStream({
+  filename: logDirectory + '/access-%DATE%.log',
+  frequency: 'daily',
+  verbose: false
+})
+// setup the logger
+app.use(logger('combined', {stream: accessLogStream}))
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(require('express-session')({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+var user = new ConnectRoles({
+  failureHandler: function (req, res, action) {
+    // optional function to customise code that runs when
+    // user fails authorisation
+    var accept = req.headers.accept || '';
+    res.status(403);
+    if (~accept.indexOf('html')) {
+      res.render('404');
+    } else {
+      res.send('Access Denied - You don\'t have permission to: ' + action);
+    }
+  }
+});
+
 app.use(express.static(__dirname +'/public'));
 app.use('/v', express.static(__dirname +'/public'));
 app.disable('etag');
 
+exports.logindb = mongoose.createConnection('mongodb://localhost/agnilogin');
+require('./account').init(exports.logindb);
+var Account = exports.logindb.model('Accounts');
+passport.use(new LocalStrategy(Account.authenticate()));
+passport.serializeUser(Account.serializeUser());
+passport.deserializeUser(Account.deserializeUser());
+app.use(user.middleware());
+
+//anonymous users can only access the home page
+//returning false stops any more rules from being
+//considered
+user.use(function (req, action) {
+  if (!req.isAuthenticated()) return action === 'access public page';
+})
+
+//moderator users can access private page, but
+//they might not be the only ones so we don't return
+//false if the user isn't a moderator
+user.use('access private page', function (req) {
+  if (req.user.role === 'contributor') {
+    return true;
+  }
+})
+
+//admin users can access all pages
+user.use(function (req) {
+  if (req.user.role === 'admin') {
+    return true;
+  }
+});
+exports.user = user;
+
 // Set up routes
 var routes  = require( './routes' );
-app.get('/', routes.index);
-app.post('/subscribe', routes.subscribe);
-app.post('/submit', routes.submit);
-app.post('/pushcta', routes.pushCTA);
-app.get('/items', routes.items);
-app.get('/i', routes.abbreviateditems);
-app.get('/v/:id', routes.viewitem);
-app.post('/s/:id', routes.share);
-app.post('/f/:id', routes.favorite);
-app.post('/uf/:id', routes.unfavorite);
-app.post('/hideitem', routes.hideitem);
-app.get('/install', routes.install);
-app.get('/buffer', routes.showBufferedContent);
-app.get('/dailystats', routes.dailystats);
-app.get('/userstats', routes.userstats);
+app.use('/', routes.router);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-    var err = new Error("http://wompwomp.co"+ req.url + ' wasn\'t found. Could you check the URL again?');
+    var err = new Error("http://wompwomp.co"+ req.url + ' wasn\'t found. Please check the URL.');
     err.status = 404;
     next(err);
 });
-
-// error handlers
 
 // development error handler
 // will print stacktrace

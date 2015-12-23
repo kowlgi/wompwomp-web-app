@@ -1,3 +1,10 @@
 include head.jade
 body
-    p='Uhoh! Could not load ' + url
+    div.container-fluid
+        div.section
+            div.row.center
+                h4 :| Couldn't load your requested url
+            div.row
+                  div.center
+                      h6.red-text
+                          = url
