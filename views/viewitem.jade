@@ -1,5 +1,10 @@
-include head.jade
+include head_no_title.jade
+head
+  each item in items
+    title 
+      = item.text
+      | - wompwomp
 body
-    include header.jade
-    include showitems.jade
+  include header.jade
+  include showitems.jade
 include footer.jade
