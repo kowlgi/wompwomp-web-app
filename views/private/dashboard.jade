@@ -22,4 +22,16 @@ block content
                             =" "
                             =user.username
                             |, you're signed in
-                        h6 Go create some magic!
+                        if(user)
+                            if(user.role == "admin")
+                            p
+                              | You have admin privileges. You can: 
+                        
+                        if(user)
+                            if(user.role == "admin")
+                                li
+                                    a(href="/buffer") View content that has been buffered
+                                li
+                                    a(href="/dailystats") View daily user stats
+                            li
+                                a(href="/post") Post content 
