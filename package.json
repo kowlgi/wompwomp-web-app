@@ -25,6 +25,7 @@
     "express-session": "^1.12.1",
     "file-stream-rotator": "0.0.6",
     "geoip-lite": "^1.1.6",
+    "gm": "^1.21.1",
     "jade": "^1.11.0",
     "mailcomposer": "^2.1.0",
     "mailgun-js": "^0.7.5",
