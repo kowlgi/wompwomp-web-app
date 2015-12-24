@@ -655,7 +655,7 @@ Router.get('/userstats', App.user.can('access admin page'), function(req, res, n
         });
 });
 
-Router.get('/post', App.user.can('access private page'), function(req, res, next) {
+Router.get('/post', App.user.can('access admin page'), function(req, res, next) {
     res.render('private/post', {user: req.user});
 });
 
