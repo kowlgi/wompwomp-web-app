@@ -3,9 +3,9 @@ block content
     .container-fluid
         div.section
             div.row
-                div.col.l4.offset-l4
+                div.col.l4.offset-l4 
                     if(!user)
-                        h3 Welcome to the wompwomp dashboard
+                        h5 Welcome to the dashboard
                         h6
                             |If you're a member,
                             =" "
@@ -17,5 +17,9 @@ block content
                             a(href='/signup') sign up
                             |. It's free.
                     else
-                        h3 You're signed in
-                        h5 Now go do your magic!
+                        h3
+                            |Hi
+                            =" "
+                            =user.username
+                            |, you're signed in
+                        h5 Go create some magic!

@@ -1,15 +1,15 @@
-var mongoose = require('mongoose'),
+const mongoose = require('mongoose'),
   Mail = require('./mail'),
   jade = require('jade'),
   fs = require('fs'),
   util = require('util'),
   App = require('./app');
-var AgniModel = mongoose.model('Agni');
-var AgniMailingListModel = mongoose.model('AgniMailingList');
-var AgniMailingListStatsModel = mongoose.model('AgniMailingListStats');
-var MAX_CAPTION_LENGTH = 40;
+const AgniModel = App.contentdb.model('Agni');
+const AgniMailingListModel = App.contentdb.model('AgniMailingList');
+const AgniMailingListStatsModel = App.contentdb.model('AgniMailingListStats');
+const MAX_CAPTION_LENGTH = 40;
 // Do not email any hidden items to the user
-var NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and: [{category: {$ne: "hidden"}}, {category: {$ne: "buffered"}}] };
+const NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and: [{category: {$ne: "hidden"}}, {category: {$ne: "buffered"}}] };
 
 // Helper to update the last time we sent users an email
 function UpdateMailingListSendTime(payload, timestamp) {

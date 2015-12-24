@@ -4,6 +4,21 @@ block content
         div.section
             div.row
                 div.col.l4.offset-l4
-                    h3 Kaam jari hai
-                    h6
-                        |Soon you'll be able to post content to wompwomp from here
+                    h3 Post Content
+                    form(role='form', action="/post", method="post", style='max-width: 300px;', enctype="multipart/form-data")
+                        div.row
+                            .form-group
+                                input(type='file', name="imagefile", id="imagefile", required)
+                        div.row
+                            .form-group
+                                textarea.form-control(id="caption", name="caption", placeholder='Write a funny caption', rows="5")
+                        button.btn.btn-default(type='submit') Submit
+                        br
+                        div.image_preview
+                            h3.grey-text Preview
+                            em.grey-text Image will later be modified for mobile viewing
+                            div(class="card hoverable")
+                              div.card-image
+                                  img.center(id="blahimg", src="", alt="Choose an image file to preview")
+                              div.card-content
+                                  p(id="blahtxt")

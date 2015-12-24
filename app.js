@@ -1,21 +1,21 @@
-var stdio = require('stdio'),
-    bodyParser = require('body-parser'),
-    jade = require('jade'),
-    path = require('path'),
-    util = require('util'),
-    favicon = require('serve-favicon'),
-    schedule = require('node-schedule'),
-    http = require('http'),
-    express = require('express'),
-    config = require('./config'),
-    logger = require('morgan');
-    cookieParser = require('cookie-parser'),
-    mongoose = require('mongoose'),
-    passport = require('passport'),
-    LocalStrategy = require('passport-local').Strategy,
-    ConnectRoles = require('connect-roles');
+const   stdio = require('stdio'),
+        bodyParser = require('body-parser'),
+        jade = require('jade'),
+        path = require('path'),
+        util = require('util'),
+        favicon = require('serve-favicon'),
+        schedule = require('node-schedule'),
+        http = require('http'),
+        express = require('express'),
+        config = require('./config'),
+        logger = require('morgan');
+        cookieParser = require('cookie-parser'),
+        mongoose = require('mongoose'),
+        passport = require('passport'),
+        LocalStrategy = require('passport-local').Strategy,
+        ConnectRoles = require('connect-roles');
 
-var ops = stdio.getopt({
+const ops = stdio.getopt({
     'updatedb':
         {key: 'u', args: 1, description: 'EXERCISE EXTREME CAUTION: this command will update the database', mandatory: false},
     'mailgun_api':
@@ -26,8 +26,8 @@ var ops = stdio.getopt({
         {key: 'l', args: 1, description: 'Who to send the mail to', default: 'fun@mg.wompwomp.co', mandatory: false},
     });
 
-var app = express();
-var compress = require('compression');
+const app = express();
+const compress = require('compression');
 app.use(compress());
 app.set('port', process.env.PORT || 3000);
 app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.png')));
@@ -45,13 +45,13 @@ if(ops.updatedb) {
     }
 }
 
-var FileStreamRotator = require('file-stream-rotator')
-var fs = require('fs')
-var logDirectory = __dirname + '/log'
+const FileStreamRotator = require('file-stream-rotator')
+const fs = require('fs')
+const logDirectory = __dirname + '/log'
 // ensure log directory exists
 fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
 // create a rotating write stream
-var accessLogStream = FileStreamRotator.getStream({
+const accessLogStream = FileStreamRotator.getStream({
   filename: logDirectory + '/access-%DATE%.log',
   frequency: 'daily',
   verbose: false
@@ -62,19 +62,23 @@ app.use(logger('combined', {stream: accessLogStream}))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(require('express-session')({
-    secret: 'keyboard cat',
+const session = require('express-session');
+const MongoStore = require('connect-mongo/es5')(session);
+const sessionStoreConnection = mongoose.createConnection('mongodb://localhost/' + config.sessiondb);
+app.use(session({
+    secret: config.session_secret,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    store: new MongoStore({ mongooseConnection: sessionStoreConnection })
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-var user = new ConnectRoles({
+const user = new ConnectRoles({
   failureHandler: function (req, res, action) {
     // optional function to customise code that runs when
     // user fails authorisation
-    var accept = req.headers.accept || '';
+    const accept = req.headers.accept || '';
     res.status(403);
     if (~accept.indexOf('html')) {
       res.render('404');
@@ -88,9 +92,11 @@ app.use(express.static(__dirname +'/public'));
 app.use('/v', express.static(__dirname +'/public'));
 app.disable('etag');
 
-exports.logindb = mongoose.createConnection('mongodb://localhost/agnilogin');
+exports.userstatsdb = mongoose.createConnection('mongodb://localhost/' + config.userstatsdb);
+require('./userstats').init(exports.userstatsdb);
+exports.logindb = mongoose.createConnection('mongodb://localhost/' + config.logindb);
 require('./account').init(exports.logindb);
-var Account = exports.logindb.model('Accounts');
+const Account = exports.logindb.model('Accounts');
 passport.use(new LocalStrategy(Account.authenticate()));
 passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
@@ -121,12 +127,12 @@ user.use(function (req) {
 exports.user = user;
 
 // Set up routes
-var routes  = require( './routes' );
+const routes  = require( './routes' );
 app.use('/', routes.router);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-    var err = new Error("http://wompwomp.co"+ req.url + ' wasn\'t found. Please check the URL.');
+    const err = new Error("http://wompwomp.co"+ req.url + ' wasn\'t found. Please check the URL.');
     err.status = 404;
     next(err);
 });
@@ -156,11 +162,11 @@ else {
 
 app.set('port', config.port);
 
-var MAILING_LIST = ops.mailing_list;
+const MAILING_LIST = ops.mailing_list;
 // The global mailgun object that will be used in other modules
-var mg = require('mailgun-js')({apiKey: ops.mailgun_api, domain: ops.email_domain});
+const mg = require('mailgun-js')({apiKey: ops.mailgun_api, domain: ops.email_domain});
 
-var mailinglist = require('./mailinglist');
+const mailinglist = require('./mailinglist');
 schedule.scheduleJob(config.mailing_list_scheduler_frequency, mailinglist.GetFresh);
 schedule.scheduleJob(config.release_content_scheduler_frequency, routes.releaseBufferedContent);
 schedule.scheduleJob(config.push_notification_scheduler_frequency, routes.pushContentNotification);

@@ -34,13 +34,4 @@ exports.init = function(connection){
         created_on     : Date
     });
     connection.model('AgniPushNotificationStats', AgniPushNotificationStatsSchema);
-
-    /* the database which contains the date the last push notification was sent */
-    var AgniUserStatsSchema = new Schema({
-        ip_address     : String,
-        timestamp      : Date,
-        action         : String,
-        content_id     : String
-    });
-    connection.model('AgniUserStats', AgniUserStatsSchema);
 }

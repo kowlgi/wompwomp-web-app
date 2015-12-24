@@ -17,6 +17,7 @@
   "dependencies": {
     "body-parser": "^1.13.3",
     "compression": "^1.6.0",
+    "connect-mongo": "^1.0.2",
     "connect-roles": "^3.1.1",
     "cookie-parser": "^1.4.0",
     "cron-parser": "^1.0.2",
@@ -31,6 +32,7 @@
     "moment-timezone": "^0.4.1",
     "mongoose": "^4.1.3",
     "morgan": "^1.6.1",
+    "multer": "^1.1.0",
     "node-gcm": "^0.12.0",
     "node-schedule": "^0.5.1",
     "node-vibrant": "^1.1.5",
@@ -42,6 +44,7 @@
     "serve-favicon": "^2.3.0",
     "shortid": "^2.2.3",
     "stdio": "^0.2.7",
+    "tmp": "0.0.28",
     "validator": "^4.4.0"
   }
 }

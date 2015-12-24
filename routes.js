@@ -1,35 +1,37 @@
-var mongoose = require('mongoose');
-var gcm = require('node-gcm');
-var util = require('util');
-var Mail = require('./mail');
-var Shortid = require('shortid');
-var Vibrant = require('node-vibrant');
-var Moment = require('moment-timezone');
-var CronParser = require('cron-parser');
-var Config = require('./config');
-var App = require('./app');
-var AgniModel = App.contentdb.model('Agni');
-var AgniMailingListModel = App.contentdb.model('AgniMailingList');
-var AgniPushNotificationStatsModel = App.contentdb.model('AgniPushNotificationStats');
-var AgniUserStatsModel = App.contentdb.model('AgniUserStats');
-var geoip = require('geoip-lite');
-var validator = require('validator');
-var Express = require('express');
-var Router = Express.Router();
-var Account = App.logindb.model('Accounts');
+const mongoose = require('mongoose');
+const gcm = require('node-gcm');
+const util = require('util');
+const Mail = require('./mail');
+const Shortid = require('shortid');
+const Moment = require('moment-timezone');
+const CronParser = require('cron-parser');
+const Config = require('./config');
+const App = require('./app');
+const AgniModel = App.contentdb.model('Agni');
+const AgniMailingListModel = App.contentdb.model('AgniMailingList');
+const AgniPushNotificationStatsModel = App.contentdb.model('AgniPushNotificationStats');
+const AgniUserStatsModel = App.userstatsdb.model('AgniUserStats');
+const geoip = require('geoip-lite');
+const validator = require('validator');
+const Express = require('express');
+const Router = Express.Router();
+const Account = App.logindb.model('Accounts');
+const multer  = require('multer');
+const upload = multer({ dest: 'uploads/' });
+const modifyAndUploadImage = require('./modify-and-upload-image');
 
-var MAX_TEXT_LENGTH = 500;
-var NOT_HIDDEN_CATEGORY = {category: {$ne: "hidden"}};
-var IS_BUFFERED_CATEGORY = {category: "buffered"};
-var NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and: [{category: {$ne: "hidden"}}, {category: {$ne: "buffered"}}] };
-var MAX_EMAIL_LENGTH = 128;
+const MAX_TEXT_LENGTH = 500;
+const NOT_HIDDEN_CATEGORY = {category: {$ne: "hidden"}};
+const IS_BUFFERED_CATEGORY = {category: "buffered"};
+const NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and: [{category: {$ne: "hidden"}}, {category: {$ne: "buffered"}}] };
+const MAX_EMAIL_LENGTH = 128;
 
 /* User actions */
-var REFRESH_TOP = "Refresh_top";
-var REFRESH_BOTTOM = "Refresh_bottom";
-var LIKE = "Like";
-var SHARE = "Share";
-var UNLIKE = "Unlike";
+const REFRESH_TOP = "Refresh_top";
+const REFRESH_BOTTOM = "Refresh_bottom";
+const LIKE = "Like";
+const SHARE = "Share";
+const UNLIKE = "Unlike";
 
 Router.get('/', function(req, res, next) {
   AgniModel.
@@ -657,6 +659,28 @@ Router.get('/post', App.user.can('access private page'), function(req, res, next
     res.render('private/post', {user: req.user});
 });
 
+Router.post('/post', App.user.can('access private page'), upload.single('imagefile'), function(req, res, next) {
+    modifyAndUploadImage(req.file.path, function(err, imageurl) {
+        var agniitem = new AgniModel({
+            text            : req.body.caption.substring(0, MAX_TEXT_LENGTH),
+            imageuri        : imageurl,
+            sourceuri       : req.user.username,
+            id              : Shortid.generate(),
+            category        : ['buffered'],
+            created_on      : Date.now(),
+            numfavorites    : 0,
+            numshares       : 0
+        }).save(function(err, agniquote) {
+            if (err) {
+                util.error(err);
+                return next(err);
+            }
+
+            res.render('private/collection');
+        });
+    });
+});
+
 Router.get('/dashboard', function(req, res, next) {
     res.render('private/dashboard', {user: req.user});
 });
@@ -732,7 +756,7 @@ function isNotLoggedIn(req, res, next) {
 }
 
 function getAppStoreLink(userAgent) {
-    var isAndroid = userAgent.match(/android/i);
+    const isAndroid = userAgent.match(/android/i);
 
     if(isAndroid) {
         return "market://details?id=co.wompwomp.sunshine";
@@ -742,7 +766,7 @@ function getAppStoreLink(userAgent) {
     }
 }
 
-var timezone = {};
+const timezone = {};
 timezone.data = require('./data/tz.json');
 
 function timezone_lookup(country, region) {
