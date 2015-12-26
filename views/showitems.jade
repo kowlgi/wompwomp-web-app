@@ -31,7 +31,7 @@ div.container-fluid
                   include private/buffered_item_meta_data.jade
               div(class="card hoverable")
                 a(href="/v/"+ item.id, class="card-image")
-                  img(src="#{item.imageuri}")
+                  img(src=item.imageuri)
                 div(class="card-content", id=item.id)
                     p
                         = item.text

@@ -19,11 +19,15 @@ const Account = App.logindb.model('Accounts');
 const multer  = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const modifyAndUploadImage = require('./modify-and-upload-image');
+const _ = require('lodash');
 
 const MAX_TEXT_LENGTH = 500;
-const NOT_HIDDEN_CATEGORY = {category: {$ne: "hidden"}};
 const IS_BUFFERED_CATEGORY = {category: "buffered"};
-const NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and: [{category: {$ne: "hidden"}}, {category: {$ne: "buffered"}}] };
+const IS_IN_REVIEW_CATEGORY = {category: "in_review"};
+const NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and:
+    [{category: {$ne: "hidden"}},
+    {category: {$ne: "buffered"}},
+    {category: {$ne: "in_review"}}] };
 const MAX_EMAIL_LENGTH = 128;
 
 /* User actions */
@@ -655,6 +659,33 @@ Router.get('/userstats', App.user.can('access admin page'), function(req, res, n
         });
 });
 
+Router.get('/itemstats', App.user.can('access admin page'), function(req, res, next) {
+  AgniModel.
+      find().
+      exec(function(err, items) {
+          items.sort(compareUserInteractions);
+          var liveItems = _.filter(items, function(item) {
+              return item.category.indexOf("hidden") == -1 &&
+                  item.category.indexOf("in_review") == -1 &&
+                  item.category.indexOf("buffered") == -1;
+          });
+          res.render('private/itemstats', {
+              totalCount : items.length,
+              hiddenCount: _.filter(items, function(item) {
+                  return item.category.indexOf("hidden") != -1;
+              }).length,
+              reviewCount: _.filter(items, function(item) {
+                  return item.category.indexOf("in_review") != -1;
+              }).length,
+              bufferedCount: _.filter(items, function(item) {
+                  return item.category.indexOf("buffered") != -1;
+              }).length,
+              liveCount: liveItems.length,
+              topItems: liveItems.slice(0,20)
+          });
+  });
+});
+
 Router.get('/post', App.user.can('access admin page'), function(req, res, next) {
     res.render('private/post', {user: req.user});
 });
@@ -679,6 +710,18 @@ Router.post('/post', App.user.can('access private page'), upload.single('imagefi
             res.render('private/collection');
         });
     });
+});
+
+Router.get('/review', App.user.can('access admin page'), function(req, res, next) {
+    AgniModel.
+        find(IS_IN_REVIEW_CATEGORY).
+        sort({created_on: 1}).
+        exec(function(err, inReviewItems){
+            if(err) {
+                return next(err);
+            }
+            res.render('private/reviewitems', {items: inReviewItems});
+        });
 });
 
 Router.get('/dashboard', function(req, res, next) {
@@ -772,5 +815,13 @@ timezone.data = require('./data/tz.json');
 function timezone_lookup(country, region) {
     return timezone.data[[country, region].join('_')] || timezone.data[[country, ''].join('_')];
 };
+
+function compareUserInteractions(a,b) {
+    if (a.numfavorites + a.numshares < b.numfavorites + b.numshares)
+        return 1;
+    if (a.numfavorites + a.numshares > b.numfavorites + b.numshares)
+        return -1;
+    return 0;
+}
 
 exports.router = Router;

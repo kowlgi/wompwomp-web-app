@@ -9,7 +9,10 @@ const AgniMailingListModel = App.contentdb.model('AgniMailingList');
 const AgniMailingListStatsModel = App.contentdb.model('AgniMailingListStats');
 const MAX_CAPTION_LENGTH = 40;
 // Do not email any hidden items to the user
-const NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and: [{category: {$ne: "hidden"}}, {category: {$ne: "buffered"}}] };
+const NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and:
+    [{category: {$ne: "hidden"}},
+     {category: {$ne: "buffered"}},
+     {category: {$ne: "in_review"}}] };
 
 // Helper to update the last time we sent users an email
 function UpdateMailingListSendTime(payload, timestamp) {

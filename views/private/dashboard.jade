@@ -25,13 +25,17 @@ block content
                         if(user)
                             if(user.role == "admin")
                             p
-                              | You have admin privileges. You can: 
-                        
+                              | You have admin privileges. You can:
+
                         if(user)
                             if(user.role == "admin")
                                 li
-                                    a(href="/buffer") View content that has been buffered
+                                    a(href="/buffer") View buffered content
                                 li
-                                    a(href="/dailystats") View daily user stats
+                                    a(href="/review") Review content
+                                li
+                                    a(href="/dailystats") View usage stats
+                                li
+                                    a(href="/itemstats") View item stats
                             li
-                                a(href="/post") Post content 
+                                a(href="/post") Post content

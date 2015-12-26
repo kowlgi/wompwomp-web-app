@@ -5,13 +5,13 @@ block content
       div.section
           div.row
               div.col.l4.offset-l4
-                  a(href="/dailystats?date="+ moment_local(today).add(-1, 'days').format('MM-DD-YYYY')).left
+                  a.left(href="/dailystats?date="+ moment_local(today).add(-1, 'days').format('MM-DD-YYYY'))
                       i.material-icons(id="icon-middle") navigate_before
                       |Previous day
-                  a(href="/dailystats?date=" + moment_local(today).add(1, 'days').format('MM-DD-YYYY')).right
+                  a.right(href="/dailystats?date=" + moment_local(today).add(1, 'days').format('MM-DD-YYYY'))
                       |Next day
                       i.material-icons(id="icon-middle") navigate_next
-          div.row.center
+          div.row
               div.col.l4.offset-l4
                   h5 User stats on
                      =" "

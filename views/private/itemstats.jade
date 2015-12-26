@@ -1,0 +1,76 @@
+extends layout
+
+block content
+    div.container-fluid
+      div.section
+          div.row
+              div.col.l4.offset-l4
+                  h4 Item Counts
+                  div(class="table-responsive")
+                    table(class="table")
+                      thead
+                          tr.trhideclass
+                              th Category
+                              th Num Items
+                      tbody
+                          tr.trhideclass
+                              td
+                                  |Hidden
+                              td
+                                   =hiddenCount
+                          tr.trhideclass
+                              td
+                                  a(href="/review")
+                                      |In Review
+                              td
+                                  =reviewCount
+                          tr.trhideclass
+                              td
+                                  a(href="/buffer")
+                                      |Buffered
+                              td
+                                  =bufferedCount
+                          tr.trhideclass
+                              td
+                                  |Live
+                              td
+                                  =liveCount
+                  |Total:
+                  =" "
+                  =totalCount
+          div.row
+              div.col.l4.offset-l4
+                  h4 Top Items
+                  div(class="table-responsive")
+                    table(class="table")
+                      thead
+                          tr.trhideclass
+                              th No.
+                              th Item
+                              th Date posted
+                      tbody
+                          - var i = 0
+                          each item in topItems
+                            - i++
+                            tr.trhideclass
+                                td
+                                    = i
+                                td
+                                    div.card(style='max-width: 200px; max-height: 300px')
+                                        div.card-image
+                                            a(href="/v/"+ item.id)
+                                              img(src=item.imageuri)
+                                        div.card-content
+                                            p.truncate
+                                                = item.text
+                                            p
+                                                =item.numshares
+                                                =" "
+                                                |shares,
+                                                =" "
+                                                =item.numfavorites
+                                                =" "
+                                                |likes
+
+                                td
+                                    = moment_local(item.created_on).tz('America/New_York').format('MMM D, YYYY')
