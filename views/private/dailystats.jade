@@ -11,11 +11,47 @@ block content
                   a.right(href="/dailystats?date=" + moment_local(today).add(1, 'days').format('MM-DD-YYYY'))
                       |Next day
                       i.material-icons(id="icon-middle") navigate_next
-          div.row
+          div.row.center
               div.col.l4.offset-l4
-                  h5 User stats on
+                  h5 Stats on
                      =" "
                      =moment_local(today).format('MMM DD, YYYY')
+          div.row
+              div.col.l4.offset-l4
+                  h5 Top Items
+                  if topItems.length > 0
+                      div(class="table-responsive")
+                        table(class="table")
+                          thead
+                              tr.trhideclass
+                                  th No.
+                                  th Item
+                                  th User Interactions
+                              tbody
+                                  - var i = 0
+                                  each item in topItems
+                                    - i++
+                                    tr.trhideclass
+                                      td
+                                        = i
+                                      td
+                                        a(href="/v/"+item[1].id)
+                                            em
+                                                = item[1].id
+                                      td
+                                        = item[1].numshares
+                                        =" "
+                                        |shares,
+                                        =" "
+                                        = item[1].numfavorites
+                                        =" "
+                                        |likes
+                    else
+                        em
+                            |Nobody seemed to share or like anything :(
+          div.row
+              div.col.l4.offset-l4
+                  h5 User Stats
                   div(class="table-responsive")
                     table(class="table")
                       thead

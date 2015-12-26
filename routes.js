@@ -577,6 +577,7 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
                 return next(err);
             }
 
+            var likedAndSharedItems = [];
             for(i = 0; i < userlist.length; i++) {
         		var geo = geoip.lookup(userlist[i]._id) ||
                     {city: "XX", region: "XX", country: "XX"};
@@ -594,12 +595,56 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
 
                 userlist[i].timezone = timezone_lookup(geo.country, geo.region) ||
                     'America/New_York';
+
+                likedAndSharedItems = likedAndSharedItems.concat(
+                    _.filter(userlist[i].stats, function(item) {
+                        return item.action === LIKE || item.action === SHARE;
+                    })
+                );
             }
 
+            var userInteractions = {};
+            for(i = 0; i < likedAndSharedItems.length; i++) {
+                var item = likedAndSharedItems[i];
+                if(item.content_id in userInteractions) {
+                    if(item.action === SHARE){
+                        userInteractions[item.content_id].numshares++;
+                    }
+                    else if (item.action === LIKE) {
+                        userInteractions[item.content_id].numfavorites++;
+                    }
+                }
+                else {
+                    userInteractions[item.content_id] = {numshares:0, numfavorites: 0, id: item.content_id};
+                    if(item.action === SHARE) {
+                        userInteractions[item.content_id].numshares++;
+                    }
+                    else if(item.action === LIKE) {
+                        userInteractions[item.content_id].numfavorites++;
+                    }
+                }
+            }
+
+            var topItems = [];
+            for (var key in userInteractions) topItems.push([key, userInteractions[key]]);
+            topItems.sort(function(a, b) {
+                a = a[1];
+                b = b[1];
+
+                if (a.numfavorites + a.numshares < b.numfavorites + b.numshares)
+                    return 1;
+                if (a.numfavorites + a.numshares > b.numfavorites + b.numshares)
+                    return -1;
+                return 0;
+            });
+
+            //userInteractions.sort(compareUserInteractions);
+            //util.log(userInteractions.length);
             res.render('private/dailystats', {
                 users: userlist,
                 today: lowerDateBound,
-                user: req.user
+                user: req.user,
+                topItems: topItems
             });
         });
 });
@@ -698,7 +743,6 @@ Router.post('/post', App.user.can('access private page'), upload.single('imagefi
             sourceuri       : req.user.username,
             id              : Shortid.generate(),
             category        : ['buffered'],
-            created_on      : Date.now(),
             numfavorites    : 0,
             numshares       : 0
         }).save(function(err, agniquote) {

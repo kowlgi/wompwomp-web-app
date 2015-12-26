@@ -4,7 +4,8 @@ const gm = require('gm'),
     fs = require('fs'),
     request = require('request'),
     imgur = require('imgur-node-api'),
-    Config = require('./config');
+    Config = require('./config'),
+    util = require('util');
 
 function upload(fname, callback) {
     imgur.setClientID(Config.imgurkey);

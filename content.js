@@ -10,9 +10,20 @@ exports.init = function(connection){
         category       : [String],
         created_on     : Date,
         numfavorites   : Number,
-        numshares      : Number
+        numshares      : Number,
+        last_modified  : Date
     });
     connection.model('Agni', AgniSchema);
+
+    AgniSchema.pre('save', function(next){
+        var now = new Date();
+        this.last_modified = now;
+        if (!this.created_on) {
+            this.created_on = now;
+        }
+
+        next();
+    });
 
     /* the database which contains the list of all users signed up for the mailing list */
     var AgniMailingListSchema = new Schema({
