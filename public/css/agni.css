@@ -114,7 +114,7 @@ input[type=email] {
     vertical-align: middle;
 }
 
-.btn {
+.cta-btn {
     height: unset;
     line-height: unset;
     padding: 0 0.5rem;
@@ -123,6 +123,3 @@ input[type=email] {
 ul {
     padding-left: 40px;
 }
-
-tr:nth-child(odd)  { background-color:#fafafa; }
-tr:nth-child(even) { background-color:#eeeeee; }
