@@ -24,8 +24,9 @@ block content
                             |, you're signed in
                         if(user)
                             if(user.role == "admin")
-                            p
-                              | You have admin privileges. You can:
+                                p You have admin privileges. You can:
+                            else
+                                p You can:
 
                         if(user)
                             if(user.role == "admin")
