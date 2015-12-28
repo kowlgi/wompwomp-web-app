@@ -185,3 +185,4 @@ exports.submit_key = config.submitkey;
 exports.pushnotificationkey = config.pushnotificationkey;
 exports.mailgun = mg;
 exports.MAILING_LIST = MAILING_LIST;
+exports.mailing_list_scheduler_frequency = mailing_list_frequency;

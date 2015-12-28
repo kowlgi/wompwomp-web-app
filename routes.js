@@ -519,7 +519,7 @@ exports.pushContentNotification = function() {
 Router.get('/buffer', App.user.can('access admin page'), function(req, res, next) {
     var release_interval = CronParser.parseExpression(Config.release_content_scheduler_frequency);
     var notification_interval = CronParser.parseExpression(Config.push_notification_scheduler_frequency);
-    var mailing_list_interval = CronParser.parseExpression(Config.mailing_list_scheduler_frequency);
+    var mailing_list_interval = CronParser.parseExpression(App.mailing_list_scheduler_frequency);
 
     AgniModel.
         find(IS_BUFFERED_CATEGORY).
