@@ -19,7 +19,7 @@ const ops = stdio.getopt({
     'updatedb':
       {key: 'u', args: 1, description: 'EXERCISE EXTREME CAUTION: this command will update the database', mandatory: false},
     'realm':
-      {key: 'r', args: 1, description: 'Realm are we running in [test|prod]?', default: 'test'},
+      {key: 'r', args: 1, description: 'Realm are we running in [test|prod]?', default: 'test', mandatory: true},
     });
 
 const app = express();
