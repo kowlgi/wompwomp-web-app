@@ -17,13 +17,9 @@ const   stdio = require('stdio'),
 
 const ops = stdio.getopt({
     'updatedb':
-        {key: 'u', args: 1, description: 'EXERCISE EXTREME CAUTION: this command will update the database', mandatory: false},
-    'mailgun_api':
-        {key: 'm', args: 1, description: 'The mailgun API key. Invalid API = no email notifications', mandatory: false},
-    'email_domain':
-        {key: 'e', args: 1, description: 'The deckrank email domain. Invalid domain = no email notifications', mandatory: false},
-    'mailing_list':
-        {key: 'l', args: 1, description: 'Who to send the mail to', default: 'fun@mg.wompwomp.co', mandatory: false},
+      {key: 'u', args: 1, description: 'EXERCISE EXTREME CAUTION: this command will update the database', mandatory: false},
+    'realm':
+      {key: 'r', args: 1, description: 'Realm are we running in [test|prod]?', default: 'test'},
     });
 
 const app = express();
@@ -162,12 +158,21 @@ else {
 
 app.set('port', config.port);
 
-const MAILING_LIST = ops.mailing_list;
+var mailing_list_frequency = config.prod_mailing_list_scheduler_frequency;
+var MAILING_LIST = config.test_mailing_list;
+if (ops.realm == 'test') {
+  mailing_list_frequency = config.test_mailing_list_scheduler_frequency;
+} else if (ops.realm == 'prod') {
+  MAILING_LIST = config.prod_mailing_list;
+};
+
+util.log('Running in realm ' + ops.realm + ' and sending emails to: ' + MAILING_LIST + ' at frequency ' + mailing_list_frequency);
+
 // The global mailgun object that will be used in other modules
-const mg = require('mailgun-js')({apiKey: ops.mailgun_api, domain: ops.email_domain});
+const mg = require('mailgun-js')({apiKey: config.mailgun_key, domain: config.email_domain});
 
 const mailinglist = require('./mailinglist');
-schedule.scheduleJob(config.mailing_list_scheduler_frequency, mailinglist.GetFresh);
+schedule.scheduleJob(mailing_list_frequency , mailinglist.GetFresh);
 schedule.scheduleJob(config.release_content_scheduler_frequency, routes.releaseBufferedContent);
 schedule.scheduleJob(config.push_notification_scheduler_frequency, routes.pushContentNotification);
 
