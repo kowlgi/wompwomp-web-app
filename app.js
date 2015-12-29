@@ -30,6 +30,11 @@ const ops = stdio.getopt({
       {key: 'r', args: 1, description: 'Realm are we running in [test|prod]?', default: 'test', mandatory: true},
     });
 
+if(ops.realm != "test" && ops.type != "prod") {
+    console.log("Error: realm isn't one of the accepted values: test/prod");
+    process.exit();
+}
+
 const app = express();
 const compress = require('compression');
 app.use(compress());
