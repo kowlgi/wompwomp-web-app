@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 const gcm = require('node-gcm');
-const util = require('util');
 const Mail = require('./mail');
 const Shortid = require('shortid');
 const Moment = require('moment-timezone');
 const CronParser = require('cron-parser');
 const Config = require('./config');
 const App = require('./app');
+const winston = App.winston;
 const AgniModel = App.contentdb.model('Agni');
 const AgniMailingListModel = App.contentdb.model('AgniMailingList');
 const AgniPushNotificationStatsModel = App.contentdb.model('AgniPushNotificationStats');
@@ -55,7 +55,7 @@ Router.get('/', function(req, res, next) {
 
 Router.post('/subscribe', function(req, res, next) {
   if(typeof req.body.email == 'undefined'){
-      util.log("missing email param for subscribe()")
+      winston.info("missing email param for subscribe()")
       res.end();
       return;
   }
@@ -66,17 +66,17 @@ Router.post('/subscribe', function(req, res, next) {
     created_on      : Date.now(),
   }).save(function(err, email) {
     if (err) {
-      util.error(err);
+      winston.error(err);
       return next(err);
     }
-    util.log('Added ' + user_entered_email + ' to the db');
+    winston.info('Added ' + user_entered_email + ' to the db');
 
     // Add the user to the mailing list
     var members = [ { address: user_entered_email } ];
     // TODO(hnag): Change the mailing list to a wompwomp.co address
     App.mailgun.lists(App.MAILING_LIST).members().add({
       members: members, subscribed: true}, function (err, body) {
-        util.log('Added ' + user_entered_email + ' to mailgun');
+        winston.info('Added ' + user_entered_email + ' to mailgun');
         res.end();
     });
   });
@@ -87,12 +87,12 @@ Router.post('/submit', function(req, res, next) {
        typeof req.body.imageuri == 'undefined' ||
        typeof req.body.sourceuri == 'undefined' ||
        typeof req.body.category == 'undefined'){
-        util.log("missing param for submit()")
+        winston.info("missing param for submit()")
         res.end();
         return;
     }
     if(req.body.submitkey != App.submit_key) {
-        util.log("wrong submit key")
+        winston.info("wrong submit key")
         res.end();
         return;
     }
@@ -108,12 +108,12 @@ Router.post('/submit', function(req, res, next) {
         numshares       : 0
     }).save(function(err, agniquote) {
         if (err) {
-            util.error(err);
+            winston.error(err);
             return next(err);
         }
 
         if(agniquote.category != "buffered" && agniquote.category != "hidden") {
-            util.log("Pushing notification at submit time for: " + agniquote);
+            winston.info("Pushing notification at submit time for: " + agniquote);
             // send notification to notify phone app to sync feed
             sendNotification("/topics/sync");
 
@@ -125,7 +125,7 @@ Router.post('/submit', function(req, res, next) {
             }
         }
         else {
-            util.log("Either buffered or hidden submit: " + agniquote);
+            winston.info("Either buffered or hidden submit: " + agniquote);
         }
 
         res.end();
@@ -134,7 +134,7 @@ Router.post('/submit', function(req, res, next) {
 
 Router.post('/pushcta', function(req, res, next) {
     if(req.body.submitkey != App.submit_key) {
-        util.log("wrong submit key")
+        winston.info("wrong submit key")
         res.end();
         return;
     }
@@ -149,7 +149,7 @@ Router.post('/pushcta', function(req, res, next) {
             sendNotification("/topics/remove_all_ctas");
         }
     } catch(err) {
-        util.error(err);
+        winston.error(err);
     } finally {
         res.end();
     }
@@ -408,7 +408,7 @@ Router.post('/uf/:id', function(req, res, next) {
 
 Router.post('/hideitem', function(req, res, next) {
     if(req.body.submitkey != App.submit_key) {
-        util.log("wrong submit key")
+        winston.info("wrong submit key")
         res.end();
         return;
     }
@@ -437,14 +437,14 @@ Router.get('/install', function(req, res, next) {
 });
 
 exports.releaseBufferedContent = function() {
-    util.log("releaseBufferedContent() called at " + Moment().format());
+    winston.info("releaseBufferedContent()");
     AgniModel.
         find(IS_BUFFERED_CATEGORY).
         sort({created_on: 1}).
         limit(1).
         exec(function(err, quotes){
             if(err) {
-                util.error(err);
+                winston.error(err);
                 return;
             }
 
@@ -454,8 +454,6 @@ exports.releaseBufferedContent = function() {
                 quotes[0].markModified('category');
                 quotes[0].markModified('created_on');
                 quotes[0].save();
-
-                util.log("Release scheduled content: " + quotes[0]);
                 // send notification to notify phone app to sync feed
                 sendNotification("/topics/sync");
             }
@@ -463,14 +461,14 @@ exports.releaseBufferedContent = function() {
 }
 
 exports.pushContentNotification = function() {
-    util.log("pushContentNotification() called at " + Moment().format());
+    winston.info("pushContentNotification()");
     AgniModel.
         find(NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY).
         sort({created_on: -1}).
         limit(1).
         exec(function(err, quotes){
             if(err) {
-                util.error(err);
+                winston.error(err);
                 return;
             }
 
@@ -481,15 +479,15 @@ exports.pushContentNotification = function() {
                     limit(1).
                     exec(function(err, previousNotification) {
                         if(err) {
-                            util.error(err);
+                            winston.error(err);
                             return;
                         }
 
-                        util.log("newest item created on: " + quotes[0].created_on);
+                        winston.info("newest item created on: " + quotes[0].created_on);
 
                         if(previousNotification.length < 1 ||
                             previousNotification[0].created_on < quotes[0].created_on) {
-                            util.log("Pushing scheduled notification: " + quotes[0]);
+                            winston.info("Pushing scheduled notification: " + quotes[0]);
 
                             sendNotification("/topics/content",
                                 quotes[0].text,
@@ -501,15 +499,15 @@ exports.pushContentNotification = function() {
                                 created_on : Date.now()
                             }).save(function(err, pushNotificationStat) {
                                 if(err) {
-                                    util.log(err);
+                                    winston.info(err);
                                     return;
                                 }
 
-                                util.log("just pushed this stat: " + pushNotificationStat);
+                                winston.info("just pushed this stat: " + pushNotificationStat);
                             });
                         }
                         else {
-                            util.log("No new items for push notification");
+                            winston.info("No new items for push notification");
                         }
                     });
             }
@@ -573,7 +571,7 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
                 }
             ], function(err, userlist){
             if(err) {
-                util.error(err);
+                winston.error(err);
                 return next(err);
             }
 
@@ -673,7 +671,7 @@ Router.get('/userstats', App.user.can('access admin page'), function(req, res, n
                 }
             ], function(err, datelist){
             if(err) {
-                util.error(err);
+                winston.error(err);
                 return next(err);
             }
 
@@ -747,11 +745,12 @@ Router.post('/post', App.user.can('access private page'), upload.single('imagefi
             numshares       : 0
         }).save(function(err, agniquote) {
             if (err) {
-                util.error(err);
+                winston.error(err);
                 return next(err);
             }
 
-            res.render('private/collection');
+            req.flash('success', "Thanks for posting! You're welcome to post another");
+            res.render('private/post');
         });
     });
 });

@@ -1,5 +1,11 @@
 var MailComposer = require('mailcomposer'),
-    util = require('util');
+    winstonpkg = require('winston');
+
+winston = new (winstonpkg.Logger)({
+            transports: [
+              new (winstonpkg.transports.Console)({'timestamp':true})
+            ]
+        });
 
 // Pass a valid mg
 function sendHtmlEmail(mg, to, subject, body_text, body_html, current_time, update_callback) {

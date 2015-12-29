@@ -2,10 +2,16 @@ var Mongoose = require('mongoose'),
     AgniModel = Mongoose.model('Agni'),
     Shortid = require('shortid'),
     Vibrant = require('node-vibrant'),
-    util = require('util'),
+    winstonpkg = require('winston'),
     Request = require('request'),
     Fs = require('fs'),
     Path = require('path');
+
+var winston = new (winstonpkg.Logger)({
+        transports: [
+          new (winstonpkg.transports.Console)({'timestamp':true})
+        ]
+    });
 
 exports.update_db_oct_16_2015 = function() {
     // Add categories and ids
@@ -13,7 +19,7 @@ exports.update_db_oct_16_2015 = function() {
 
     AgniModel.find(conditions, function(err, docs) {
         if(err) {
-            util.log(err);
+            winston.info(err);
             return;
         }
 
@@ -31,13 +37,13 @@ exports.update_db_oct_20_2015 = function() {
 
     AgniModel.find(conditions, function(err, docs) {
         if(err) {
-            util.log(err);
+            winston.info(err);
             return;
         }
 
         docs.forEach(function(elem, index, array) {
             var filename = "images/" + Path.basename(elem.imageuri);
-            util.log(filename);
+            winston.info(filename);
             var stream = Fs.createWriteStream(filename);
             Request.get(elem.imageuri).pipe(stream);
             stream.once('close', function() {
@@ -46,7 +52,7 @@ exports.update_db_oct_20_2015 = function() {
                     if(err ||
                        typeof swatches['LightVibrant'].getHex === "undefined" ||
                        typeof swatches['LightVibrant'].getBodyTextColor === "undefined" ) {
-                        util.log(err);
+                        winston.info(err);
                         elem.backgroundcolor = "#FFFFFF";
                         elem.bodytextcolor = "#000000";
                         elem.save();
@@ -84,7 +90,7 @@ exports.update_db_oct_24_2015 = function() {
 
     AgniModel.find(conditions, function(err, docs) {
         if(err) {
-            util.log(err);
+            winston.info(err);
             return;
         }
 

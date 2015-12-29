@@ -2,7 +2,7 @@ const   stdio = require('stdio'),
         bodyParser = require('body-parser'),
         jade = require('jade'),
         path = require('path'),
-        util = require('util'),
+        winstonpkg = require('winston'),
         favicon = require('serve-favicon'),
         schedule = require('node-schedule'),
         http = require('http'),
@@ -13,7 +13,15 @@ const   stdio = require('stdio'),
         mongoose = require('mongoose'),
         passport = require('passport'),
         LocalStrategy = require('passport-local').Strategy,
-        ConnectRoles = require('connect-roles');
+        ConnectRoles = require('connect-roles'),
+        flash = require('express-flash');
+
+winston = new (winstonpkg.Logger)({
+    transports: [
+      new (winstonpkg.transports.Console)({'timestamp':true})
+    ]
+});
+exports.winston = winston;
 
 const ops = stdio.getopt({
     'updatedb':
@@ -122,6 +130,9 @@ user.use(function (req) {
 });
 exports.user = user;
 
+// Set up for flash messages
+app.use(flash());
+
 // Set up routes
 const routes  = require( './routes' );
 app.use('/', routes.router);
@@ -166,7 +177,7 @@ if (ops.realm == 'test') {
   MAILING_LIST = config.prod_mailing_list;
 };
 
-util.log('Running in realm ' + ops.realm + ' and sending emails to: ' + MAILING_LIST + ' at frequency ' + mailing_list_frequency);
+winston.info('Running in realm ' + ops.realm + ' and sending emails to: ' + MAILING_LIST + ' at frequency ' + mailing_list_frequency);
 
 // The global mailgun object that will be used in other modules
 const mg = require('mailgun-js')({apiKey: config.mailgun_key, domain: config.email_domain});
@@ -178,7 +189,7 @@ schedule.scheduleJob(config.push_notification_scheduler_frequency, routes.pushCo
 
 // Start server
 http.createServer(app).listen(app.get('port'), function() {
-  util.log('Express listening on port ' + app.get('port'));
+  winston.info('Express listening on port ' + app.get('port'));
 });
 
 exports.submit_key = config.submitkey;

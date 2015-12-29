@@ -2,8 +2,9 @@ const mongoose = require('mongoose'),
   Mail = require('./mail'),
   jade = require('jade'),
   fs = require('fs'),
-  util = require('util'),
-  App = require('./app');
+  App = require('./app'),
+  winston = App.winston;
+  
 const AgniModel = App.contentdb.model('Agni');
 const AgniMailingListModel = App.contentdb.model('AgniMailingList');
 const AgniMailingListStatsModel = App.contentdb.model('AgniMailingListStats');
@@ -24,7 +25,7 @@ function UpdateMailingListSendTime(payload, timestamp) {
       console.error(err);
       return next(err);
     }
-    util.log('Updated the mailing list time ' + timestamp);
+    winston.info('Updated the mailing list time ' + timestamp);
   });
 };
 
@@ -35,7 +36,7 @@ exports.GetFresh = function() {
   AgniMailingListStatsModel.find().sort('-created_on').limit(1).exec(function(err, stats) {
     if (stats.length == 0) {
       UpdateMailingListSendTime('test', current_time);
-      util.log('mailing stats db empty; creating first entry');
+      winston.info('mailing stats db empty; creating first entry');
     } else {
         previous_time = stats[0].created_on;
         var date_filter = { "created_on" : { $gt : new Date(previous_time) }};
@@ -59,7 +60,7 @@ exports.GetFresh = function() {
             }
             Mail.sendHtmlEmail(App.mailgun, App.MAILING_LIST, subject, '', html, current_time, UpdateMailingListSendTime);
           } else {
-            util.log('There are no new items to mail our users');
+            winston.info('There are no new items to mail our users');
           }
         });
     }

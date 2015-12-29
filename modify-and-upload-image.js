@@ -5,13 +5,19 @@ const gm = require('gm'),
     request = require('request'),
     imgur = require('imgur-node-api'),
     Config = require('./config'),
-    util = require('util');
+    winstonpkg = require('winston');
+
+winston = new (winstonpkg.Logger)({
+        transports: [
+          new (winstonpkg.transports.Console)({'timestamp':true})
+        ]
+    });
 
 function upload(fname, callback) {
     imgur.setClientID(Config.imgurkey);
     imgur.upload(fname, function (err, res) {
         if(err) {
-          util.error(err);
+          winston.error(err);
           return callback(err);
         }
 
@@ -32,20 +38,20 @@ function pad_on(fname, extent_int, callback) {
     .noProfile()
     .write(out_fname, function (err) {
         if (err) {
-            util.error(err);
+            winston.error(err);
             return;
         }
 
         gm(out_fname).size(function(err, value) {
             if (err) {
-                util.error(err);
+                winston.error(err);
                 return callback(err);
             }
 
             if (value.width == Config.width && value.height == Config.height) {
                 upload(out_fname, callback);
             } else {
-                util.log("Error: image dimensions turned out different than expected");
+                winston.info("Error: image dimensions turned out different than expected");
                 return callback(err);
             }
         });
@@ -56,7 +62,7 @@ module.exports = function(image_path, callback) {
     gm(image_path)
     .size(function (err, size) {
         if (err) {
-            util.error(err);
+            winston.error(err);
             return callback(err);
         }
 
