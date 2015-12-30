@@ -28,10 +28,10 @@ div(class="table-responsive")
                     div.input-field
                       .form-group
                           select.form-control(id="selectreviewdecision"+item.id)
-                            option(value="" disabled selected) Choose an option
-                            option(value="hide") Hide item from users
+                            option(value="" disabled selected) What do you want to do with this post?
+                            option(value="hide") Hide
                             if enable_show_item
-                                option(value="show") Show item to users
+                                option(value="show") Publish
                             else
-                                option(value="review") Review item again
+                                option(value="review") Re-Review
                       button.btn(type='submit', id="submitreviewdecision"+item.id) Submit
