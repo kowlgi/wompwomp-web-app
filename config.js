@@ -9,8 +9,7 @@ config.session_secret = "keyboard cat"
 config.sessiondb = "agnisession";
 config.userstatsdb = "agniuserstats";
 
-//config.release_content_scheduler_frequency = "0 0 1,3,6,10,13,17,21,23 * * *";
-config.release_content_scheduler_frequency = "0 */1 * * * *"
+config.release_content_scheduler_frequency = "0 0 1,3,6,10,13,17,21,23 * * *";
 
 /* in cases where release time overlaps, give ~10 seconds for buffered content
    to be released  */
