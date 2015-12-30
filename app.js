@@ -31,7 +31,7 @@ const ops = stdio.getopt({
     });
 
 if(ops.realm != "test" && ops.type != "prod") {
-    console.log("Error: realm isn't one of the accepted values: test/prod");
+    console.log("Error: set realm to one of the valid values: test/prod");
     process.exit();
 }
 
