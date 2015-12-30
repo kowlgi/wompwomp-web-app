@@ -5,7 +5,7 @@ var passportLocalMongoose = require('passport-local-mongoose');
 exports.init = function(connection){
     var Account = new Schema(
         {
-            username: String,
+            username: {type: String, lowercase: true},
             email: String,
             role: String,
             resetPasswordToken: String,

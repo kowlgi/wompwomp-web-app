@@ -845,17 +845,25 @@ Router.get('/signup', isNotLoggedIn, function(req, res, next) {
 });
 
 Router.post('/signup', function(req, res, next) {
-    Account.register(
-            new Account({
-                        username : req.body.username,
-                        email: req.body.email,
-                        role : "contributor" }),
-            req.body.password,
-            function(err, account) {
-        if (err) {
+    if( /[^a-zA-Z0-9]/.test(req.body.username) ) {
+        req.flash('error', "Username must only contain alphanumeric characters");
+        return res.render('private/signup',
+            {
+                username: req.body.username,
+                email: req.body.email
+            }
+        );
+    }
+
+    Account.findOne({username: req.body.username.toLowerCase()}, function(err, item) {
+        if(err) {
             winston.error(err);
-            req.flash('error', err.message);
-            return res.render("private/signup",
+            return next(err);
+        }
+
+        if(item != null) {
+            req.flash('error', "A user with the given username is already registered");
+            return res.render('private/signup',
                 {
                     username: req.body.username,
                     email: req.body.email
@@ -863,24 +871,53 @@ Router.post('/signup', function(req, res, next) {
             );
         }
 
-        passport.authenticate('local',
-            {
-                failureRedirect: '/signup',
-                failureFlash: true,
-                successFlash: 'Welcome!'
-            })(req, res, function () {
-            req.session.save(function (err) {
-                if (err) {
-                    winston.error(err);
-                    req.flash('error', err.message);
-                    return res.render("private/signup",
-                        {
-                            username: req.body.username,
-                            email: req.body.email
-                        }
-                    );
+        if(req.body.username.length < 4) {
+            req.flash('error', "Username must be at least 4 characters long");
+            return res.render('private/signup',
+                {
+                    username: req.body.username,
+                    email: req.body.email
                 }
-                res.redirect('/dashboard');
+            );
+        }
+
+        Account.register(
+                new Account({
+                            username : req.body.username,
+                            email: req.body.email,
+                            role : "contributor" }),
+                req.body.password,
+                function(err, account) {
+            if (err) {
+                winston.error(err);
+                req.flash('error', err.message);
+                return res.render("private/signup",
+                    {
+                        username: req.body.username,
+                        email: req.body.email
+                    }
+                );
+            }
+
+            passport.authenticate('local',
+                {
+                    failureRedirect: '/signup',
+                    failureFlash: true,
+                    successFlash: 'Welcome!'
+                })(req, res, function () {
+                req.session.save(function (err) {
+                    if (err) {
+                        winston.error(err);
+                        req.flash('error', err.message);
+                        return res.render("private/signup",
+                            {
+                                username: req.body.username,
+                                email: req.body.email
+                            }
+                        );
+                    }
+                    res.redirect('/dashboard');
+                });
             });
         });
     });
