@@ -781,7 +781,7 @@ Router.post('/post', App.user.can('access private page'), function(req, res, nex
                     return res.render('private/post');
                 }
 
-                req.flash('success', "Content posted for review! You can post another if you wish.");
+                req.flash('success', "Thanks for submitting! Your post is currently in the review bin and will go live once an admin has approved it");
                 res.render('private/post');
             });
         });
