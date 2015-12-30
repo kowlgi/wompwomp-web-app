@@ -30,7 +30,7 @@ const ops = stdio.getopt({
       {key: 'r', args: 1, description: 'Realm are we running in [test|prod]?', default: 'test', mandatory: true},
     });
 
-if(ops.realm != "test" && ops.type != "prod") {
+if(ops.realm != "test" && ops.realm != "prod") {
     console.log("Error: set realm to one of the valid values: test/prod");
     process.exit();
 }
