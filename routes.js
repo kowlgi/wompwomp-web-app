@@ -524,6 +524,7 @@ Router.get('/buffer', App.user.can('access admin page'), function(req, res, next
         sort({created_on: 1}).
         exec(function(err, quotes){
             if(err) {
+                winston.error(err);
                 return next(err);
             }
 
@@ -706,6 +707,10 @@ Router.get('/itemstats', App.user.can('access admin page'), function(req, res, n
   AgniModel.
       find().
       exec(function(err, items) {
+          if(err) {
+              winston.error(err);
+              return next(err);
+          }
           items.sort(compareUserInteractions);
           var liveItems = _.filter(items, function(item) {
               return item.category.indexOf("hidden") == -1 &&
@@ -746,10 +751,11 @@ Router.post('/post', App.user.can('access private page'), upload.single('imagefi
         }).save(function(err, agniquote) {
             if (err) {
                 winston.error(err);
-                return next(err);
+                req.flash('error', "An error occurred while posting your content. Please try again.")
+                return res.render('private/post');
             }
 
-            req.flash('success', "Thanks for posting! You're welcome to post another");
+            req.flash('success', "Content posted for review! You can post another if you wish.");
             res.render('private/post');
         });
     });
@@ -761,6 +767,7 @@ Router.get('/review', App.user.can('access admin page'), function(req, res, next
         sort({created_on: 1}).
         exec(function(err, inReviewItems){
             if(err) {
+                winston.error(err);
                 return next(err);
             }
             res.render('private/reviewitems', {items: inReviewItems});
@@ -775,19 +782,31 @@ Router.get('/signin', isNotLoggedIn, function(req, res, next) {
     res.render('private/signin', {user: req.user});
 });
 
-Router.post('/signin', isNotLoggedIn, passport.authenticate('local'), function(req, res, next) {
-    req.session.save(function (err) {
-        if (err) {
-            return next(err);
+Router.post('/signin',
+    isNotLoggedIn,
+    passport.authenticate('local',
+        {
+            failureRedirect: '/signin',
+            failureFlash: true,
+            successFlash: 'Welcome!'
         }
-        res.redirect('/dashboard');
+    ),
+    function(req, res, next) {
+        req.session.save(function (err) {
+            if (err) {
+                winston.error(err);
+                req.flash('error', err.message);
+                return res.render("private/signin");
+            }
+            res.redirect('/dashboard');
+        });
     });
-});
 
 Router.get('/signout', isLoggedIn, function(req, res, next) {
     req.logout();
     req.session.save(function (err) {
         if (err) {
+            winston.error(err);
             return next(err);
         }
         res.redirect('/dashboard');
@@ -799,19 +818,40 @@ Router.get('/signup', isNotLoggedIn, function(req, res, next) {
 });
 
 Router.post('/signup', function(req, res, next) {
-    Account.register(new Account({
-                    username : req.body.username,
-                    email: req.body.email,
-                    role : "contributor" }),
-                 req.body.password, function(err, account) {
+    Account.register(
+            new Account({
+                        username : req.body.username,
+                        email: req.body.email,
+                        role : "contributor" }),
+            req.body.password,
+            function(err, account) {
         if (err) {
-          return res.render("signup", {info: "Sorry. That username already exists. Try again."});
+            winston.error(err);
+            req.flash('error', err.message);
+            return res.render("private/signup",
+                {
+                    username: req.body.username,
+                    email: req.body.email
+                }
+            );
         }
 
-        passport.authenticate('local')(req, res, function () {
+        passport.authenticate('local',
+            {
+                failureRedirect: '/signup',
+                failureFlash: true,
+                successFlash: 'Welcome!'
+            })(req, res, function () {
             req.session.save(function (err) {
                 if (err) {
-                    return next(err);
+                    winston.error(err);
+                    req.flash('error', err.message);
+                    return res.render("private/signup",
+                        {
+                            username: req.body.username,
+                            email: req.body.email
+                        }
+                    );
                 }
                 res.redirect('/dashboard');
             });

@@ -60,24 +60,27 @@ body
                             a(href="/signout") Sign Out
     .container-fluid
         div.section
-            div.row
-                div.col.l4.offset-l4
+            div.row.center
+                div.col.l4.offset-l4.flow-text
                     if messages.error
                         .alert.alert-danger
                             div.red-text
-                                h5
-                                    = messages.error
+                                = messages.error
                     if messages.info
                         .alert.alert-info
                             div.orange-text
-                                h5
-                                    = messages.info
+                                = messages.info
                     if messages.success
                         .alert.alert-success
                             div.green-text
-                                h5
-                                    = messages.success
+                                = messages.success
     block content
+    div.center.tiny-text(id="footer")
+        |a hatching amazing labs creation &copy; 2015&nbsp;
+        |&middot;&nbsp;
+        a(href="mailto:wompwompapp@gmail.com") Contact&nbsp;
+        |&middot;&nbsp;
+        |Privacy
 script(src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js")
 script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.2/js/materialize.min.js")
 script(src="js/agnidashboard.js")

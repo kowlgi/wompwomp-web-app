@@ -8,16 +8,22 @@ block content
                     h1 Sign Up
                     p.lead It's been free since the ice age
                     br
+                    if username
+                        - usernameplaceholder = username
+                    else
+                        - usernameplaceholder = ""
+                    if email
+                        - emailplaceholder = email
+                    else
+                        - emailplaceholder = ""
                     form(role='form', action="/signup",method="post", style='max-width: 300px;')
                         .form-group
-                            input.form-control(type='text', name="username", placeholder='Enter a username', required)
+                            input.form-control(type='text', name="username", placeholder="Enter a username", value=usernameplaceholder, required)
                         .form-group
-                            input.form-control(type='email', name="email", placeholder='Enter your email', required)
+                            input.form-control(type='email', name="email", placeholder="Enter your email", value=emailplaceholder, required)
                         .form-group
                             input.form-control(type='password', name="password", placeholder='Password', required)
                         button.btn.btn-default(type='submit') Sign Up
-                    br
-                    h4= info
                     br
                     |Already a member?
                     =" "

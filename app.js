@@ -106,7 +106,11 @@ require('./userstats').init(exports.userstatsdb);
 exports.logindb = mongoose.createConnection('mongodb://localhost/' + config.logindb);
 require('./account').init(exports.logindb);
 const Account = exports.logindb.model('Accounts');
-passport.use(new LocalStrategy(Account.authenticate()));
+passport.use(new LocalStrategy(
+    {
+        usernameField: 'email'
+    },
+    Account.authenticate()));
 passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
 app.use(user.middleware());
