@@ -1,0 +1,37 @@
+if display_buffered_item_meta_data
+    if items.length > 0
+        h4 Buffered Items
+    else
+        h4 wompwomp for real :(
+        |Don't sit on yo ass. Submit an item quick or eat only samosas for the rest of your life
+div(class="table-responsive")
+  table(class="table highlight striped")
+   tbody
+       - var i = 0
+       each item in items
+         - i++
+         tr.trhideclass
+             td
+                 = i
+             td
+                if display_buffered_item_meta_data
+                   include buffered_item_meta_data.jade
+                div(class="card hoverable")
+                  a(href="/v/"+ item.id, class="card-image")
+                    img(src=item.imageuri)
+                  div(class="card-content", id=item.id)
+                      p
+                          = item.text
+                      p.em.small.grey-text
+                          =moment_local(item.created_on).fromNow()
+                form.itemreviewform.center(id=item.id, role='form', action="/review/"+item.id, method="post")
+                    div.input-field
+                      .form-group
+                          select.form-control(id="selectreviewdecision"+item.id)
+                            option(value="" disabled selected) Choose an option
+                            option(value="hide") Hide item from users
+                            if enable_show_item
+                                option(value="show") Show item to users
+                            else
+                                option(value="review") Review item again
+                      button.btn(type='submit', id="submitreviewdecision"+item.id) Submit

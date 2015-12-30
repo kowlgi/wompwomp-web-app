@@ -771,7 +771,7 @@ Router.post('/post', App.user.can('access private page'), function(req, res, nex
                 imageuri        : imageurl,
                 sourceuri       : req.user.username,
                 id              : Shortid.generate(),
-                category        : ['buffered'],
+                category        : ['in_review'],
                 numfavorites    : 0,
                 numshares       : 0
             }).save(function(err, agniquote) {
@@ -797,8 +797,37 @@ Router.get('/review', App.user.can('access admin page'), function(req, res, next
                 winston.error(err);
                 return next(err);
             }
-            res.render('private/reviewitems', {items: inReviewItems});
+            res.render('private/reviewitems', {items: inReviewItems, enable_show_item: true});
         });
+});
+
+Router.post('/review/:id', App.user.can('access admin page'), function(req, res, next) {
+    AgniModel.findOne({id : req.params.id}, function(err, item) {
+        if(err) {
+            return next(err);
+        }
+
+        if(item == null) {
+            return res.render ('404', {url:req.url});
+        }
+
+        if(req.body.reviewdecision == "hide") {
+            item.category[0] = "hidden";
+        }
+        else if(req.body.reviewdecision == "show") {
+            item.category[0] = "buffered";
+        }
+        else if(req.body.reviewdecision == "review") {
+            item.category[0] = "in_review";
+        }
+        else {
+            req.flash("Only valid values are: hide, show and review");
+        }
+
+        item.markModified('category');
+        item.save();
+        res.end();
+    });
 });
 
 Router.get('/dashboard', function(req, res, next) {

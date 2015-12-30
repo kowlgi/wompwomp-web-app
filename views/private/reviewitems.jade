@@ -5,5 +5,12 @@ block content
       div.section
           div.row
               div.col.l4.offset-l4
-                  h4 Items In Review
-    include ../showitems.jade
+                  h4 
+                      = items.length 
+                      =" "
+                      if items.length == 1
+                         |Item To Review
+                      else
+                         |Items To Review
+                  include tableofitems.jade
+                    

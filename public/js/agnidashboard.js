@@ -22,4 +22,28 @@ $(document).ready(function() {
     });
 
     $('textarea#imagefile').characterCounter();
+
+    $('select').material_select();
+
+    $('.itemreviewform').submit(function (event) {
+        event.preventDefault();
+        var $form = $( this ),
+            id = $form.attr('id'),
+            val = $('#selectreviewdecision' + id + ' option:selected').val(),
+            url = $form.attr( "action" );
+        var posting = $.post( url, {reviewdecision: val} );
+        posting.done(function( data ) {
+            if(val == "hide") {
+                $('#submitreviewdecision'+id).html('Hidden');
+            }
+            else if(val == "show") {
+                $('#submitreviewdecision'+id).html('Buffered');
+            }
+            else if(val == "review") {
+                $('#submitreviewdecision'+id).html('In Review');
+            }
+            $('#submitreviewdecision'+id).prop('disabled', 'true');
+        });
+        return false;
+    });
 });
