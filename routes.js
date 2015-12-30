@@ -17,7 +17,22 @@ const Express = require('express');
 const Router = Express.Router();
 const Account = App.logindb.model('Accounts');
 const multer  = require('multer');
-const upload = multer({ dest: 'uploads/' });
+const upload = multer(
+    {
+        dest: 'uploads/',
+        limits: {
+            fileSize: 204800 /* 200 KB filesize limit */
+        },
+        fileFilter: function(req, file, cb) {
+            var type = file.mimetype;
+            if (type !== 'image/png' && type !== 'image/jpg' && type !== 'image/jpeg') {
+              cb(new Error("Uploaded file type must either png or jpg"));
+            } else {
+              cb(null, true);
+            }
+        }
+    }
+).single('imagefile');
 const modifyAndUploadImage = require('./modify-and-upload-image');
 const _ = require('lodash');
 
@@ -738,25 +753,37 @@ Router.get('/post', App.user.can('access admin page'), function(req, res, next) 
     res.render('private/post', {user: req.user});
 });
 
-Router.post('/post', App.user.can('access private page'), upload.single('imagefile'), function(req, res, next) {
-    modifyAndUploadImage(req.file.path, function(err, imageurl) {
-        var agniitem = new AgniModel({
-            text            : req.body.caption.substring(0, MAX_TEXT_LENGTH),
-            imageuri        : imageurl,
-            sourceuri       : req.user.username,
-            id              : Shortid.generate(),
-            category        : ['buffered'],
-            numfavorites    : 0,
-            numshares       : 0
-        }).save(function(err, agniquote) {
-            if (err) {
-                winston.error(err);
-                req.flash('error', "An error occurred while posting your content. Please try again.")
+Router.post('/post', App.user.can('access private page'), function(req, res, next) {
+    upload(req, res, function (err) {
+        if(err) {
+            req.flash('error', err.message);
+            return res.render('private/post');
+        }
+
+        modifyAndUploadImage(req.file.path, function(err, imageurl) {
+            if(err) {
+                req.flash('error', err.message);
                 return res.render('private/post');
             }
 
-            req.flash('success', "Content posted for review! You can post another if you wish.");
-            res.render('private/post');
+            var agniitem = new AgniModel({
+                text            : req.body.caption.substring(0, MAX_TEXT_LENGTH),
+                imageuri        : imageurl,
+                sourceuri       : req.user.username,
+                id              : Shortid.generate(),
+                category        : ['buffered'],
+                numfavorites    : 0,
+                numshares       : 0
+            }).save(function(err, agniquote) {
+                if (err) {
+                    winston.error(err);
+                    req.flash('error', err.message)
+                    return res.render('private/post');
+                }
+
+                req.flash('success', "Content posted for review! You can post another if you wish.");
+                res.render('private/post');
+            });
         });
     });
 });

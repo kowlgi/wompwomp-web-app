@@ -7,11 +7,20 @@ block content
                     h3 Post Something Funny
                     form(role='form', action="/post", method="post", style='max-width: 300px;', enctype="multipart/form-data")
                         div.row
-                            .form-group
-                                input(type='file', name="imagefile", id="imagefile", required)
+                            em    
+                                |Upload an image file less than 200KB
+                            div.file-field.input-field
+                                div.btn
+                                    span File
+                                    input(type="file", name="imagefile", id="imagefile", accept=".jpg,.jpeg,.png,.bmp", required)
+                                div.file-path-wrapper
+                                    input.file-path.validate(type="text", placeholder="Choose an image file")
+                        br
                         div.row
-                            .form-group
-                                textarea.form-control(id="caption", name="caption", placeholder='Write a funny caption in 140 characters or less', maxlength="140", rows="8")
+                            em
+                                |Optionally write a funny caption in 140 characters or less
+                            div.input-field
+                                textarea.materialize-textarea(id="caption", name="caption", length="140", maxLength="140", placeholder="Write a funny caption...")
                         button.btn.btn-default(type='submit') Submit
                         br
                         div.image_preview

@@ -20,4 +20,6 @@ $(document).ready(function() {
     $('#caption').keyup(function(){
         $('#blahtxt').html($(this).val());
     });
+
+    $('textarea#imagefile').characterCounter();
 });
