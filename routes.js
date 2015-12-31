@@ -831,7 +831,40 @@ Router.post('/review/:id', App.user.can('access admin page'), function(req, res,
 });
 
 Router.get('/dashboard', function(req, res, next) {
-    res.render('private/dashboard', {user: req.user});
+    if (!req.isAuthenticated())
+        return res.render('private/dashboard', {user: req.user});
+
+    AgniModel.
+        find({sourceuri: req.user.username}).
+        sort('-created_on').
+        exec(function(err, items) {
+            var reviewitems = [], goingliveitems = [], liveitems = [];
+            for(i = 0; i < items.length; i++) {
+                if(items[i].category[0] == "in_review") {
+                    reviewitems.push(items[i]);
+                }
+                else if(items[i].category[0] == "buffered") {
+                    goingliveitems.push(items[i]);
+                }
+                else if(items[i].category[0] == "hidden") {
+                    // do nothing
+                }
+                else {
+                    // must be live if it's no other category
+                    liveitems.push(items[i]);
+                }
+            }
+
+            return res.render(
+                'private/dashboard',
+                {
+                  user: req.user,
+                  reviewitems: reviewitems,
+                  goingliveitems: goingliveitems,
+                  liveitems: liveitems
+                }
+            );
+    });
 });
 
 Router.get('/signin', isNotLoggedIn, function(req, res, next) {
@@ -843,8 +876,7 @@ Router.post('/signin',
     passport.authenticate('local',
         {
             failureRedirect: '/signin',
-            failureFlash: true,
-            successFlash: 'Welcome!'
+            failureFlash: true
         }
     ),
     function(req, res, next) {

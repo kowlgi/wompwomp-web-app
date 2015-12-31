@@ -2,7 +2,7 @@ extends layout
 block content
     .container-fluid
         div.section
-            div.row
+            div.row.center
                 div.col.l4.offset-l4
                     if(!user)
                         h5 Welcome to the dashboard
@@ -21,22 +21,105 @@ block content
                             |Hi
                             =" "
                             =user.username
-                            |, you're signed in
-                        if(user)
-                            if(user.role == "admin")
-                                p You have admin privileges. You can do the following:
-                            else
-                                p You can do the following:
+                            |!     
+                        br
+                        p
+                            a.waves-effect.btn-large.theme-dark(href="/post") Post Something Funny
+                        br
+                        ul.tabs(id="dashboardtabs")
+                            li.tab.col.s3
+                                a(href="#in_review") In Review
+                            li.tab.col.s3
+                                a.active(href="#going_live") Going Live
+                            li.tab.col.s3
+                                a(href="#live") Live
+                        div.col.s12(id="in_review")
+                            h5
+                                =reviewitems.length
+                                =" "
+                                if(reviewitems.length == 1) 
+                                    |item
+                                else
+                                    |items
+                                =" "
+                                |in review
+                            br
+                            div(class="table-responsive")
+                              table(class="table highlight striped")
+                               tbody
+                                   - var i = 0
+                                   each item in reviewitems
+                                     - i++
+                                     tr.trhideclass
+                                         td
+                                             = i
+                                         td
+                                            div(class="card hoverable")
+                                              a(href="/v/"+ item.id, class="card-image")
+                                                img(src=item.imageuri)
+                                              div(class="card-content", id=item.id)
+                                                  p
+                                                      = item.text
+                                                  p.em.small.grey-text
+                                                      =moment_local(item.created_on).fromNow()
+                        div.col.s12(id="going_live")
+                            h5 
+                                =goingliveitems.length
+                                =" "
+                                if(goingliveitems.length == 1) 
+                                    |item
+                                else
+                                    |items
+                                =" "
+                                |going live
+                            br
+                            div(class="table-responsive")
+                              table(class="table highlight striped")
+                               tbody
+                                   - var i = 0
+                                   each item in goingliveitems
+                                     - i++
+                                     tr.trhideclass
+                                         td
+                                             = i
+                                         td
+                                            div(class="card hoverable")
+                                              a(href="/v/"+ item.id, class="card-image")
+                                                img(src=item.imageuri)
+                                              div(class="card-content", id=item.id)
+                                                  p
+                                                      = item.text
+                                                  p.em.small.grey-text
+                                                      =moment_local(item.created_on).fromNow()
+                        div.col.s12(id="live")
+                            h5
+                                =liveitems.length
+                                =" "
+                                if(liveitems.length == 1) 
+                                    |item
+                                else
+                                    |items
+                                =" "
+                                |live
+                            br
+                            div(class="table-responsive")
+                                table(class="table highlight striped")
+                                 tbody
+                                     - var i = 0
+                                     each item in liveitems
+                                       - i++
+                                       tr.trhideclass
+                                           td
+                                               = i
+                                           td
+                                              div(class="card hoverable")
+                                                a(href="/v/"+ item.id, class="card-image")
+                                                  img(src=item.imageuri)
+                                                div(class="card-content", id=item.id)
+                                                    p
+                                                        = item.text
+                                                    p.em.small.grey-text
+                                                        =moment_local(item.created_on).fromNow()
 
-                        if(user)
-                            if(user.role == "admin")
-                                li
-                                    a(href="/buffer") View buffered content
-                                li
-                                    a(href="/review") Review content
-                                li
-                                    a(href="/dailystats") View usage stats
-                                li
-                                    a(href="/itemstats") View item stats
-                            li
-                                a(href="/post") Post content
+
+                        

@@ -46,4 +46,12 @@ $(document).ready(function() {
         });
         return false;
     });
+
+    $('ul.tabs').tabs();
+
+    document.getElementById('dashboardtabs')
+        .setAttribute("style", "width: 100%;");
+
+    $('#dashboardtabs').css({padding: '0px'});
+
 });

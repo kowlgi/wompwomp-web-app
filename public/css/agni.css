@@ -16,7 +16,7 @@
     color: #ffffff;
 }
 
-.theme-dark, .btn, .btn:hover, .btn:focus {
+.theme-dark, .btn, .btn:hover, .btn:focus, .btn-large, .btn-large:hover, .btn-large:focus{
     background-color: #264BD0;
 }
 
@@ -128,4 +128,16 @@ ul {
     position: fixed;
     bottom: 0;
     width: 100%;
+}
+
+.tab a {
+    color: #6985EC !important;
+}
+
+.tab a:hover {
+    color: #8FA5F4 !important;
+}
+
+.indicator {
+    background-color: #6985EC !important;
 }
