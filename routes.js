@@ -797,7 +797,13 @@ Router.get('/review', App.user.can('access admin page'), function(req, res, next
                 winston.error(err);
                 return next(err);
             }
-            res.render('private/reviewitems', {items: inReviewItems, enable_show_item: true});
+            res.render('private/reviewitems',
+                {
+                    items: inReviewItems,
+                    enable_show_item: true,
+                    allow_edit: true
+                }
+            );
         });
 });
 
@@ -878,9 +884,13 @@ Router.get('/edititem/:id', App.user.can('access private page'), function(req, r
         }
 
         if(item.category[0] != "in_review" &&
-           item.category[0] != "buffered" &&
            item.category[0] != "hidden") {
-               req.flash("error", "This post cannot be edited as it's already live.");
+               if(item.category[0] == "buffered") {
+                   req.flash("error", "This post cannot be edited as it's going live.");
+               }
+               else {
+                   req.flash("error", "This post cannot be edited as it's already live.");
+               }
                return res.render('private/edititem',
                     {
                         user: req.user,
