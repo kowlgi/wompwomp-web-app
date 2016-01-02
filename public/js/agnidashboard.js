@@ -47,6 +47,19 @@ $(document).ready(function() {
         return false;
     });
 
+    $('#edititemform').submit(function (event) {
+        event.preventDefault();
+        var $form = $( this ),
+            val = $('#edititemtext').val(),
+            url = $form.attr( "action" );
+        var posting = $.post( url, {caption: val} );
+        posting.done(function( data ) {
+            $('#edititembutton').html('Updated');
+            $('#edititembutton').prop('disabled', 'true');
+        });
+        return false;
+    });
+
     $('ul.tabs').tabs();
 
     document.getElementById('dashboardtabs')

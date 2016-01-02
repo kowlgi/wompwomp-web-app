@@ -99,6 +99,7 @@ const user = new ConnectRoles({
 
 app.use(express.static(__dirname +'/public'));
 app.use('/v', express.static(__dirname +'/public'));
+app.use('/edititem', express.static(__dirname +'/public'));
 app.disable('etag');
 
 exports.userstatsdb = mongoose.createConnection('mongodb://localhost/' + config.userstatsdb);

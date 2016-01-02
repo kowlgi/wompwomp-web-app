@@ -867,6 +867,70 @@ Router.get('/dashboard', function(req, res, next) {
     });
 });
 
+Router.get('/edititem/:id', App.user.can('access private page'), function(req, res, next) {
+    AgniModel.findOne({id : req.params.id}, function(err, item) {
+        if(err) {
+            return res.render ('404', {url:req.url});
+        }
+
+        if(item == null) {
+            return res.render ('404', {url:req.url});
+        }
+
+        if(item.category[0] != "in_review" &&
+           item.category[0] != "buffered" &&
+           item.category[0] != "hidden") {
+               req.flash("error", "This post cannot be edited as it's already live.");
+               return res.render('private/edititem',
+                    {
+                        user: req.user,
+                        allow_edit: false,
+                        item: item
+                    }
+                );
+        }
+
+        return res.render('private/edititem',
+        {
+            user: req.user,
+            allow_edit: true,
+            item: item
+        });
+    });
+});
+
+Router.post('/edititem/:id', App.user.can('access private page'), function(req, res, next) {
+    AgniModel.findOne({id : req.params.id}, function(err, item) {
+        if(err) {
+            return res.render ('404', {url:req.url});
+        }
+
+        if(item == null) {
+            return res.render ('404', {url:req.url});
+        }
+
+        if(item.category[0] != "in_review" &&
+           item.category[0] != "buffered" &&
+           item.category[0] != "hidden") {
+               req.flash("error", "This post cannot be edited as it's already live.");
+               return res.render('private/edititem',
+                    {
+                        user: req.user,
+                        allow_edit: false,
+                        item: item
+                    }
+                );
+        }
+
+        winston.info(req.body.caption);
+        item.text = req.body.caption.substring(0, MAX_TEXT_LENGTH);
+        item.markModified('text');
+        item.save();
+
+        return res.end();
+    });
+});
+
 Router.get('/signin', isNotLoggedIn, function(req, res, next) {
     res.render('private/signin', {user: req.user});
 });

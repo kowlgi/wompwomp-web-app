@@ -1,0 +1,21 @@
+extends layout
+block content
+    .container-fluid
+        div.section
+            div.row.center
+                div.col.s12.l4.offset-l4
+                    h4 Edit Post  
+                    div(class="card hoverable")
+                        a(href="/v/"+ item.id, class="card-image")
+                          img(src=item.imageuri)
+                        div(class="card-content", id=item.id)
+                            if(allow_edit)
+                                form(id="edititemform", role='form', action="/edititem/"+item.id, method="post")
+                                    div.input-field
+                                        textarea.materialize-textarea(id="edititemtext", name="caption", length="140", maxLength="140")
+                                            =item.text
+                                    br
+                                    button.btn.btn-default(type='submit', id='edititembutton') Update
+                            else    
+                                p
+                                    =item.text
