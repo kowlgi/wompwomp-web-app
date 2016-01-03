@@ -451,88 +451,12 @@ Router.get('/install', function(req, res, next) {
     res.redirect(appStoreLink);
 });
 
-exports.releaseBufferedContent = function() {
-    winston.info("releaseBufferedContent()");
-    AgniModel.
-        find(IS_BUFFERED_CATEGORY).
-        sort({created_on: 1}).
-        limit(1).
-        exec(function(err, quotes){
-            if(err) {
-                winston.error(err);
-                return;
-            }
-
-            if(quotes.length > 0) {
-                quotes[0].category[0] = "";
-                quotes[0].created_on = Date.now();
-                quotes[0].markModified('category');
-                quotes[0].markModified('created_on');
-                quotes[0].save();
-                // send notification to notify phone app to sync feed
-                sendNotification("/topics/sync");
-            }
-        });
-}
-
-exports.pushContentNotification = function() {
-    winston.info("pushContentNotification()");
-    AgniModel.
-        find(NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY).
-        sort({created_on: -1}).
-        limit(1).
-        exec(function(err, quotes){
-            if(err) {
-                winston.error(err);
-                return;
-            }
-
-            if(quotes.length > 0) {
-                AgniPushNotificationStatsModel.
-                    find().
-                    sort({created_on: -1}).
-                    limit(1).
-                    exec(function(err, previousNotification) {
-                        if(err) {
-                            winston.error(err);
-                            return;
-                        }
-
-                        winston.info("newest item created on: " + quotes[0].created_on);
-
-                        if(previousNotification.length < 1 ||
-                            previousNotification[0].created_on < quotes[0].created_on) {
-                            winston.info("Pushing scheduled notification: " + quotes[0]);
-
-                            sendNotification("/topics/content",
-                                quotes[0].text,
-                                quotes[0].imageuri,
-                                quotes[0].id);
-
-                            var newPushNotification = new AgniPushNotificationStatsModel({
-                                item_id    : quotes[0].id,
-                                created_on : Date.now()
-                            }).save(function(err, pushNotificationStat) {
-                                if(err) {
-                                    winston.info(err);
-                                    return;
-                                }
-
-                                winston.info("just pushed this stat: " + pushNotificationStat);
-                            });
-                        }
-                        else {
-                            winston.info("No new items for push notification");
-                        }
-                    });
-            }
-        });
-}
-
 Router.get('/buffer', App.user.can('access admin page'), function(req, res, next) {
     var release_interval = CronParser.parseExpression(Config.release_content_scheduler_frequency);
     var notification_interval = CronParser.parseExpression(Config.push_notification_scheduler_frequency);
     var mailing_list_interval = CronParser.parseExpression(App.mailing_list_scheduler_frequency);
+    var push_share_card_interval = CronParser.parseExpression(Config.push_share_card_scheduler_frequency);
+    var push_rate_card_interval = CronParser.parseExpression(Config.push_rate_card_scheduler_frequency);
 
     AgniModel.
         find(IS_BUFFERED_CATEGORY).
@@ -558,7 +482,9 @@ Router.get('/buffer', App.user.can('access admin page'), function(req, res, next
                 app_store_link                  : getAppStoreLink(req.headers['user-agent']),
                 metaDescription                 : "",
                 display_buffered_item_meta_data : true,
-                user                            : req.user
+                user                            : req.user,
+                pushRateCardTime                : push_rate_card_interval,
+                pushShareCardTime               : push_share_card_interval
             });
         });
 });
@@ -1057,6 +983,96 @@ Router.post('/signup', function(req, res, next) {
         });
     });
 });
+
+exports.releaseBufferedContent = function() {
+    winston.info("releaseBufferedContent()");
+    AgniModel.
+        find(IS_BUFFERED_CATEGORY).
+        sort({created_on: 1}).
+        limit(1).
+        exec(function(err, quotes){
+            if(err) {
+                winston.error(err);
+                return;
+            }
+
+            if(quotes.length > 0) {
+                quotes[0].category[0] = "";
+                quotes[0].created_on = Date.now();
+                quotes[0].markModified('category');
+                quotes[0].markModified('created_on');
+                quotes[0].save();
+                // send notification to notify phone app to sync feed
+                sendNotification("/topics/sync");
+            }
+        });
+}
+
+exports.pushContentNotification = function() {
+    winston.info("pushContentNotification()");
+    AgniModel.
+        find(NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY).
+        sort({created_on: -1}).
+        limit(1).
+        exec(function(err, quotes){
+            if(err) {
+                winston.error(err);
+                return;
+            }
+
+            if(quotes.length > 0) {
+                AgniPushNotificationStatsModel.
+                    find().
+                    sort({created_on: -1}).
+                    limit(1).
+                    exec(function(err, previousNotification) {
+                        if(err) {
+                            winston.error(err);
+                            return;
+                        }
+
+                        winston.info("newest item created on: " + quotes[0].created_on);
+
+                        if(previousNotification.length < 1 ||
+                            previousNotification[0].created_on < quotes[0].created_on) {
+                            winston.info("Pushing scheduled notification: " + quotes[0]);
+
+                            sendNotification("/topics/content",
+                                quotes[0].text,
+                                quotes[0].imageuri,
+                                quotes[0].id);
+
+                            var newPushNotification = new AgniPushNotificationStatsModel({
+                                item_id    : quotes[0].id,
+                                created_on : Date.now()
+                            }).save(function(err, pushNotificationStat) {
+                                if(err) {
+                                    winston.info(err);
+                                    return;
+                                }
+
+                                winston.info("just pushed this stat: " + pushNotificationStat);
+                            });
+                        }
+                        else {
+                            winston.info("No new items for push notification");
+                        }
+                    });
+            }
+        });
+}
+
+exports.pushShareCard = function() {
+    var date = new Date();
+    sendNotification("/topics/remove_all_ctas");
+    sendNotification("/topics/cta_share", date.toISOString());
+}
+
+exports.pushRateCard = function() {
+    var date = new Date();
+    sendNotification("/topics/remove_all_ctas");
+    sendNotification("/topics/cta_rate", date.toISOString());
+}
 
 // route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {

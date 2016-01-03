@@ -76,6 +76,40 @@ block content
                               =moment_local(pushNotificationTime.next()).tz('Europe/London').format('MMM D, h:mm:ss A z')
                               - pushNotificationTime.reset()
                   p
+                      |Share CTA card will be posted  
+                      =" "
+                      span.theme-color-text
+                          =" "
+                          - pushShareCardTime.reset()
+                          =moment_local(pushShareCardTime.next()).fromNow()
+                          - pushShareCardTime.reset()
+                      =" "
+                      |on
+                      ul
+                          li
+                              img(class="flag flag-us")
+                              =" "
+                              - pushShareCardTime.reset()
+                              =moment_local(pushShareCardTime.next()).tz('America/New_York').format('MMM D, h:mm:ss A z')
+                              - pushShareCardTime.reset()
+                  p
+                      |Rate CTA card will be posted  
+                      =" "
+                      span.theme-color-text
+                          =" "
+                          - pushRateCardTime.reset()
+                          =moment_local(pushRateCardTime.next()).fromNow()
+                          - pushRateCardTime.reset()
+                      =" "
+                      |on
+                      ul
+                          li
+                              img(class="flag flag-us")
+                              =" "
+                              - pushRateCardTime.reset()
+                              =moment_local(pushRateCardTime.next()).tz('America/New_York').format('MMM D, h:mm:ss A z')
+                              - pushRateCardTime.reset()
+                  p
                       |Buffer empty
                       =" "
                       span.theme-color-text
