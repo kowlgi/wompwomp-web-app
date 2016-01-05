@@ -72,6 +72,12 @@ block content
                                     a(href="/userstats?ip="+user._id)
                                         em
                                             = user._id
+                                    if user.installation_id[0]
+                                        br
+                                        em.tiny-text
+                                            |ID: 
+                                            =" "
+                                            =user.installation_id[0]
                                   td
                                     ol
                                       each stat in user.stats

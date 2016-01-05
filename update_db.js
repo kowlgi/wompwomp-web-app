@@ -1,11 +1,12 @@
-var Mongoose = require('mongoose'),
-    AgniModel = Mongoose.model('Agni'),
-    Shortid = require('shortid'),
-    Vibrant = require('node-vibrant'),
-    winstonpkg = require('winston'),
-    Request = require('request'),
-    Fs = require('fs'),
-    Path = require('path');
+const Mongoose = require('mongoose'),
+      App = require('./app');
+      AgniModel = App.contentdb.model('Agni');
+      Shortid = require('shortid'),
+      Vibrant = require('node-vibrant'),
+      winstonpkg = require('winston'),
+      Request = require('request'),
+      Fs = require('fs'),
+      Path = require('path');
 
 var winston = new (winstonpkg.Logger)({
         transports: [
@@ -97,6 +98,59 @@ exports.update_db_oct_24_2015 = function() {
         docs.forEach(function(elem, index, array) {
             elem.numfavorites = 0;
             elem.numshares = 0;
+            elem.save();
+        });
+    });
+}
+
+exports.update_db_jan_5_2016 = function() {
+    // Add numdismiss
+    var conditions = {numdismiss : {$exists: false}};
+
+    AgniModel.find(conditions, function(err, docs) {
+        if(err) {
+            winston.info(err);
+            return;
+        }
+
+        docs.forEach(function(elem, index, array) {
+            elem.numdismiss = 0;
+            elem.save();
+        });
+    });
+}
+
+exports.update_db_jan_5_2016_2 = function() {
+    // Initialize sourceuri to "higgsboson" if sourceuri field doesn't exist
+    var conditions = {sourceuri : {$exists: false}};
+
+    AgniModel.find(conditions, function(err, docs) {
+        if(err) {
+            winston.info(err);
+            return;
+        }
+
+        docs.forEach(function(elem, index, array) {
+            elem.sourceuri = "higgsboson";
+            elem.markModified('sourceuri');
+            elem.save();
+        });
+    });
+}
+
+exports.update_db_jan_5_2016_3 = function() {
+    // Fix all items where sourceuri is set to a filepath starting with /
+    var conditions = {sourceuri: {$exists: true}, sourceuri : {$regex: "^/"}};
+
+    AgniModel.find(conditions, function(err, docs) {
+        if(err) {
+            winston.info(err);
+            return;
+        }
+
+        docs.forEach(function(elem, index, array) {
+            elem.sourceuri = "higgsboson";
+            elem.markModified('sourceuri');
             elem.save();
         });
     });

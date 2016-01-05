@@ -51,6 +51,7 @@ const REFRESH_BOTTOM = "Refresh_bottom";
 const LIKE = "Like";
 const SHARE = "Share";
 const UNLIKE = "Unlike";
+const DISMISS = "Dismiss";
 
 Router.get('/', function(req, res, next) {
   AgniModel.
@@ -355,8 +356,10 @@ Router.post('/s/:id', function(req, res, next) {
         res.end();
 
         var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+        var inst_id = req.body.inst_id || "no installation id"
         var agniuserstat = new AgniUserStatsModel({
             ip_address     : ip,
+            installation_id: inst_id,
             timestamp      : Date.now(),
             action         : SHARE,
             content_id     : item.id
@@ -381,9 +384,10 @@ Router.post('/f/:id', function(req, res, next) {
         res.end();
 
         var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-
+        var inst_id = req.body.inst_id || "no installation id"
         var agniuserstat = new AgniUserStatsModel({
             ip_address     : ip,
+            installation_id: inst_id,
             timestamp      : Date.now(),
             action         : LIKE,
             content_id     : item.id
@@ -411,9 +415,10 @@ Router.post('/uf/:id', function(req, res, next) {
         res.end();
 
         var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-
+        var inst_id = req.body.inst_id || "no installation id"
         var agniuserstat = new AgniUserStatsModel({
             ip_address     : ip,
+            installation_id: inst_id,
             timestamp      : Date.now(),
             action         : UNLIKE,
             content_id     : item.id
@@ -443,6 +448,34 @@ Router.post('/hideitem', function(req, res, next) {
         item.markModified('category');
         item.save();
         res.end();
+    });
+});
+
+Router.post('/d/:id', function(req, res, next) {
+    AgniModel.findOne({id : req.params.id}, function(err, item) {
+        if(err) {
+            res.render ('404', {url:req.url});
+            return;
+        }
+
+        if(item == null) {
+            res.render ('404', {url:req.url});
+            return;
+        }
+
+        item.numdismiss += 1;
+        item.save();
+        res.end();
+
+        var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+        var inst_id = req.body.inst_id || "no installation id"
+        var agniuserstat = new AgniUserStatsModel({
+            ip_address     : ip,
+            installation_id: inst_id,
+            timestamp      : Date.now(),
+            action         : DISMISS,
+            content_id     : item.id
+        }).save();
     });
 });
 
@@ -507,8 +540,9 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
                     }
                 },
                 {$group: {
-                    _id   : '$ip_address',
-                    stats : {$push: '$$ROOT'},
+                        _id             : '$ip_address',
+                        installation_id : {$push: '$installation_id'},
+                        stats           : {$push: '$$ROOT'},
                     }
                 }
             ], function(err, userlist){
