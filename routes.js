@@ -689,7 +689,7 @@ Router.get('/userstats', App.user.can('access admin page'), function(req, res, n
         });
 });
 
-Router.get('/itemstats', App.user.can('access admin page'), function(req, res, next) {
+Router.get('/itemstats', App.user.can('access private page'), function(req, res, next) {
   AgniModel.
       find().
       exec(function(err, items) {
@@ -698,11 +698,25 @@ Router.get('/itemstats', App.user.can('access admin page'), function(req, res, n
               return next(err);
           }
           items.sort(compareUserInteractions);
-          var liveItems = _.filter(items, function(item) {
+          const popularItems = _.filter(items, function(item) {
+              return item.numshares + item.numfavorites > 0;
+          });
+
+          const liveItems = _.filter(popularItems, function(item) {
               return item.category.indexOf("hidden") == -1 &&
                   item.category.indexOf("in_review") == -1 &&
                   item.category.indexOf("buffered") == -1;
           });
+
+          const now = new Date();
+          const liveAWeekAgo = _.filter(popularItems, function(item) {
+              return days_between(item.created_on, now) <= 7;
+          });
+
+          const liveADayAgo = _.filter(liveAWeekAgo, function(item) {
+              return days_between(item.created_on, now) <= 1;
+          });
+
           res.render('private/itemstats', {
               totalCount : items.length,
               hiddenCount: _.filter(items, function(item) {
@@ -715,10 +729,29 @@ Router.get('/itemstats', App.user.can('access admin page'), function(req, res, n
                   return item.category.indexOf("buffered") != -1;
               }).length,
               liveCount: liveItems.length,
-              topItems: liveItems.slice(0,20)
+              allTimePopular: liveItems.slice(0,10),
+              last24HrsPopular: liveADayAgo.slice(0,10),
+              lastWeekPopular: liveAWeekAgo.slice(0,10)
           });
   });
 });
+
+/* http://stackoverflow.com/questions/2627473/how-to-calculate-the-number-of-days-between-two-dates-using-javascript */
+function days_between(date1, date2) {
+    // The number of milliseconds in one day
+    const ONE_DAY = 1000 * 60 * 60 * 24;
+
+    // Convert both dates to milliseconds
+    const date1_ms = date1.getTime();
+    const date2_ms = date2.getTime();
+
+    // Calculate the difference in milliseconds
+    const difference_ms = Math.abs(date1_ms - date2_ms);
+
+    // Convert back to days and return
+    return Math.ceil(difference_ms/ONE_DAY);
+
+}
 
 Router.get('/post', App.user.can('access private page'), function(req, res, next) {
     res.render('private/post', {user: req.user});
