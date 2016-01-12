@@ -62,6 +62,7 @@ $(document).ready(function() {
 
     // disable email subscribe button by default and enable when the input
     // field has some text
+    /* Subscribe modal logic */
     $('.modal-trigger').click( function(){
         $('#subscribebutton').prop('disabled', true);
         $('#subscribebutton').html('Subscribe');

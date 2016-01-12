@@ -69,35 +69,35 @@ html, body {
 }
 
 /* label color */
-.input-field label {
+.modalinput label {
     color: #ffffff;
 }
 
 /* label focus color */
-.input-field input[type=email]:focus + label {
+.modalinput input[type=email]:focus + label {
     color: #ffffff;
 }
 /* label underline focus color */
-.input-field input[type=email]:focus {
+.modalinput input[type=email]:focus {
     border-bottom: 1px solid #ffffff;
     box-shadow: 0 1px 0 0 #ffffff;
 }
 /* valid color */
-.input-field input[type=email].valid {
+.modalinput input[type=email].valid {
     border-bottom: 1px solid #ffffff;
     box-shadow: 0 1px 0 0 #ffffff;
 }
 /* invalid color */
-.input-field input[type=email].invalid {
+.modalinput input[type=email].invalid {
     border-bottom: 1px solid #ffffff;
     box-shadow: 0 1px 0 0 #ffffff;
 }
 /* icon prefix focus color */
-.input-field .prefix.active {
+.modalinput .prefix.active {
     color: #ffffff;
 }
 
-input[type=email] {
+.modalemailinput {
    border-bottom: 1px solid #ffffff;
 }
 

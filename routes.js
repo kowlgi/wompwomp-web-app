@@ -61,8 +61,6 @@ Router.get('/', function(req, res, next) {
     res.render(
       'showall', {
         items: items,
-        google_tracking_code   : App.google_tracking_code,
-        app_store_link         : getAppStoreLink(req.headers['user-agent']),
         display_headline       : true,
         metaDescription        : "Your funniest minute every day. Mobile friendly."
     });
@@ -331,9 +329,7 @@ Router.get('/v/:id', function(req, res, next) {
           // To simplify the rendering logic for showing one item and multiple items, we'll stick
           // the item into an array.
           items: [ item ],
-          google_tracking_code   : App.google_tracking_code,
           display_home_button    : true,
-          app_store_link         : getAppStoreLink(req.headers['user-agent']),
           metaDescription        : item.text
         });
     });
@@ -480,8 +476,26 @@ Router.post('/d/:id', function(req, res, next) {
 });
 
 Router.get('/install', function(req, res, next) {
-    appStoreLink = getAppStoreLink(req.headers['user-agent']);
-    res.redirect(appStoreLink);
+    const userAgent = req.headers['user-agent'];
+    const isAndroid = userAgent.match(/android/i);
+
+    if(isAndroid) {
+        return res.redirect("http://play.google.com/store/apps/details?id=co.wompwomp.sunshine");
+    }
+    else {
+        return res.redirect("/subscribe");
+    }
+});
+
+Router.get('/subscribe', function(req, res, next) {
+    const userAgent = req.headers['user-agent'];
+    const isAndroid = userAgent.match(/android/i);
+    const appStoreLink = "http://play.google.com/store/apps/details?id=co.wompwomp.sunshine";
+
+    if(!isAndroid) {
+        req.flash('info', "We don't have an app yet for your device OS. Sign up below to get wompwomp content by email.");
+    }
+    return res.render('subscribe', {app_store_link : appStoreLink, disable_install_cta: true});
 });
 
 Router.get('/buffer', App.user.can('access admin page'), function(req, res, next) {
@@ -511,9 +525,6 @@ Router.get('/buffer', App.user.can('access admin page'), function(req, res, next
                 endtime                         : endtime,
                 pushNotificationTime            : notification_interval,
                 mailingListTime                 : mailing_list_interval,
-                google_tracking_code            : App.google_tracking_code,
-                app_store_link                  : getAppStoreLink(req.headers['user-agent']),
-                metaDescription                 : "",
                 display_buffered_item_meta_data : true,
                 user                            : req.user,
                 pushRateCardTime                : push_rate_card_interval,
@@ -1128,17 +1139,6 @@ function isNotLoggedIn(req, res, next) {
 
     // if they aren't redirect them to the dashboard
     res.redirect('/dashboard');
-}
-
-function getAppStoreLink(userAgent) {
-    const isAndroid = userAgent.match(/android/i);
-
-    if(isAndroid) {
-        return "market://details?id=co.wompwomp.sunshine";
-    }
-    else {
-        return "http://play.google.com/store/apps/details?id=co.wompwomp.sunshine";
-    }
 }
 
 const timezone = {};

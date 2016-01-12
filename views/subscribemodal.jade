@@ -6,11 +6,11 @@ div.theme-background(id="subscribemodal", class="modal")
                 b Sign up
     div.modal-content
         div.row.center.theme-text
-            |Get the best of wompwomp beamed to your inbox weekly
+            |Get the best of wompwomp beamed to your inbox biweekly
         form.subscribeform(role="form", method="post", action="/subscribe")
             div.row.center
-                div.input-field
-                    input(id="emailfield", type="email", class="validate",
+                div.input-field.modalinput
+                    input.modalemailinput(id="emailfield", type="email", class="validate",
                         name="email", autocomplete="on", maxlength="100")
                     label(for="email") Enter Your Email
                     button(type="submit", id="subscribebutton", class="btn theme-dark cta-btn")

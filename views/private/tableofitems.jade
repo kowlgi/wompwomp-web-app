@@ -28,10 +28,11 @@ div(class="table-responsive")
                                 i.material-icons mode_edit 
                       p.em.small.grey-text
                           =moment_local(item.created_on).fromNow()
-                p.center
-                    em
-                        |@
-                        =item.sourceuri
+                          =" "
+                          |by 
+                          =" "
+                          |@
+                          =item.sourceuri
                 form.itemreviewform.center(id=item.id, role='form', action="/review/"+item.id, method="post")
                     div.input-field
                       .form-group

@@ -34,7 +34,12 @@ div.container-fluid
                             data-action="share/whatsapp/share")
                             img(src="images/share-icon.png" height="24px", width="24px")
                     p.em.small.grey-text
-                        =moment_local(item.created_on).fromNow()                 
+                        =moment_local(item.created_on).fromNow()     
+                        =" "
+                        |by 
+                        =" "
+                        |@
+                        =item.sourceuri
         - itemcount++
     div.center.tiny-text
         |a hatching amazing labs creation &copy; 2015&nbsp;

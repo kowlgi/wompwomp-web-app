@@ -8,14 +8,16 @@ div(id="masthead")
             div.center
                 b.theme-text.tagline
                     |Your Funniest Minute Every Day
-div(id="install_placeholder")
-div(id="install")
-    div.container-fluid.theme-background
-        div.section
-            div.right
-                a(id="pinnedinstallclosebutton", href="")
-                    i.material-icons.theme-background.theme-text.closebutton close
-            div.theme-text.center
-                |Get the app &nbsp;
-                = " "
-                a.btn.theme-dark.cta-btn(href=app_store_link) Install
+if disable_install_cta
+else
+    div(id="install_placeholder")
+    div(id="install")
+        div.container-fluid.theme-background
+            div.section
+                div.right
+                    a(id="pinnedinstallclosebutton", href="")
+                        i.material-icons.theme-background.theme-text.closebutton close
+                div.theme-text.center
+                    |Get the app &nbsp;
+                    = " "
+                    a.btn.theme-dark.cta-btn(href="/install") Install
