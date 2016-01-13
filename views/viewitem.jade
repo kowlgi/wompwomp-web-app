@@ -1,11 +1,84 @@
 include head_no_title.jade
 head
-  each item in items
     title
       = item.text
       | - wompwomp
-    meta(name="description", content="#{item.text}" + " - wompwomp is your funniest minute everyday. wompwomp has the best funny pics, memes, cute, geeky photos on the web. wompwomp is your daily source of fun. Just one notification a day. Check out wompwomp now!")
+    meta(name="description", content="#{item.text}" + " - wompwomp is your funniest minute everyday. wompwomp has the best funny pics, memes, cute, geeky photos on the web. wompwomp is your daily source of fun. Check out wompwomp now!")
 body
-  include header.jade
-  include showitems.jade
+    include header.jade
+    if display_home_button
+      div.section
+          div.row
+              div.col.l4.offset-l4
+                  a(href="/")
+                      i.material-icons(id="icon-middle") navigate_before
+                      |See new funny posts
+    div.section
+      div.row
+        div.col.l4.offset-l4
+          div(class="card hoverable")
+            a(href="/v/"+ item.id, class="card-image")
+              img(src=item.imageuri)
+            div(class="card-content", id=item.id)
+                p
+                    = item.text
+                span.right
+                    =item.numshares
+                div.right
+                    |&nbsp;
+                a.right(href="whatsapp://send?text=" + encodeURIComponent(item.text
+                        + " - wompwomp.co/v/"+ item.id),
+                        data-action="share/whatsapp/share")
+                        img(src="images/share-icon.png" height="24px", width="24px")
+                div.right
+                    |&nbsp;&nbsp;
+                span.right
+                    =item.numfavorites
+                =" "
+                i.right.material-icons.red-text favorite
+                p.em.small.grey-text
+                    =moment_local(item.created_on).fromNow()     
+                    =" "
+                    |by 
+                    =" "
+                    |@
+                    =item.sourceuri
+    div.section
+      h4.center Other Top Posts This Week
+      each item in topItems
+          div.row
+            div.col.l4.offset-l4
+              div(class="card hoverable")
+                a(href="/v/"+ item.id, class="card-image")
+                  img(src=item.imageuri)
+                div(class="card-content", id=item.id)
+                    p
+                        = item.text
+                    span.right
+                        =item.numshares
+                    div.right
+                        |&nbsp;
+                    a.right(href="whatsapp://send?text=" + encodeURIComponent(item.text
+                            + " - wompwomp.co/v/"+ item.id),
+                            data-action="share/whatsapp/share")
+                            img(src="images/share-icon.png" height="24px", width="24px")
+                    div.right
+                        |&nbsp;&nbsp;
+                    span.right
+                        =item.numfavorites
+                    =" "
+                    i.right.material-icons.red-text favorite
+                    p.em.small.grey-text
+                        =moment_local(item.created_on).fromNow()     
+                        =" "
+                        |by 
+                        =" "
+                        |@
+                        =item.sourceuri
+    div.center.tiny-text
+      |a hatching amazing labs creation &copy; 2015&nbsp;
+      |&middot;&nbsp;
+      a(href="mailto:wompwompapp@gmail.com") Contact&nbsp;
+      |&middot;&nbsp;
+      |Privacy
 include footer.jade

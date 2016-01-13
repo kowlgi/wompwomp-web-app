@@ -33,6 +33,12 @@ div.container-fluid
                             + " - wompwomp.co/v/"+ item.id),
                             data-action="share/whatsapp/share")
                             img(src="images/share-icon.png" height="24px", width="24px")
+                    div.right
+                        |&nbsp;&nbsp;
+                    span.right
+                        =item.numfavorites
+                    =" "
+                    i.right.material-icons.red-text favorite
                     p.em.small.grey-text
                         =moment_local(item.created_on).fromNow()     
                         =" "

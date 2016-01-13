@@ -39,6 +39,7 @@ const _ = require('lodash');
 const MAX_TEXT_LENGTH = 500;
 const IS_BUFFERED_CATEGORY = {category: "buffered"};
 const IS_IN_REVIEW_CATEGORY = {category: "in_review"};
+const IS_NOT_HIDDEN = {category: {$ne: "hidden"}};
 const NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and:
     [{category: {$ne: "hidden"}},
     {category: {$ne: "buffered"}},
@@ -314,37 +315,55 @@ Router.get('/i', function(req, res, next) {
 });
 
 Router.get('/v/:id', function(req, res, next) {
-    AgniModel.findOne({id : req.params.id}, function(err, item) {
-        if(err) {
-            res.render ('404', {url:req.url});
-            return;
-        }
+    AgniModel.
+        find(IS_NOT_HIDDEN).
+        exec(function(err, items) {
+            if(err) {
+                winston.error(err);
+                return next(err);
+            }
 
-        if(item == null) {
-            res.render ('404', {url:req.url});
-            return;
-        }
+            items.sort(compareUserInteractions);
 
-        res.render('viewitem', {
-          // To simplify the rendering logic for showing one item and multiple items, we'll stick
-          // the item into an array.
-          items: [ item ],
-          display_home_button    : true,
-          metaDescription        : item.text
+            const now = new Date();
+            const liveAWeekAgo = _.filter(items, function(item) {
+                return days_between(item.created_on, now) <= 7 &&
+                    item.id != req.params.id;
+            });
+
+            var i = 0;
+            for(i = 0; i < items.length; i++) {
+                if(items[i].id == req.params.id) {
+                    break;
+                }
+            }
+
+            var item;
+            if(i == items.length) {
+                return res.render ('404', {url:req.url});
+            }
+            else {
+                item = items[i];
+            }
+
+            return res.render('viewitem', {
+              // To simplify the rendering logic for showing one item and multiple items, we'll stick
+              // the item into an array.
+              item                   : item,
+              display_home_button    : true,
+              topItems               : liveAWeekAgo.slice(0,3)
+            });
         });
-    });
 });
 
 Router.post('/s/:id', function(req, res, next) {
     AgniModel.findOne({id : req.params.id}, function(err, item) {
         if(err) {
-            res.render ('404', {url:req.url});
-            return;
+            return res.render ('404', {url:req.url});
         }
 
         if(item == null) {
-            res.render ('404', {url:req.url});
-            return;
+            return res.render ('404', {url:req.url});
         }
 
         item.numshares += 1;
@@ -366,13 +385,11 @@ Router.post('/s/:id', function(req, res, next) {
 Router.post('/f/:id', function(req, res, next) {
     AgniModel.findOne({id : req.params.id}, function(err, item) {
         if(err) {
-            res.render ('404', {url:req.url});
-            return;
+            return res.render ('404', {url:req.url});
         }
 
         if(item == null) {
-            res.render ('404', {url:req.url});
-            return;
+            return res.render ('404', {url:req.url});
         }
 
         item.numfavorites += 1;
@@ -394,13 +411,11 @@ Router.post('/f/:id', function(req, res, next) {
 Router.post('/uf/:id', function(req, res, next) {
     AgniModel.findOne({id : req.params.id}, function(err, item) {
         if(err) {
-            res.render ('404', {url:req.url});
-            return;
+            return res.render ('404', {url:req.url});
         }
 
         if(item == null) {
-            res.render ('404', {url:req.url});
-            return;
+            return res.render ('404', {url:req.url});
         }
 
         if(item.numfavorites > 0) {
@@ -431,13 +446,11 @@ Router.post('/hideitem', function(req, res, next) {
 
     AgniModel.findOne({id : req.body.id}, function(err, item) {
         if(err) {
-            res.render ('404', {url:req.url});
-            return;
+            return res.render ('404', {url:req.url});
         }
 
         if(item == null) {
-            res.render ('404', {url:req.url});
-            return;
+            return res.render ('404', {url:req.url});
         }
 
         item.category[0] = "hidden";
@@ -450,13 +463,11 @@ Router.post('/hideitem', function(req, res, next) {
 Router.post('/d/:id', function(req, res, next) {
     AgniModel.findOne({id : req.params.id}, function(err, item) {
         if(err) {
-            res.render ('404', {url:req.url});
-            return;
+            return res.render ('404', {url:req.url});
         }
 
         if(item == null) {
-            res.render ('404', {url:req.url});
-            return;
+            return res.render ('404', {url:req.url});
         }
 
         item.numdismiss += 1;
@@ -1179,7 +1190,7 @@ timezone.data = require('./data/tz.json');
 
 function timezone_lookup(country, region) {
     return timezone.data[[country, region].join('_')] || timezone.data[[country, ''].join('_')];
-};
+}
 
 function compareUserInteractions(a,b) {
     if (a.numfavorites + a.numshares < b.numfavorites + b.numshares)
