@@ -291,7 +291,9 @@ Router.get('/i', function(req, res, next) {
                                 "i":quotes[i].id, /* unique id */
                                 "c":quotes[i].created_on, /* created_on */
                                 "f":quotes[i].numfavorites, /* num favorites */
-                                "s":quotes[i].numshares}); /* num shares */
+                                "s":quotes[i].numshares, /* num shares */
+                                "a":quotes[i].sourceuri /* author's name */
+                               });
             }
             var response = quotelist;
             res.contentType('application/json');
@@ -351,7 +353,7 @@ Router.get('/v/:id', function(req, res, next) {
               // the item into an array.
               item                   : item,
               display_home_button    : true,
-              topItems               : liveAWeekAgo.slice(0,3)
+              topItems               : liveAWeekAgo.slice(0,5)
             });
         });
 });
