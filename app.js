@@ -63,10 +63,14 @@ fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
 const accessLogStream = FileStreamRotator.getStream({
   filename: logDirectory + '/access-%DATE%.log',
   frequency: 'daily',
-  verbose: false
+  verbose: false,
+  date_format: 'YYYY-MM-DD'
 })
 // setup the logger
-app.use(logger('combined', {stream: accessLogStream}))
+logger.token('remote-addr', function(req, res){ return req.header('x-forwarded-for') || req.connection.remoteAddress; });
+app.use(logger(
+    ':remote-addr - [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] :response-time ms',
+    {stream: accessLogStream}));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
