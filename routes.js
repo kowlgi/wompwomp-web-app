@@ -44,6 +44,7 @@ const NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and:
     [{category: {$ne: "hidden"}},
     {category: {$ne: "buffered"}},
     {category: {$ne: "in_review"}}] };
+const NO_VIDEOS = {$or: [{videouri: {$exists: false}}, {videouri: ""}]};
 const MAX_EMAIL_LENGTH = 128;
 
 /* User actions */
@@ -240,8 +241,94 @@ Router.get('/items', function(req, res, next) {
    cursor = somedate, limit = x: if (x < 0) return x items immediately before somedate
                                  OR if (x > 0) return x items immediately after somedate
                                  OR if (x == 0) return all items immediately after somedate
+   This API will be deprecated starting apk v1.2, the first release with video support
 */
 Router.get('/i', function(req, res, next) {
+    var limitval = 0,
+        cursor = new Date('1995-12-17T03:24:00'), /*an arbitrary date that's
+                                                    guaranteed prior to any item
+                                                    creation date*/
+        sortorder = -1, // descending order
+        cursorInclusive = false;
+
+    if(typeof req.query.limit != "undefined"){
+        limitval = parseInt(req.query.limit);
+    }
+
+    if(typeof req.query.cursor != "undefined"){
+        cursor = Date.parse(req.query.cursor) ;
+        sortorder = 1; // ascending order
+    }
+
+    if(typeof req.query.cursorInclusive != "undefined" &&
+       req.query.cursorInclusive == "yes") {
+        cursorInclusive = true;
+    }
+
+    var find_condition = {}, sort_condition = {};
+
+    if(limitval >= 0) {
+        sort_condition = {created_on: sortorder};
+        if(cursorInclusive) {
+            find_condition = {created_on: {$gte: cursor}};
+        }
+        else {
+            find_condition = {created_on: {$gt: cursor}};
+        }
+
+    } else {
+        find_condition = {created_on: {$lt: cursor}};
+        sort_condition = {created_on: -1};
+    }
+
+    AgniModel.
+        find(NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY).
+        find(NO_VIDEOS).
+        find(find_condition).
+        sort(sort_condition).
+        limit(limitval).
+        exec(function(err, quotes) {
+            var quotelist = [];
+            for (var i = 0; i < quotes.length; i++) {
+                quotelist.push({"t": quotes[i].text, /* text */
+                                "u": quotes[i].imageuri, /* image uri */
+                                "i":quotes[i].id, /* unique id */
+                                "c":quotes[i].created_on, /* created_on */
+                                "f":quotes[i].numfavorites, /* num favorites */
+                                "s":quotes[i].numshares, /* num shares */
+                                "a":quotes[i].sourceuri /* author's name */
+                               });
+            }
+            var response = quotelist;
+            res.contentType('application/json');
+            res.send(JSON.stringify(response));
+
+            var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+
+            /* We don't want to record auto background sync
+               in user stats. Assumption here is that cursorInclusive flag
+               is true only in the auto background sync case.
+            */
+            if(!cursorInclusive) {
+                var agniuserstat = new AgniUserStatsModel({
+                    ip_address     : ip,
+                    timestamp      : Date.now(),
+                    action         : limitval < 0 ? REFRESH_BOTTOM : REFRESH_TOP,
+                    content_id     : ""
+                }).save();
+            }
+        });
+});
+
+/* Here's how this works:
+   cursor not specified, limit not specified: return all items
+   cursor not specified, limit = x: return if (x > 0) return x number of latest items, otherwise nothing
+   cursor = somedate, limit not specified: return all items created after somedate
+   cursor = somedate, limit = x: if (x < 0) return x items immediately before somedate
+                                 OR if (x > 0) return x items immediately after somedate
+                                 OR if (x == 0) return all items immediately after somedate
+*/
+Router.get('/iv', function(req, res, next) {
     var limitval = 0,
         cursor = new Date('1995-12-17T03:24:00'), /*an arbitrary date that's
                                                     guaranteed prior to any item
@@ -293,7 +380,9 @@ Router.get('/i', function(req, res, next) {
                                 "c":quotes[i].created_on, /* created_on */
                                 "f":quotes[i].numfavorites, /* num favorites */
                                 "s":quotes[i].numshares, /* num shares */
-                                "a":quotes[i].sourceuri /* author's name */
+                                "a":quotes[i].sourceuri, /* author's name */
+                                "m":quotes[i].videouri || "",/* video uri is populated only for videos */
+                                "p":quotes[i].numplays /* number of times the video was played */
                                });
             }
             var response = quotelist;
