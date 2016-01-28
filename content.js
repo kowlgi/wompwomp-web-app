@@ -6,12 +6,14 @@ exports.init = function(connection){
         text           : String,
         imageuri       : String,
         sourceuri      : String,
+        videouri       : String,
         id             : String,
         category       : [String],
         created_on     : Date,
         numfavorites   : Number,
         numshares      : Number,
         numdismiss     : Number,
+        numplays       : Number,
         last_modified  : Date
     });
     connection.model('Agni', AgniSchema);

@@ -53,6 +53,7 @@ const LIKE = "Like";
 const SHARE = "Share";
 const UNLIKE = "Unlike";
 const DISMISS = "Dismiss";
+const PLAY_VIDEO = "Play_video"
 
 Router.get('/', function(req, res, next) {
   AgniModel.
@@ -318,7 +319,7 @@ Router.get('/i', function(req, res, next) {
 
 Router.get('/v/:id', function(req, res, next) {
     AgniModel.
-        find(IS_NOT_HIDDEN).
+        find(NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY).
         exec(function(err, items) {
             if(err) {
                 winston.error(err);
@@ -379,6 +380,32 @@ Router.post('/s/:id', function(req, res, next) {
             installation_id: inst_id,
             timestamp      : Date.now(),
             action         : SHARE,
+            content_id     : item.id
+        }).save();
+    });
+});
+
+Router.post('/p/:id', function(req, res, next) {
+    AgniModel.findOne({id : req.params.id}, function(err, item) {
+        if(err) {
+            return res.render ('404', {url:req.url});
+        }
+
+        if(item == null) {
+            return res.render ('404', {url:req.url});
+        }
+
+        item.numplays += 1;
+        item.save();
+        res.end();
+
+        var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+        var inst_id = req.body.inst_id || "no installation id"
+        var agniuserstat = new AgniUserStatsModel({
+            ip_address     : ip,
+            installation_id: inst_id,
+            timestamp      : Date.now(),
+            action         : PLAY_VIDEO,
             content_id     : item.id
         }).save();
     });
@@ -767,7 +794,7 @@ function days_between(date1, date2) {
 }
 
 Router.get('/post', App.user.can('access private page'), function(req, res, next) {
-    res.render('private/post', {user: req.user});
+    res.render('private/post', {user: req.user, videofilename: Shortid.generate()});
 });
 
 Router.post('/post', App.user.can('access private page'), function(req, res, next) {
@@ -802,6 +829,28 @@ Router.post('/post', App.user.can('access private page'), function(req, res, nex
                 res.render('private/post');
             });
         });
+    });
+});
+
+Router.post('/postvideo', App.user.can('access private page'), function(req, res, next) {
+    var agniitem = new AgniModel({
+        text            : req.body.caption.substring(0, MAX_TEXT_LENGTH),
+        imageuri        : Config.AWSS3BucketVideoURL + req.body.id + ".jpg",
+        videouri        : Config.AWSS3BucketVideoURL + req.body.id + ".mp4",
+        sourceuri       : req.user.username,
+        id              : Shortid.generate(),
+        category        : ['in_review'],
+        numfavorites    : 0,
+        numshares       : 0
+    }).save(function(err, agniquote) {
+        if (err) {
+            winston.error(err);
+            req.flash('error', err.message)
+            return res.render('private/post');
+        }
+
+        req.flash('success', "Thanks for submitting! Your post is currently in the review bin and will go live once an admin has approved it");
+        res.render('private/post');
     });
 });
 

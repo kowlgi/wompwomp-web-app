@@ -7,7 +7,11 @@ block content
                     h4 Edit Post  
                     div(class="card hoverable")
                         a(href="/v/"+ item.id, class="card-image")
-                          img(src=item.imageuri)
+                            if(item.videouri && item.videouri.length > 0)
+                                video(class='responsive-video' controls poster=item.imageuri)
+                                    source(src=item.videouri)
+                            else
+                                img(src=item.imageuri)
                         div(class="card-content", id=item.id)
                             if(allow_edit)
                                 form(id="edititemform", role='form', action="/edititem/"+item.id, method="post")
