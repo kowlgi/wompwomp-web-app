@@ -1,7 +1,7 @@
 div(class="card hoverable")
   div.card-image
       if(item.videouri && item.videouri.length > 0)
-          video(class='responsive-video' controls poster=item.imageuri width="500")
+          video(class='responsive-video' controls loop poster=item.imageuri width="500")
               source(src=item.videouri)
       else
           img(src=item.imageuri)
