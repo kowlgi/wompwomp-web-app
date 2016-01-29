@@ -1,0 +1,38 @@
+div(class="card hoverable")
+  div.card-image
+      if(item.videouri && item.videouri.length > 0)
+          video(class='responsive-video' controls poster=item.imageuri)
+              source(src=item.videouri)
+      else
+          img(src=item.imageuri)
+  div(class="card-content", id=item.id)
+      p
+          = item.text
+          if allow_edit
+              =" "
+              a(href='/edititem/'+item.id)
+                i.material-icons mode_edit 
+      span.right
+          =item.numshares
+      div.right
+          |&nbsp;
+      a.right(href="whatsapp://send?text=" + encodeURIComponent(item.text
+              + " - wompwomp.co/v/"+ item.id),
+              data-action="share/whatsapp/share")
+              img(src="images/share-icon.png" height="24px", width="24px")
+      div.right
+          |&nbsp;&nbsp;
+      span.right
+          =item.numfavorites
+      =" "
+      i.right.material-icons.red-text favorite
+      span.right
+          a(href="/v/"+ item.id)
+              i.right.material-icons link
+      p.em.small.grey-text
+          =moment_local(item.created_on).fromNow()     
+          =" "
+          |by 
+          =" "
+          |@
+          =item.sourceuri

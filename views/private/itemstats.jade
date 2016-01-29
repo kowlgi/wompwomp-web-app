@@ -64,33 +64,7 @@ block content
                                     td
                                         = i
                                     td
-                                        div(class="card hoverable")
-                                          a(href="/v/"+ item.id, class="card-image")
-                                              if(item.videouri && item.videouri.length > 0)
-                                                  video(class='responsive-video' controls poster=item.imageuri)
-                                                      source(src=item.videouri)
-                                              else
-                                                  img(src=item.imageuri)
-                                          div(class="card-content", id=item.id)
-                                              p
-                                                  = item.text
-                                              span.right
-                                                  =item.numshares
-                                              =" "
-                                              i.right.material-icons.grey-text share
-                                              div.right
-                                                  |&nbsp;&nbsp;
-                                              span.right
-                                                  =item.numfavorites
-                                              =" "
-                                              i.right.material-icons.red-text favorite
-                                              p.em.small.grey-text
-                                                  =moment_local(item.created_on).fromNow()
-                                                  =" "
-                                                  |by 
-                                                  =" "
-                                                  |@
-                                                  =item.sourceuri
+                                        include ../fullcard.jade
                   div.col.s12(id="last_week")
                       div(class="table-responsive")
                         table(class="table highlight striped")
@@ -106,33 +80,7 @@ block content
                                     td
                                         = i
                                     td
-                                        div(class="card hoverable")
-                                          a(href="/v/"+ item.id, class="card-image")
-                                              if(item.videouri && item.videouri.length > 0)
-                                                  video(class='responsive-video' controls poster=item.imageuri)
-                                                      source(src=item.videouri)
-                                              else
-                                                  img(src=item.imageuri)
-                                          div(class="card-content", id=item.id)
-                                              p
-                                                  = item.text
-                                              span.right
-                                                  =item.numshares
-                                              =" "
-                                              i.right.material-icons.grey-text share
-                                              div.right
-                                                  |&nbsp;&nbsp;
-                                              span.right
-                                                  =item.numfavorites
-                                              =" "
-                                              i.right.material-icons.red-text favorite
-                                              p.em.small.grey-text
-                                                  =moment_local(item.created_on).fromNow()
-                                                  =" "
-                                                  |by 
-                                                  =" "
-                                                  |@
-                                                  =item.sourceuri
+                                        include ../fullcard.jade
                   div.col.s12(id="all_time")
                       div(class="table-responsive")
                         table(class="table highlight striped")
@@ -148,30 +96,4 @@ block content
                                     td
                                         = i
                                     td
-                                        div(class="card hoverable")
-                                          a(href="/v/"+ item.id, class="card-image")
-                                              if(item.videouri && item.videouri.length > 0)
-                                                  video(class='responsive-video' controls poster=item.imageuri)
-                                                      source(src=item.videouri)
-                                              else
-                                                  img(src=item.imageuri)
-                                          div(class="card-content", id=item.id)
-                                              p
-                                                  = item.text
-                                              span.right
-                                                  =item.numshares
-                                              =" "
-                                              i.right.material-icons.grey-text share
-                                              div.right
-                                                  |&nbsp;&nbsp;
-                                              span.right
-                                                  =item.numfavorites
-                                              =" "
-                                              i.right.material-icons.red-text favorite
-                                              p.em.small.grey-text
-                                                  =moment_local(item.created_on).fromNow()
-                                                  =" "
-                                                  |by 
-                                                  =" "
-                                                  |@
-                                                  =item.sourceuri
+                                        include ../fullcard.jade
