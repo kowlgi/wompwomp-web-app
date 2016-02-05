@@ -99,56 +99,6 @@ Router.post('/subscribe', function(req, res, next) {
   });
 });
 
-Router.post('/submit', function(req, res, next) {
-    if(typeof req.body.text == 'undefined' ||
-       typeof req.body.imageuri == 'undefined' ||
-       typeof req.body.sourceuri == 'undefined' ||
-       typeof req.body.category == 'undefined'){
-        winston.info("missing param for submit()")
-        res.end();
-        return;
-    }
-    if(req.body.submitkey != App.submit_key) {
-        winston.info("wrong submit key")
-        res.end();
-        return;
-    }
-
-    var agniitem = new AgniModel({
-        text            : req.body.text.substring(0, MAX_TEXT_LENGTH),
-        imageuri        : req.body.imageuri.substring(0, MAX_TEXT_LENGTH),
-        sourceuri       : req.body.sourceuri.substring(0, MAX_TEXT_LENGTH),
-        id              : Shortid.generate(),
-        category        : req.body.category.slice(0, 10), // limit to 10 categories
-        created_on      : Date.now(),
-        numfavorites    : 0,
-        numshares       : 0
-    }).save(function(err, agniquote) {
-        if (err) {
-            winston.error(err);
-            return next(err);
-        }
-
-        if(agniquote.category != "buffered" && agniquote.category != "hidden") {
-            winston.info("Pushing notification at submit time for: " + agniquote);
-            // send notification to notify phone app to sync feed
-            sendNotification("/topics/sync");
-
-            if(req.body.notifyuser == "content") {
-                sendNotification("/topics/content",
-                    agniquote.text,
-                    agniquote.imageuri,
-                    agniquote.id);
-            }
-        }
-        else {
-            winston.info("Either buffered or hidden submit: " + agniquote);
-        }
-
-        res.end();
-    });
-});
-
 Router.post('/pushcta', function(req, res, next) {
     if(req.body.submitkey != App.submit_key) {
         winston.info("wrong submit key")
@@ -172,6 +122,7 @@ Router.post('/pushcta', function(req, res, next) {
     }
 });
 
+function sendNotification(topicString, notificationText, imageuri, itemid, versionCode, versionCondition) {
 function sendNotification(topicString, notificationText, imageuri, itemid) {
     var message = new gcm.Message();
     if(typeof notificationText !== 'undefined' && notificationText != "") {
@@ -184,6 +135,18 @@ function sendNotification(topicString, notificationText, imageuri, itemid) {
 
     if(typeof itemid !== 'undefined' && itemid != "") {
         message.addData("itemid", itemid);
+    }
+
+    if(typeof versionCode !== 'undefined' && versionCode != "") {
+        message.addData("versionCode", versionCode);
+    } else {
+        message.addData("versionCode", "0");
+    }
+
+    if(typeof versionCondition !== 'undefined' && versionCondition != "") {
+        message.addData("versionCondition", versionCondition);
+    } else {
+        message.addData("versionCondition", ">");
     }
 
     // Set up the sender with you API key
