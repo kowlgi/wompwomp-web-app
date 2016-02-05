@@ -123,7 +123,6 @@ Router.post('/pushcta', function(req, res, next) {
 });
 
 function sendNotification(topicString, notificationText, imageuri, itemid, versionCode, versionCondition) {
-function sendNotification(topicString, notificationText, imageuri, itemid) {
     var message = new gcm.Message();
     if(typeof notificationText !== 'undefined' && notificationText != "") {
         message.addData('message', notificationText);
