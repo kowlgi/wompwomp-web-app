@@ -11,8 +11,12 @@ config.userstatsdb = "agniuserstats";
 
 config.release_content_scheduler_frequency = "0 0 1,3,6,10,13,17,21,23 * * *";
 
-config.push_share_card_scheduler_frequency = "10 59 22 * * *";
-config.push_rate_card_scheduler_frequency = "10 59 9 * * *";
+config.push_share_card_scheduler_frequency = "10 59 22 * * 5";
+config.push_rate_card_scheduler_frequency = "10 59 9 * * 4";
+config.push_upgrade_card_scheduler_frequency = "30 59 9 * * 0,3,7";
+config.push_remove_all_cta_scheduler_frequency = "1 50 9,22 * * *";
+config.push_upgrade_card_version = "8";
+
 /* in cases where release time overlaps, give ~10 seconds for buffered content
    to be released  */
 config.push_notification_scheduler_frequency = "10 0 10,23 * * *";

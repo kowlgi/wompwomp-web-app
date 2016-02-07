@@ -8,9 +8,9 @@ block content
                     h3.center Post Something Funny
                     ul.tabs(id="dashboardtabs")
                         li.tab.col.s3
-                            a(href="#image") Image
+                            a.active(href="#image") Image
                         li.tab.col.s3
-                            a.active(href="#gif") GIF
+                            a(href="#gif") GIF
                     br
                     div.col.s12(id="image")
                         form(role='form', action="/post", method="post", style='max-width: 300px;', enctype="multipart/form-data")
@@ -40,35 +40,36 @@ block content
                                   div.card-content
                                       p(id="blahtxt")
                     div.col.s12(id="gif")
-                        form(id="uploadvideoform", role='form', action="http://wompwomp.s3.amazonaws.com/", method="post", style='max-width: 300px;', enctype="multipart/form-data")
-                            input(type="text", name="key", id="videofilename", value=videofilename hidden)
-                            div.row
-                                em    
-                                    |1. Upload an mp4 file less than 2MB
-                                div.file-field.input-field
-                                    div.btn
-                                        span File
-                                        input(type="file", name="file", id="videofile", accept=".mp4", required)
-                                    div.file-path-wrapper
-                                        input.file-path.validate(type="text", placeholder="Choose an mp4 file")
-                            br
-                            div.row
-                                em
-                                    |2. Take a screenshot for the video thumbnail
-                                div(id="data-vid")
-                                p(id="size-vid")
-                                input.btn.btn-default(type="button", id="takescreenshotbutton", value="Take Screenshot" disabled) 
-                            div.row
-                                em
-                                    |3. Optionally write a funny caption in 140 characters or less
-                                div.input-field
-                                    textarea.materialize-textarea(id="videocaption", name="caption", length="140", maxLength="140", placeholder="Write a funny caption...")
-                            button.btn.btn-large(id="videosubmitbutton", type='submit' disabled) Submit   
-                        br
-                        div.image_preview
-                            h3.grey-text Preview
-                            div(class="card hoverable")
-                              div.card-image.center
-                                  canvas
-                              div.card-content
-                                  p(id="videoblahtxt")
+                        |No gif support yet, stay tuned
+                        //- form(id="uploadvideoform", role='form', action="http://wompwomp.s3.amazonaws.com/", method="post", style='max-width: 300px;', enctype="multipart/form-data")
+                        //-     input(type="text", name="key", id="videofilename", value=videofilename hidden)
+                        //-     div.row
+                        //-         em    
+                        //-             |1. Upload an mp4 file less than 2MB
+                        //-         div.file-field.input-field
+                        //-             div.btn
+                        //-                 span File
+                        //-                 input(type="file", name="file", id="videofile", accept=".mp4", required)
+                        //-             div.file-path-wrapper
+                        //-                 input.file-path.validate(type="text", placeholder="Choose an mp4 file")
+                        //-     br
+                        //-     div.row
+                        //-         em
+                        //-             |2. Take a screenshot for the video thumbnail
+                        //-         div(id="data-vid")
+                        //-         p(id="size-vid")
+                        //-         input.btn.btn-default(type="button", id="takescreenshotbutton", value="Take Screenshot" disabled) 
+                        //-     div.row
+                        //-         em
+                        //-             |3. Optionally write a funny caption in 140 characters or less
+                        //-         div.input-field
+                        //-             textarea.materialize-textarea(id="videocaption", name="caption", length="140", maxLength="140", placeholder="Write a funny caption...")
+                        //-     button.btn.btn-large(id="videosubmitbutton", type='submit' disabled) Submit   
+                        //- br
+                        //- div.image_preview
+                        //-     h3.grey-text Preview
+                        //-     div(class="card hoverable")
+                        //-       div.card-image.center
+                        //-           canvas
+                        //-       div.card-content
+                        //-           p(id="videoblahtxt")

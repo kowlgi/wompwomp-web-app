@@ -1,3 +1,26 @@
+mixin NotificationTime(interval, timezone, flag)
+    li
+        img.flag(class=flag)
+        =" "
+        - interval.reset()
+        =moment_local(interval.next()).tz(timezone).format('MMM D, h:mm:ss A z')
+        - interval.reset()
+mixin CTATime(interval)
+    =" "
+    span.theme-color-text
+        =" "
+        - interval.reset()
+        =moment_local(interval.next()).fromNow()
+        - interval.reset()
+    =" "
+    |on
+    ul
+        span
+            img(class="flag flag-us")
+            =" "
+            - interval.reset()
+            =moment_local(interval.next()).tz('America/New_York').format('MMM D, h:mm:ss A z')
+            - interval.reset()
 extends layout
 block content
     div.container-fluid
@@ -33,81 +56,38 @@ block content
                               =moment_local(starttime.next()).tz('America/New_York').format('MMM D, h:mm:ss A z')
                               - starttime.reset()
                   p
-                      i.material-icons.tiny alarm
-                      |Notification
-                      =" "
-                      span.theme-color-text
-                          =" "
-                          - pushNotificationTime.reset()
-                          =moment_local(pushNotificationTime.next()).fromNow()
-                          - pushNotificationTime.reset()
-                      =" "
-                      |on
-                      ul
+                      ul.collapsible(data-collapsible="accordion")
                           li
-                              img(class="flag flag-us")
-                              =" "
-                              - pushNotificationTime.reset()
-                              =moment_local(pushNotificationTime.next()).tz('America/New_York').format('MMM D, h:mm:ss A z')
-                              - pushNotificationTime.reset()
-                          li
-                              img(class="flag flag-us")
-                              =" "
-                              - pushNotificationTime.reset()
-                              =moment_local(pushNotificationTime.next()).tz('America/Los_Angeles').format('MMM D, h:mm:ss A z')
-                              - pushNotificationTime.reset()
-                          li
-                              img(class="flag flag-in")
-                              =" "
-                              - pushNotificationTime.reset()
-                              =moment_local(pushNotificationTime.next()).tz('Asia/Kolkata').format('MMM D, h:mm:ss A z')
-                              - pushNotificationTime.reset()
-                          li
-                              img(class="flag flag-br" )
-                              =" "
-                              - pushNotificationTime.reset()
-                              =moment_local(pushNotificationTime.next()).tz('America/Sao_Paulo').format('MMM D, h:mm:ss A z')
-                              - pushNotificationTime.reset()
-                          li
-                              img(class="flag flag-gb" )
-                              =" "
-                              - pushNotificationTime.reset()
-                              =moment_local(pushNotificationTime.next()).tz('Europe/London').format('MMM D, h:mm:ss A z')
-                              - pushNotificationTime.reset()
-                  p
-                      |Share CTA card will be posted  
-                      =" "
-                      span.theme-color-text
-                          =" "
-                          - pushShareCardTime.reset()
-                          =moment_local(pushShareCardTime.next()).fromNow()
-                          - pushShareCardTime.reset()
-                      =" "
-                      |on
-                      ul
-                          li
-                              img(class="flag flag-us")
-                              =" "
-                              - pushShareCardTime.reset()
-                              =moment_local(pushShareCardTime.next()).tz('America/New_York').format('MMM D, h:mm:ss A z')
-                              - pushShareCardTime.reset()
-                  p
-                      |Rate CTA card will be posted  
-                      =" "
-                      span.theme-color-text
-                          =" "
-                          - pushRateCardTime.reset()
-                          =moment_local(pushRateCardTime.next()).fromNow()
-                          - pushRateCardTime.reset()
-                      =" "
-                      |on
-                      ul
-                          li
-                              img(class="flag flag-us")
-                              =" "
-                              - pushRateCardTime.reset()
-                              =moment_local(pushRateCardTime.next()).tz('America/New_York').format('MMM D, h:mm:ss A z')
-                              - pushRateCardTime.reset()
+                            .collapsible-header
+                                i.material-icons.tiny alarm
+                                |Notification
+                                =" "
+                                span.theme-color-text
+                                    =" "
+                                    - pushNotificationTime.reset()
+                                    =moment_local(pushNotificationTime.next()).fromNow()
+                                    - pushNotificationTime.reset()
+                            .collapsible-body
+                                ul
+                                    +NotificationTime(pushNotificationTime, 'America/New_York', 'flag-us')
+                                    +NotificationTime(pushNotificationTime, 'America/Los_Angeles', 'flag-us')
+                                    +NotificationTime(pushNotificationTime, 'Asia/Kolkata', 'flag-in')
+                                    +NotificationTime(pushNotificationTime, 'America/Sao_Paulo', 'flag-br')
+                                    +NotificationTime(pushNotificationTime, 'Europe/London', 'flag-gb')             
+                            li
+                              .collapsible-header
+                                i.material-icons.tiny rowing
+                                |CTAs
+                              .collapsible-body
+                                  span
+                                      |Share CTA card will be posted  
+                                      +CTATime(pushShareCardTime)
+                                  span
+                                      |Rate CTA card will be posted  
+                                      +CTATime(pushRateCardTime)
+                                  span
+                                      |Upgrade CTA card will be posted  
+                                      +CTATime(pushUpgradeCardTime)
                   p
                       |Buffer empty
                       =" "

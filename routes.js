@@ -595,6 +595,8 @@ Router.get('/buffer', App.user.can('access admin page'), function(req, res, next
     var mailing_list_interval = CronParser.parseExpression(App.mailing_list_scheduler_frequency);
     var push_share_card_interval = CronParser.parseExpression(Config.push_share_card_scheduler_frequency);
     var push_rate_card_interval = CronParser.parseExpression(Config.push_rate_card_scheduler_frequency);
+    var push_upgade_card_interval = CronParser.parseExpression(Config.push_upgrade_card_scheduler_frequency);
+    var push_remove_all_cta_interval = CronParser.parseExpression(Config.push_remove_all_cta_scheduler_frequency);
 
     AgniModel.
         find(IS_BUFFERED_CATEGORY).
@@ -619,7 +621,9 @@ Router.get('/buffer', App.user.can('access admin page'), function(req, res, next
                 display_buffered_item_meta_data : true,
                 user                            : req.user,
                 pushRateCardTime                : push_rate_card_interval,
-                pushShareCardTime               : push_share_card_interval
+                pushShareCardTime               : push_share_card_interval,
+                pushUpgradeCardTime             : push_upgade_card_interval,
+                pushRemoveAllCTATime            : push_remove_all_cta_interval
             });
         });
 });
@@ -1255,14 +1259,22 @@ exports.pushContentNotification = function() {
 
 exports.pushShareCard = function() {
     var date = new Date();
-    sendNotification("/topics/remove_all_ctas");
     sendNotification("/topics/cta_share", date.toISOString());
 }
 
 exports.pushRateCard = function() {
     var date = new Date();
-    sendNotification("/topics/remove_all_ctas");
     sendNotification("/topics/cta_rate", date.toISOString());
+}
+
+exports.pushUpgradeCard = function() {
+    var date = new Date();
+    sendNotification("/topics/cta_upgrade", date.toISOString(), null, null, Config.push_upgrade_card_version);
+}
+
+exports.pushRemoveAllCTA = function() {
+    var date = new Date();
+    sendNotification("/topics/remove_all_ctas");
 }
 
 // route middleware to make sure a user is logged in

@@ -202,6 +202,8 @@ schedule.scheduleJob(config.release_content_scheduler_frequency, routes.releaseB
 schedule.scheduleJob(config.push_notification_scheduler_frequency, routes.pushContentNotification);
 schedule.scheduleJob(config.push_share_card_scheduler_frequency, routes.pushShareCard);
 schedule.scheduleJob(config.push_rate_card_scheduler_frequency, routes.pushRateCard);
+schedule.scheduleJob(config.push_upgrade_card_scheduler_frequency, routes.pushUpgradeCard);
+schedule.scheduleJob(config.push_remove_all_cta_scheduler_frequency, routes.pushRemoveAllCTA);
 
 // Start server
 http.createServer(app).listen(app.get('port'), function() {
