@@ -12,7 +12,6 @@ exports.init = function(connection){
         created_on     : Date,
         numfavorites   : Number,
         numshares      : Number,
-        numdismiss     : Number,
         numplays       : Number,
         last_modified  : Date
     });
