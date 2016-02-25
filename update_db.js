@@ -155,3 +155,20 @@ exports.update_db_jan_5_2016_3 = function() {
         });
     });
 }
+
+exports.update_db_feb_24_2016 = function() {
+    // Add numplays
+    var conditions = {numplays : {$exists: false}};
+
+    AgniModel.find(conditions, function(err, docs) {
+        if(err) {
+            winston.info(err);
+            return;
+        }
+
+        docs.forEach(function(elem, index, array) {
+            elem.numplays = 0;
+            elem.save();
+        });
+    });
+}

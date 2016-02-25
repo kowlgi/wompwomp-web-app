@@ -44,7 +44,6 @@ const NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY = { $and:
     [{category: {$ne: "hidden"}},
     {category: {$ne: "buffered"}},
     {category: {$ne: "in_review"}}] };
-const NO_VIDEOS = {$or: [{videouri: {$exists: false}}, {videouri: ""}]};
 const MAX_EMAIL_LENGTH = 128;
 
 /* User actions */
@@ -53,7 +52,10 @@ const REFRESH_BOTTOM = "Refresh_bottom";
 const LIKE = "Like";
 const SHARE = "Share";
 const UNLIKE = "Unlike";
-const PLAY_VIDEO = "Play_video"
+const PLAY_VIDEO = "Play_video";
+const APP_INSTALLED = "App_installed";
+const APP_OPENED = "App_opened";
+const PUSH_NOTIFICATION_CLICKED = "Push_notification_clicked";
 
 Router.get('/', function(req, res, next) {
   AgniModel.
@@ -244,14 +246,20 @@ Router.get('/i', function(req, res, next) {
 
     AgniModel.
         find(NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY).
-        find(NO_VIDEOS).
         find(find_condition).
         sort(sort_condition).
         limit(limitval).
         exec(function(err, quotes) {
             var quotelist = [];
             for (var i = 0; i < quotes.length; i++) {
-                quotelist.push({"t": quotes[i].text, /* text */
+                var quoteText = "";
+                if(quotes[i].videouri) {
+                    quoteText = quotes[i].text +
+                    " (Please upgrade to the new version of the wompwomp app from the Play store to see this video)";
+                } else {
+                    quoteText = quotes[i].text;
+                }
+                quotelist.push({"t": quoteText, /* text */
                                 "u": quotes[i].imageuri, /* image uri */
                                 "i":quotes[i].id, /* unique id */
                                 "c":quotes[i].created_on, /* created_on */
@@ -295,7 +303,9 @@ Router.get('/iv', function(req, res, next) {
                                                     guaranteed prior to any item
                                                     creation date*/
         sortorder = -1, // descending order
-        cursorInclusive = false;
+        cursorInclusive = false,
+        inst_id = "",
+        userInitiated = false;
 
     if(typeof req.query.limit != "undefined"){
         limitval = parseInt(req.query.limit);
@@ -308,8 +318,15 @@ Router.get('/iv', function(req, res, next) {
 
     if(typeof req.query.cursorInclusive != "undefined" &&
        req.query.cursorInclusive == "yes") {
-        cursorInclusive = true;
+           cursorInclusive = true;
     }
+
+    if(typeof req.query.userInitiated != "undefined" &&
+       req.query.userInitiated == "yes") {
+           userInitiated = true;
+    }
+
+    inst_id = req.query.instId || "No installation id";
 
     var find_condition = {}, sort_condition = {};
 
@@ -342,8 +359,8 @@ Router.get('/iv', function(req, res, next) {
                                 "f":quotes[i].numfavorites, /* num favorites */
                                 "s":quotes[i].numshares, /* num shares */
                                 "a":quotes[i].sourceuri, /* author's name */
-                                "m":quotes[i].videouri || "",/* video uri is populated only for videos */
-                                "p":quotes[i].numplays /* number of times the video was played */
+                                "m":quotes[i].videouri || "", /* video uri is populated only for videos */
+                                "p":quotes[i].numplays || 0/* number of times the video was played */
                                });
             }
             var response = quotelist;
@@ -352,13 +369,10 @@ Router.get('/iv', function(req, res, next) {
 
             var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
 
-            /* We don't want to record auto background sync
-               in user stats. Assumption here is that cursorInclusive flag
-               is true only in the auto background sync case.
-            */
-            if(!cursorInclusive) {
+            if(userInitiated) {
                 var agniuserstat = new AgniUserStatsModel({
                     ip_address     : ip,
+                    inst_id        : inst_id,
                     timestamp      : Date.now(),
                     action         : limitval < 0 ? REFRESH_BOTTOM : REFRESH_TOP,
                     content_id     : ""
@@ -514,6 +528,43 @@ Router.post('/uf/:id', function(req, res, next) {
             content_id     : item.id
         }).save();
     });
+});
+
+Router.post('/in', function(req, res, next) {
+    var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+    var inst_id = req.body.inst_id || "no installation id";
+    var referrer = req.body.referrer || "no referrer";
+    var agniuserstat = new AgniUserStatsModel({
+        ip_address     : ip,
+        installation_id: inst_id,
+        timestamp      : Date.now(),
+        action         : APP_INSTALLED,
+        content_id     : referrer
+    }).save();
+});
+
+Router.post('/op', function(req, res, next) {
+    var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+    var inst_id = req.body.inst_id || "no installation id";
+    var agniuserstat = new AgniUserStatsModel({
+        ip_address     : ip,
+        installation_id: inst_id,
+        timestamp      : Date.now(),
+        action         : APP_OPENED,
+        content_id     : ""
+    }).save();
+});
+
+Router.post('/not/:id', function(req, res, next) {
+    var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+    var inst_id = req.body.inst_id || "no installation id"
+    var agniuserstat = new AgniUserStatsModel({
+        ip_address     : ip,
+        installation_id: inst_id,
+        timestamp      : Date.now(),
+        action         : PUSH_NOTIFICATION_CLICKED,
+        content_id     : req.params.id
+    }).save();
 });
 
 Router.post('/hideitem', function(req, res, next) {
@@ -822,20 +873,20 @@ function days_between(date1, date2) {
 }
 
 Router.get('/post', App.user.can('access private page'), function(req, res, next) {
-    res.render('private/post', {user: req.user, videofilename: Shortid.generate()});
+    res.render('private/post', {videofilename: Shortid.generate()});
 });
 
 Router.post('/post', App.user.can('access private page'), function(req, res, next) {
     upload(req, res, function (err) {
         if(err) {
             req.flash('error', err.message);
-            return res.render('private/post');
+            return res.render('private/post', {videofilename: Shortid.generate()});
         }
 
         modifyAndUploadImage(req.file.path, function(err, imageurl) {
             if(err) {
                 req.flash('error', err.message);
-                return res.render('private/post');
+                return res.render('private/post', {videofilename: Shortid.generate()});
             }
 
             var agniitem = new AgniModel({
@@ -850,11 +901,11 @@ Router.post('/post', App.user.can('access private page'), function(req, res, nex
                 if (err) {
                     winston.error(err);
                     req.flash('error', err.message)
-                    return res.render('private/post');
+                    return res.render('private/post', {videofilename: Shortid.generate()});
                 }
 
                 req.flash('success', "Thanks for submitting! Your post is currently in the review bin and will go live once an admin has approved it");
-                res.render('private/post');
+                res.render('private/post', {videofilename: Shortid.generate()});
             });
         });
     });
@@ -869,16 +920,17 @@ Router.post('/postvideo', App.user.can('access private page'), function(req, res
         id              : Shortid.generate(),
         category        : ['in_review'],
         numfavorites    : 0,
-        numshares       : 0
+        numshares       : 0,
+        numplays        : 0
     }).save(function(err, agniquote) {
         if (err) {
             winston.error(err);
             req.flash('error', err.message)
-            return res.render('private/post');
+            return res.render('private/post', {videofilename: Shortid.generate()});
         }
 
         req.flash('success', "Thanks for submitting! Your post is currently in the review bin and will go live once an admin has approved it");
-        res.render('private/post');
+        res.render('private/post', {videofilename: Shortid.generate()});
     });
 });
 
@@ -1170,8 +1222,6 @@ exports.releaseBufferedContent = function() {
                 quotes[0].markModified('category');
                 quotes[0].markModified('created_on');
                 quotes[0].save();
-                // send notification to notify phone app to sync feed
-                sendNotification("/topics/sync");
             }
         });
 }

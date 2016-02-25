@@ -25,7 +25,7 @@ function sendHtmlEmail(mg, to, subject, body_text, body_html, current_time, upda
 
     mg.messages().sendMime(dataToSend, function (err, body) {
       if (err) {
-        util.log('Unable to send outbound emails. Error:' + err.statusCode);
+        winston.info('Unable to send outbound emails. Error:' + err.statusCode);
       } else {
         update_callback(body_html, current_time);
       }
