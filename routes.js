@@ -255,7 +255,7 @@ Router.get('/i', function(req, res, next) {
                 var quoteText = "";
                 if(quotes[i].videouri) {
                     quoteText = quotes[i].text +
-                    " (Please upgrade to the new version of the wompwomp app from the Play store to see this video)";
+                    " (Please upgrade to the new version of wompwomp from the Play store to see this video)";
                 } else {
                     quoteText = quotes[i].text;
                 }
