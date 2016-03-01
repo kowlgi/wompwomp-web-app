@@ -360,7 +360,8 @@ Router.get('/iv', function(req, res, next) {
                                 "s":quotes[i].numshares, /* num shares */
                                 "a":quotes[i].sourceuri, /* author's name */
                                 "m":quotes[i].videouri || "", /* video uri is populated only for videos */
-                                "p":quotes[i].numplays || 0/* number of times the video was played */
+                                "p":quotes[i].numplays || 0, /* number of times the video was played */
+                                "z":quotes[i].filesize || 0 /* size of the video file */
                                });
             }
             var response = quotelist;
@@ -921,7 +922,8 @@ Router.post('/postvideo', App.user.can('access private page'), function(req, res
         category        : ['in_review'],
         numfavorites    : 0,
         numshares       : 0,
-        numplays        : 0
+        numplays        : 0,
+        filesize        : req.body.size
     }).save(function(err, agniquote) {
         if (err) {
             winston.error(err);

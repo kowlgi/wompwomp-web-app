@@ -112,6 +112,7 @@ $(document).ready(function() {
         document.getElementById("videofilename").value = "video/" + KEY + ".mp4";
         var FD = new FormData(standardform);
         var thumbnailData = canvas.toDataURL('image/jpeg');
+        var filesize = document.getElementById('videofile').files[0].size;
         $.ajax({
             url: URL,
             data: FD,
@@ -129,7 +130,7 @@ $(document).ready(function() {
                     contentType: false,
                     type: 'POST',
                     success: function(){
-                        var posting = $.post("/postvideo", {id: KEY, caption: document.getElementById("videocaption").value});
+                        var posting = $.post("/postvideo", {id: KEY, size: filesize, caption: document.getElementById("videocaption").value});
                         posting.done(function(response){
                             $('#spinner').css({display: 'none'});
                             $("body").html(response);

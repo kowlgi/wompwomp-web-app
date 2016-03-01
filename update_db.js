@@ -6,7 +6,8 @@ const Mongoose = require('mongoose'),
       winstonpkg = require('winston'),
       Request = require('request'),
       Fs = require('fs'),
-      Path = require('path');
+      Path = require('path'),
+      remoteFileSize = require('remote-file-size');
 
 var winston = new (winstonpkg.Logger)({
         transports: [
@@ -169,6 +170,27 @@ exports.update_db_feb_24_2016 = function() {
         docs.forEach(function(elem, index, array) {
             elem.numplays = 0;
             elem.save();
+        });
+    });
+}
+
+exports.update_db_feb_29_2016 = function() {
+    // Add filesize
+    var conditions = {filesize : {$exists: false}, videouri: {$exists: true}};
+
+    AgniModel.find(conditions, function(err, docs) {
+        if(err) {
+            winston.info(err);
+            return;
+        }
+
+        docs.forEach(function(elem, index, array) {
+            console.log();
+            remoteFileSize(elem.videouri, function(err, sizeInBytes) {
+                console.log(elem.videouri + ": " + sizeInBytes);
+                elem.filesize = sizeInBytes;
+                elem.save();
+            });
         });
     });
 }

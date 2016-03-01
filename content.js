@@ -13,7 +13,8 @@ exports.init = function(connection){
         numfavorites   : Number,
         numshares      : Number,
         numplays       : Number,
-        last_modified  : Date
+        last_modified  : Date,
+        filesize       : Number
     });
     connection.model('Agni', AgniSchema);
 
