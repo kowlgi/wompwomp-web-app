@@ -671,8 +671,7 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
                     }
                 },
                 {$group: {
-                        _id             : '$ip_address',
-                        installation_id : {$push: '$installation_id'},
+                        _id             : '$installation_id',
                         stats           : {$push: '$$ROOT'},
                     }
                 }
@@ -683,8 +682,10 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
             }
 
             var likedAndSharedItems = [];
+            var appInstallData = [];
             for(i = 0; i < userlist.length; i++) {
-        		var geo = geoip.lookup(userlist[i]._id) ||
+                var ip_address = userlist[i].stats[0].ip_address
+        		var geo = geoip.lookup(ip_address) ||
                     {city: "XX", region: "XX", country: "XX"};
 
                 if(geo.city != '') {
@@ -704,6 +705,12 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
                 likedAndSharedItems = likedAndSharedItems.concat(
                     _.filter(userlist[i].stats, function(item) {
                         return item.action === LIKE || item.action === SHARE;
+                    })
+                );
+
+                appInstallData = appInstallData.concat(
+                    _.filter(userlist[i].stats, function(item) {
+                        return item.action === APP_INSTALLED;
                     })
                 );
             }
@@ -730,6 +737,19 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
                 }
             }
 
+            var campaignAttributions = {};
+            for(i = 0; i < appInstallData; i++) {
+                var item = appInstallData[i];
+                var params = item.content_id.split("&");
+                var campaignId = QueryString(params).campaignId;
+                if(campaignId in campaignAttributions) {
+                    userInteractions[campaignId].numinstalls++;
+                }
+                else {
+                    userInteractions[campaignId] = {numinstalls: 1, id: campaignId};
+                }
+            }
+
             var topItems = [];
             for (var key in userInteractions) topItems.push([key, userInteractions[key]]);
             topItems.sort(function(a, b) {
@@ -743,28 +763,40 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
                 return 0;
             });
 
-            //userInteractions.sort(compareUserInteractions);
-            //util.log(userInteractions.length);
+            var topCampaigns = [];
+            for (var key in campaignAttributions) topItems.push([key, campaignAttributions[key]]);
+            topCampaigns.sort(function(a, b) {
+                a = a[1];
+                b = b[1];
+
+                if (a.numinstalls < b.numinstalls)
+                    return 1;
+                if (a.numinstalls > b.numinstalls)
+                    return -1;
+                return 0;
+            });
+
             res.render('private/dailystats', {
                 users: userlist,
                 today: lowerDateBound,
                 user: req.user,
-                topItems: topItems
+                topItems: topItems,
+                topCampaigns: topCampaigns
             });
         });
 });
 
 Router.get('/userstats', App.user.can('access admin page'), function(req, res, next) {
-    var user_ip = " ";
-    if(typeof req.query.ip !== 'undefined') {
-        user_ip = req.query.ip;
+    var user_id = " ";
+    if(typeof req.query.id !== 'undefined') {
+        user_id = req.query.id;
     }
 
     AgniUserStatsModel.
         aggregate(
             [
                 {$match: {
-                    ip_address : user_ip
+                    installation_id : user_id
                     }
                 },
                 {$group: {
@@ -782,7 +814,7 @@ Router.get('/userstats', App.user.can('access admin page'), function(req, res, n
                 return next(err);
             }
 
-            var geo = geoip.lookup(user_ip) ||
+            var geo = geoip.lookup(datelist[0].events[0].ip_address) ||
                 {city: "XX", region: "XX", country: "XX"};
 
             if(geo.city != '') {
@@ -803,7 +835,7 @@ Router.get('/userstats', App.user.can('access admin page'), function(req, res, n
                 days: datelist,
                 location: user_location,
                 timezone: user_timezone,
-                ip_address: user_ip,
+                id: user_id,
                 user: req.user
             });
         });
@@ -1337,6 +1369,29 @@ function compareUserInteractions(a,b) {
     if (a.numfavorites + a.numshares > b.numfavorites + b.numshares)
         return -1;
     return 0;
+}
+
+//http://stackoverflow.com/questions/979975/how-to-get-the-value-from-the-url-parameter
+function QueryString(params) {
+  // This function is anonymous, is executed immediately and
+  // the return value is assigned to QueryString!
+  var query_string = {};
+  var vars = params.split("&");
+  for (var i=0;i<vars.length;i++) {
+    var pair = vars[i].split("=");
+        // If first entry with this name
+    if (typeof query_string[pair[0]] === "undefined") {
+      query_string[pair[0]] = decodeURIComponent(pair[1]);
+        // If second entry with this name
+    } else if (typeof query_string[pair[0]] === "string") {
+      var arr = [ query_string[pair[0]],decodeURIComponent(pair[1]) ];
+      query_string[pair[0]] = arr;
+        // If third or later entry with this name
+    } else {
+      query_string[pair[0]].push(decodeURIComponent(pair[1]));
+    }
+  }
+    return query_string;
 }
 
 exports.router = Router;

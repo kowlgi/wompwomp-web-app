@@ -65,6 +65,40 @@ block content
                             |Nobody seemed to share or like anything :(
           div.row
               div.col.l4.offset-l4
+                    h5 Top Campaigns
+                    if topCampaigns.length > 0
+                        - var totalInstalls = 0
+                        div(class="table-responsive")
+                            table(class="table highlight striped")
+                              thead
+                                  tr.trhideclass
+                                      th No.
+                                      th Campaign ID
+                                      th Installs
+                                  tbody
+                                      - var i = 0
+                                      each item in topCampaigns
+                                        - i++
+                                        - totalInstalls += item[1].numinstalls
+                                        tr.trhideclass
+                                          td
+                                            = i
+                                          td
+                                            = item[1].id
+                                          td
+                                            = item[1].numinstalls
+                                            =" "
+                                            |installs
+                        |Total:
+                        =" "
+                        =totalInstalls
+                    else
+                        br
+                        em
+                            |No installs today :(
+                        
+          div.row
+              div.col.l4.offset-l4
                   h5 User Stats
                   div(class="table-responsive")
                     table(class="table highlight striped")
@@ -83,15 +117,9 @@ block content
                                   td
                                     = user.location
                                     br
-                                    a(href="/userstats?ip="+user._id)
+                                    a(href="/userstats?id="+user._id)
                                         em
                                             = user._id
-                                    if user.installation_id[0]
-                                        br
-                                        em.tiny-text
-                                            |ID: 
-                                            =" "
-                                            =user.installation_id[0]
                                   td
                                     ol
                                       each stat in user.stats
