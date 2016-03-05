@@ -18,84 +18,91 @@ block content
                      =moment_local(today).format('MMM DD, YYYY')
           div.row
               div.col.l4.offset-l4
-                    h5 Top Items
-                    if topItems.length > 0
-                        - var totalLikes = 0
-                        - var totalShares = 0
-                        div(class="table-responsive")
-                            table(class="table highlight striped")
-                              thead
-                                  tr.trhideclass
-                                      th No.
-                                      th Item
-                                      th User Interactions
-                                  tbody
-                                      - var i = 0
-                                      each item in topItems
-                                        - i++
-                                        - totalLikes += item[1].numfavorites
-                                        - totalShares += item[1].numshares
-                                        tr.trhideclass
-                                          td
-                                            = i
-                                          td
-                                            a(href="/v/"+item[1].id)
-                                                em
-                                                    = item[1].id
-                                          td
-                                            = item[1].numshares
-                                            =" "
-                                            |shares,
-                                            =" "
-                                            = item[1].numfavorites
-                                            =" "
-                                            |likes
-                        |Total:
-                        =" "
-                        =totalShares
-                        =" "
-                        |shares,     
-                        =" "
-                        =totalLikes
-                        =" "
-                        |likes      
-                    else
-                        br
-                        em
-                            |Nobody seemed to share or like anything :(
-          div.row
-              div.col.l4.offset-l4
-                    h5 Top Campaigns
-                    if topCampaigns.length > 0
-                        - var totalInstalls = 0
-                        div(class="table-responsive")
-                            table(class="table highlight striped")
-                              thead
-                                  tr.trhideclass
-                                      th No.
-                                      th Campaign ID
-                                      th Installs
-                                  tbody
-                                      - var i = 0
-                                      each item in topCampaigns
-                                        - i++
-                                        - totalInstalls += item[1].numinstalls
-                                        tr.trhideclass
-                                          td
-                                            = i
-                                          td
-                                            = item[1].id
-                                          td
-                                            = item[1].numinstalls
-                                            =" "
-                                            |installs
-                        |Total:
-                        =" "
-                        =totalInstalls
-                    else
-                        br
-                        em
-                            |No installs today :(
+                  ul.collapsible(data-collapsible="accordion")
+                      li
+                          .collapsible-header
+                              i.material-icons.tiny thumb_up
+                              |Top Items
+                          .collapsible-body
+                                if topItems.length > 0
+                                    - var totalLikes = 0
+                                    - var totalShares = 0
+                                    div(class="table-responsive")
+                                        table(class="table highlight striped")
+                                          thead
+                                              tr.trhideclass
+                                                  th No.
+                                                  th Item
+                                                  th User Interactions
+                                              tbody
+                                                  - var i = 0
+                                                  each item in topItems
+                                                    - i++
+                                                    - totalLikes += item[1].numfavorites
+                                                    - totalShares += item[1].numshares
+                                                    tr.trhideclass
+                                                      td
+                                                        = i
+                                                      td
+                                                        a(href="/v/"+item[1].id)
+                                                            em
+                                                                = item[1].id
+                                                      td
+                                                        = item[1].numshares
+                                                        =" "
+                                                        |shares,
+                                                        =" "
+                                                        = item[1].numfavorites
+                                                        =" "
+                                                        |likes
+                                    b Total:
+                                    =" "
+                                    =totalShares
+                                    =" "
+                                    |shares,     
+                                    =" "
+                                    =totalLikes
+                                    =" "
+                                    |likes      
+                                else
+                                    br
+                                    em
+                                        |Nobody seemed to share or like anything :(
+                       li
+                           .collapsible-header
+                               i.material-icons.tiny attach_money
+                               |Campaigns
+                           .collapsible-body
+                                if topCampaigns.length > 0
+                                    - var totalInstalls = 0
+                                    div(class="table-responsive")
+                                        table(class="table highlight striped")
+                                          thead
+                                              tr.trhideclass
+                                                  th No.
+                                                  th Campaign ID
+                                                  th Installs
+                                              tbody
+                                                  - var i = 0
+                                                  each item in topCampaigns
+                                                    - i++
+                                                    - totalInstalls += item[1].numinstalls
+                                                    tr.trhideclass
+                                                      td
+                                                        = i
+                                                      td
+                                                        = item[1].id
+                                                      td
+                                                        = item[1].numinstalls
+                                    b Total:
+                                    =" "
+                                    =totalInstalls
+                                    =" "
+                                    |installs
+                                else
+                                    br
+                                    em
+                                        |No installs today :(
                         
           div.row
               div.col.l4.offset-l4
@@ -126,7 +133,11 @@ block content
                                         li
                                             =stat.action
                                             =" "
-                                            if(stat.content_id != "")
+                                            if(stat.action == "App_installed")
+                                                |through campaign
+                                                =" "
+                                                =stat.content_id
+                                            else if(stat.content_id != "")
                                                 a(href="http://wompwomp.co/v/"+stat.content_id)
                                                      =stat.content_id
                                             =" "
