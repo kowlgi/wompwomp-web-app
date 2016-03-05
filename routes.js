@@ -594,9 +594,10 @@ Router.post('/hideitem', function(req, res, next) {
 Router.get('/install', function(req, res, next) {
     const userAgent = req.headers['user-agent'];
     const isAndroid = userAgent.match(/android/i);
+    const id = userAgent.match(/whatsapp/i) ? "whatsapp" : "webapp";
 
     if(isAndroid) {
-        return res.redirect("http://play.google.com/store/apps/details?id=co.wompwomp.sunshine");
+        return res.redirect("http://play.google.com/store/apps/details?id=co.wompwomp.sunshine&campaignid="+id);
     }
     else {
         return res.redirect("/subscribe");
@@ -606,7 +607,8 @@ Router.get('/install', function(req, res, next) {
 Router.get('/subscribe', function(req, res, next) {
     const userAgent = req.headers['user-agent'];
     const isAndroid = userAgent.match(/android/i);
-    const appStoreLink = "http://play.google.com/store/apps/details?id=co.wompwomp.sunshine";
+    const id = userAgent.match(/whatsapp/i) ? "whatsapp" : "webapp";
+    const appStoreLink = "http://play.google.com/store/apps/details?id=co.wompwomp.sunshine&campaignid="+id;
 
     if(!isAndroid) {
         req.flash('info', "We don't have an app yet for your device. You can enjoy wompwomp by getting on our mailing list. Subscribe below");
