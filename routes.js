@@ -738,14 +738,14 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
             }
 
             var campaignAttributions = {};
-            for(i = 0; i < appInstallData; i++) {
+            for(i = 0; i < appInstallData.length; i++) {
                 var item = appInstallData[i];
-                var params = item.content_id.split("&");
-                if(QueryString(params).campaignid in campaignAttributions) {
-                    campaignAttributions[campaignId].numinstalls++;
+                var campaignid = QueryString(item.content_id).campaignid;
+                if(campaignid in campaignAttributions) {
+                    campaignAttributions[campaignid].numinstalls++;
                 }
                 else {
-                    campaignAttributions[campaignId] = {numinstalls: 1, id: campaignId};
+                    campaignAttributions[campaignid] = {numinstalls: 1, id: campaignid};
                 }
             }
 
@@ -763,7 +763,7 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
             });
 
             var topCampaigns = [];
-            for (var key in campaignAttributions) topItems.push([key, campaignAttributions[key]]);
+            for (var key in campaignAttributions) topCampaigns.push([key, campaignAttributions[key]]);
             topCampaigns.sort(function(a, b) {
                 a = a[1];
                 b = b[1];
