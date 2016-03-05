@@ -741,12 +741,11 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
             for(i = 0; i < appInstallData; i++) {
                 var item = appInstallData[i];
                 var params = item.content_id.split("&");
-                var campaignId = QueryString(params).campaignId;
-                if(campaignId in campaignAttributions) {
-                    userInteractions[campaignId].numinstalls++;
+                if(QueryString(params).campaignid in campaignAttributions) {
+                    campaignAttributions[campaignId].numinstalls++;
                 }
                 else {
-                    userInteractions[campaignId] = {numinstalls: 1, id: campaignId};
+                    campaignAttributions[campaignId] = {numinstalls: 1, id: campaignId};
                 }
             }
 
