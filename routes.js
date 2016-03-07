@@ -55,6 +55,7 @@ const UNLIKE = "Unlike";
 const PLAY_VIDEO = "Play_video";
 const APP_INSTALLED = "App_installed";
 const APP_OPENED = "App_opened";
+const APP_CLOSED = "App_closed";
 const PUSH_NOTIFICATION_CLICKED = "Push_notification_clicked";
 
 Router.get('/', function(req, res, next) {
@@ -304,7 +305,6 @@ Router.get('/iv', function(req, res, next) {
                                                     creation date*/
         sortorder = -1, // descending order
         cursorInclusive = false,
-        inst_id = "",
         userInitiated = false;
 
     if(typeof req.query.limit != "undefined"){
@@ -326,7 +326,8 @@ Router.get('/iv', function(req, res, next) {
            userInitiated = true;
     }
 
-    inst_id = req.query.instId || "No installation id";
+    var inst_id = req.query.instId || "No installation id";
+    var time = req.body.timestamp || Date.now();
 
     var find_condition = {}, sort_condition = {};
 
@@ -374,7 +375,7 @@ Router.get('/iv', function(req, res, next) {
                 var agniuserstat = new AgniUserStatsModel({
                     ip_address     : ip,
                     inst_id        : inst_id,
-                    timestamp      : Date.now(),
+                    timestamp      : time,
                     action         : limitval < 0 ? REFRESH_BOTTOM : REFRESH_TOP,
                     content_id     : ""
                 }).save();
@@ -439,11 +440,12 @@ Router.post('/s/:id', function(req, res, next) {
         res.end();
 
         var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-        var inst_id = req.body.inst_id || "no installation id"
+        var inst_id = req.body.inst_id || "no installation id";
+        var time = req.body.timestamp || Date.now();
         var agniuserstat = new AgniUserStatsModel({
             ip_address     : ip,
             installation_id: inst_id,
-            timestamp      : Date.now(),
+            timestamp      : time,
             action         : SHARE,
             content_id     : item.id
         }).save();
@@ -465,11 +467,12 @@ Router.post('/p/:id', function(req, res, next) {
         res.end();
 
         var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-        var inst_id = req.body.inst_id || "no installation id"
+        var inst_id = req.body.inst_id || "no installation id";
+        var time = req.body.timestamp || Date.now();
         var agniuserstat = new AgniUserStatsModel({
             ip_address     : ip,
             installation_id: inst_id,
-            timestamp      : Date.now(),
+            timestamp      : time,
             action         : PLAY_VIDEO,
             content_id     : item.id
         }).save();
@@ -491,11 +494,12 @@ Router.post('/f/:id', function(req, res, next) {
         res.end();
 
         var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-        var inst_id = req.body.inst_id || "no installation id"
+        var inst_id = req.body.inst_id || "no installation id";
+        var time = req.body.timestamp || Date.now();
         var agniuserstat = new AgniUserStatsModel({
             ip_address     : ip,
             installation_id: inst_id,
-            timestamp      : Date.now(),
+            timestamp      : time,
             action         : LIKE,
             content_id     : item.id
         }).save();
@@ -520,11 +524,12 @@ Router.post('/uf/:id', function(req, res, next) {
         res.end();
 
         var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-        var inst_id = req.body.inst_id || "no installation id"
+        var inst_id = req.body.inst_id || "no installation id";
+        var time = req.body.timestamp || Date.now();
         var agniuserstat = new AgniUserStatsModel({
             ip_address     : ip,
             installation_id: inst_id,
-            timestamp      : Date.now(),
+            timestamp      : time,
             action         : UNLIKE,
             content_id     : item.id
         }).save();
@@ -535,10 +540,11 @@ Router.post('/in', function(req, res, next) {
     var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
     var inst_id = req.body.inst_id || "no installation id";
     var referrer = req.body.referrer || "no referrer";
+    var time = req.body.timestamp || Date.now();
     var agniuserstat = new AgniUserStatsModel({
         ip_address     : ip,
         installation_id: inst_id,
-        timestamp      : Date.now(),
+        timestamp      : time,
         action         : APP_INSTALLED,
         content_id     : referrer
     }).save();
@@ -547,22 +553,37 @@ Router.post('/in', function(req, res, next) {
 Router.post('/op', function(req, res, next) {
     var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
     var inst_id = req.body.inst_id || "no installation id";
+    var time = req.body.timestamp || Date.now();
     var agniuserstat = new AgniUserStatsModel({
         ip_address     : ip,
         installation_id: inst_id,
-        timestamp      : Date.now(),
+        timestamp      : time,
         action         : APP_OPENED,
+        content_id     : ""
+    }).save();
+});
+
+Router.post('/cl', function(req, res, next) {
+    var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+    var inst_id = req.body.inst_id || "no installation id";
+    var time = req.body.timestamp || Date.now();
+    var agniuserstat = new AgniUserStatsModel({
+        ip_address     : ip,
+        installation_id: inst_id,
+        timestamp      : time,
+        action         : APP_CLOSED,
         content_id     : ""
     }).save();
 });
 
 Router.post('/not/:id', function(req, res, next) {
     var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-    var inst_id = req.body.inst_id || "no installation id"
+    var inst_id = req.body.inst_id || "no installation id";
+    var time = req.body.timestamp || Date.now();
     var agniuserstat = new AgniUserStatsModel({
         ip_address     : ip,
         installation_id: inst_id,
-        timestamp      : Date.now(),
+        timestamp      : time,
         action         : PUSH_NOTIFICATION_CLICKED,
         content_id     : req.params.id
     }).save();
