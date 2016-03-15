@@ -12,8 +12,8 @@ config.userstatsdb = "agniuserstats";
 config.release_content_scheduler_frequency = "0 0 1,3,7,10,14,17 * * *";
 config.push_share_card_scheduler_frequency = "10 59 2 * * 5";
 config.push_rate_card_scheduler_frequency = "10 59 13 * * 4";
-config.push_upgrade_card_scheduler_frequency = "30 59 13 * * 0,3,6";
-config.push_remove_all_cta_scheduler_frequency = "1 50 2,13 * * *";
+config.push_upgrade_card_scheduler_frequency = "30 59 7 * * 0,3,6";
+config.push_remove_all_cta_scheduler_frequency = "1 50 2 * * *";
 config.push_upgrade_card_version = "10";
 
 /* in cases where release time overlaps, give ~10 seconds for buffered content
@@ -34,8 +34,6 @@ config.prod_mailing_list = 'fun@mg.wompwomp.co';
 config.test_mailing_list_scheduler_frequency = "0 */1 * * * * "; // 0th second of every minute
 config.prod_mailing_list_scheduler_frequency = "0 0 14 * * 3,6";
 
-config.AWSAccessKeyId = "accesskey";
-config.AWSSecretKey = "secretkey";
 config.AWSS3BucketVideoURL = "http://wompwomp.s3.amazonaws.com/video/";
 
 module.exports = config;
