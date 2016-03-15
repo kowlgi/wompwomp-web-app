@@ -9,17 +9,16 @@ config.session_secret = "don martin doesn't want any secrets but his spies are w
 config.sessiondb = "agnisession";
 config.userstatsdb = "agniuserstats";
 
-config.release_content_scheduler_frequency = "0 0 1,3,6,10,13,17,21,23 * * *";
-
-config.push_share_card_scheduler_frequency = "10 59 22 * * 5";
-config.push_rate_card_scheduler_frequency = "10 59 9 * * 4";
-config.push_upgrade_card_scheduler_frequency = "30 59 9 * * 0,3,7";
-config.push_remove_all_cta_scheduler_frequency = "1 50 9,22 * * *";
-config.push_upgrade_card_version = "8";
+config.release_content_scheduler_frequency = "0 0 1,3,7,10,14,17 * * *";
+config.push_share_card_scheduler_frequency = "10 59 2 * * 5";
+config.push_rate_card_scheduler_frequency = "10 59 13 * * 4";
+config.push_upgrade_card_scheduler_frequency = "30 59 13 * * 0,3,6";
+config.push_remove_all_cta_scheduler_frequency = "1 50 2,13 * * *";
+config.push_upgrade_card_version = "10";
 
 /* in cases where release time overlaps, give ~10 seconds for buffered content
    to be released  */
-config.push_notification_scheduler_frequency = "10 0 10,23 * * *";
+config.push_notification_scheduler_frequency = "10 0 3,14 * * *";
 
 /* image upload */
 config.imgurkey = "490ca385c5ef403";
@@ -32,8 +31,8 @@ config.email_domain = 'mg.wompwomp.co';
 config.test_mailing_list = 'wompwompapp@gmail.com';
 config.prod_mailing_list = 'fun@mg.wompwomp.co';
 //config.test_mailing_list_scheduler_frequency = "0 */1 * * * * "; // 0th second of every minute
-config.test_mailing_list_scheduler_frequency = "0 0 10 * * 3,6";
-config.prod_mailing_list_scheduler_frequency = "0 0 10 * * 3,6";
+config.test_mailing_list_scheduler_frequency = "0 */1 * * * * "; // 0th second of every minute
+config.prod_mailing_list_scheduler_frequency = "0 0 14 * * 3,6";
 
 config.AWSAccessKeyId = "accesskey";
 config.AWSSecretKey = "secretkey";
