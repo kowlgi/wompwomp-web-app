@@ -93,7 +93,7 @@ block content
                       =" "
                       span.theme-color-text
                           =" "
-                          =moment_local(endtime).fromNow()
+                          =moment_local(endtime).tz('America/New_York').fromNow()
                       =" "
                       |on
                       ul
