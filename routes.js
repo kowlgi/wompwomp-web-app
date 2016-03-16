@@ -17,6 +17,7 @@ const Express = require('express');
 const Router = Express.Router();
 const Account = App.logindb.model('Accounts');
 const multer  = require('multer');
+const CountryList = require('country-list')();
 const upload = multer(
     {
         dest: 'uploads/',
@@ -719,7 +720,7 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
         		}
 
                 if(geo.country != '') {
-                    userlist[i].location += geo.country;
+                    userlist[i].location += CountryList.getName(geo.country);
                 }
 
                 userlist[i].timezone = timezone_lookup(geo.country, geo.region) ||
@@ -875,7 +876,7 @@ Router.get('/userstats', App.user.can('access admin page'), function(req, res, n
             }
 
             if(geo.country != '') {
-                user_location += geo.country;
+                user_location += CountryList.getName(geo.country);
             }
 
             user_timezone = timezone_lookup(geo.country, geo.region) ||

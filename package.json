@@ -20,6 +20,7 @@
     "connect-mongo": "^1.1.0",
     "connect-roles": "^3.1.2",
     "cookie-parser": "^1.4.0",
+    "country-list": "0.0.3",
     "cron-parser": "^1.1.0",
     "express": "^4.13.4",
     "express-flash": "0.0.2",
