@@ -126,7 +126,9 @@ block content
                                                        td
                                                          = i
                                                        td
-                                                         = item[1].id
+                                                           a(href="/v/"+item[1].id)
+                                                               em
+                                                                   = item[1].id
                                                        td
                                                          = item[1].numplays
                                      b Total:
