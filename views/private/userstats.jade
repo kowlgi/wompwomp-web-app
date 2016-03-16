@@ -8,41 +8,56 @@ block content
                   h5 Stats for user in
                      =" "
                      =location
-                     =" "
-                     |with ID
-                     =" "
-                     =id
-                  div(class="table-responsive")
-                    table(class="table highlight striped")
-                      thead
-                          tr.trhideclass
-                              th No.
-                              th Date
-                              th Events
-                          tbody
-                              - var i = 0
-                              each day in days
-                                - i++
-                                tr.trhideclass
-                                  td
-                                    = i
-                                  td
-                                    a(href="/dailystats?date="+day._id.month+"-"+day._id.day+"-"+day._id.year)
-                                        =day._id.month
-                                        ="-"
-                                        =day._id.day
-                                        ="-"
-                                        =day._id.year
-                                  td
-                                    ol
-                                      each event in day.events
-                                        li
-                                            =event.action
-                                            =" "
-                                            if(event.content_id != "")
-                                                a(href="http://wompwomp.co/v/"+event.content_id)
-                                                     =event.content_id
-                                            =" "
-                                            |at
-                                            =" "
-                                            =moment_local(event.timestamp).tz(timezone).format('h:mm A z')
+                  p
+                      - var firstDay = days[days.length - 1]
+                      - var now = moment_local();
+                      - var firstMoment = moment_local([parseInt(firstDay._id.year), parseInt(firstDay._id.month) - 1, parseInt(firstDay._id.day)])
+                      - var totalDaysAsUser = now.diff(firstMoment, 'days') 
+                      |Active on 
+                      = days.length
+                      =" "
+                      |out of 
+                      =" "
+                      =totalDaysAsUser
+                      =" "
+                      |days as a user
+                  - var i = 0
+                  ul.collapsible.popout(data-collapsible="expandable")
+                      each day in days
+                        - i++
+                        li 
+                            .collapsible-header 
+                                = day.events.length
+                                =" "
+                                |events on
+                                =" "
+                                a(href="/dailystats?date="+day._id.month+"-"+day._id.day+"-"+day._id.year)
+                                    =day._id.month
+                                    ="-"
+                                    =day._id.day
+                                    ="-"
+                                    =day._id.year
+                            .collapsible-body
+                                div(class="table-responsive")
+                                    table(class="table highlight striped")
+                                      thead
+                                          tr.trhideclass
+                                              th No.
+                                              th Event
+                                          tbody
+                                              - var statcounter = 0
+                                              each event in day.events
+                                                - statcounter++
+                                                tr.trhideclass
+                                                    td
+                                                        =statcounter
+                                                    td
+                                                        =event.action
+                                                        =" "
+                                                        if(event.content_id != "")
+                                                            a(href="http://wompwomp.co/v/"+event.content_id)
+                                                                 =event.content_id
+                                                        =" "
+                                                        |at
+                                                        =" "
+                                                        =moment_local(event.timestamp).tz(timezone).format('h:mm A z')

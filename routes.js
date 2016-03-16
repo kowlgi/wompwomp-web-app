@@ -858,11 +858,21 @@ Router.get('/userstats', App.user.can('access admin page'), function(req, res, n
                     },
                     events : {$push: '$$ROOT'},
                     }
+                },
+                {$sort: {
+                    "_id.year": -1,
+                    "_id.month": -1,
+                    "_id.day": -1
+                    }
                 }
             ], function(err, datelist){
             if(err) {
                 winston.error(err);
                 return next(err);
+            }
+
+            if(typeof datelist[0] === "undefined") {
+                return res.render ('404', {url:req.url});
             }
 
             var geo = geoip.lookup(datelist[0].events[0].ip_address) ||
