@@ -704,7 +704,7 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
                 return next(err);
             }
 
-            var likedAndSharedItems = [];
+            var likedSharedPlayedItems = [];
             var appInstallData = [];
             for(i = 0; i < userlist.length; i++) {
                 var ip_address = userlist[i].stats[0].ip_address
@@ -725,9 +725,9 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
                 userlist[i].timezone = timezone_lookup(geo.country, geo.region) ||
                     'America/New_York';
 
-                likedAndSharedItems = likedAndSharedItems.concat(
+                likedSharedPlayedItems = likedSharedPlayedItems.concat(
                     _.filter(userlist[i].stats, function(item) {
-                        return item.action === LIKE || item.action === SHARE;
+                        return item.action === LIKE || item.action === SHARE || item.action === PLAY_VIDEO;
                     })
                 );
 
@@ -749,24 +749,22 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
             }
 
             var userInteractions = {};
-            for(i = 0; i < likedAndSharedItems.length; i++) {
-                var item = likedAndSharedItems[i];
-                if(item.content_id in userInteractions) {
-                    if(item.action === SHARE){
-                        userInteractions[item.content_id].numshares++;
-                    }
-                    else if (item.action === LIKE) {
-                        userInteractions[item.content_id].numfavorites++;
-                    }
+            for(i = 0; i < likedSharedPlayedItems.length; i++) {
+                var item = likedSharedPlayedItems[i];
+                if(!(item.content_id in userInteractions)) {
+                    userInteractions[item.content_id] = {
+                        numshares:0,
+                        numfavorites: 0,
+                        numplays: 0,
+                        id: item.content_id};
                 }
-                else {
-                    userInteractions[item.content_id] = {numshares:0, numfavorites: 0, id: item.content_id};
-                    if(item.action === SHARE) {
-                        userInteractions[item.content_id].numshares++;
-                    }
-                    else if(item.action === LIKE) {
-                        userInteractions[item.content_id].numfavorites++;
-                    }
+
+                if(item.action === SHARE) {
+                    userInteractions[item.content_id].numshares++;
+                } else if(item.action === LIKE) {
+                    userInteractions[item.content_id].numfavorites++;
+                } else if (item.action === PLAY_VIDEO) {
+                    userInteractions[item.content_id].numplays++;
                 }
             }
 
@@ -782,14 +780,34 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
             }
 
             var topItems = [];
-            for (var key in userInteractions) topItems.push([key, userInteractions[key]]);
+            var topVideos = [];
+            for (var key in userInteractions) {
+                if(userInteractions[key].numfavorites > 0 ||
+                   userInteractions[key].numshares > 0) {
+                    topItems.push([key, userInteractions[key]]);
+                }
+
+                if(userInteractions[key].numplays > 0) {
+                    topVideos.push([key, userInteractions[key]]);
+                }
+            }
+
             topItems.sort(function(a, b) {
                 a = a[1];
                 b = b[1];
-
                 if (a.numfavorites + a.numshares < b.numfavorites + b.numshares)
                     return 1;
                 if (a.numfavorites + a.numshares > b.numfavorites + b.numshares)
+                    return -1;
+                return 0;
+            });
+
+            topVideos.sort(function(a,b) {
+                a = a[1];
+                b = b[1];
+                if (a.numplays < b.numplays)
+                    return 1;
+                if (a.numplays > b.numplays)
                     return -1;
                 return 0;
             });
@@ -812,6 +830,7 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
                 today: lowerDateBound,
                 user: req.user,
                 topItems: topItems,
+                topVideos: topVideos,
                 topCampaigns: topCampaigns
             });
         });

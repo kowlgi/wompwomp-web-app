@@ -103,7 +103,41 @@ block content
                                     br
                                     em
                                         |No installs today :(
-                        
+                       li
+                            .collapsible-header
+                                i.material-icons.tiny play_circle_filled
+                                |Videos Played
+                            .collapsible-body
+                                 if topVideos.length > 0
+                                     - var totalPlays = 0
+                                     div(class="table-responsive")
+                                         table(class="table highlight striped")
+                                           thead
+                                               tr.trhideclass
+                                                   th No.
+                                                   th Video
+                                                   th Plays
+                                               tbody
+                                                   - var i = 0
+                                                   each item in topVideos
+                                                     - i++
+                                                     - totalPlays += item[1].numplays
+                                                     tr.trhideclass
+                                                       td
+                                                         = i
+                                                       td
+                                                         = item[1].id
+                                                       td
+                                                         = item[1].numplays
+                                     b Total:
+                                     =" "
+                                     =totalplays
+                                     =" "
+                                     |plays
+                                 else
+                                     br
+                                     em
+                                         |No videos played today :(                           
           div.row
               div.col.l4.offset-l4
                   h5 User Stats
