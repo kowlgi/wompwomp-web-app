@@ -143,40 +143,42 @@ block content
           div.row
               div.col.l4.offset-l4
                   h5 User Stats
-                  div(class="table-responsive")
-                    table(class="table highlight striped")
-                      thead
-                          tr.trhideclass
-                              th No.
-                              th User
-                              th Events
-                          tbody
-                              - var i = 0
-                              each user in users
-                                - i++
-                                tr.trhideclass
-                                  td
-                                    = i
-                                  td
-                                    = user.location
-                                    br
-                                    a(href="/userstats?id="+user._id)
-                                        em
-                                            = user._id
-                                  td
-                                    ol
-                                      each stat in user.stats
-                                        li
-                                            =stat.action
-                                            =" "
-                                            if(stat.action == "App_installed")
-                                                |through campaign
-                                                =" "
-                                                =stat.content_id
-                                            else if(stat.content_id != "")
-                                                a(href="http://wompwomp.co/v/"+stat.content_id)
-                                                     =stat.content_id
-                                            =" "
-                                            |at
-                                            =" "
-                                            =moment_local(stat.timestamp).tz(user.timezone).format('h:mm A z')
+                  - var i = 0
+                  ul.collapsible.popout(data-collapsible="expandable")
+                      each user in users
+                        - i++
+                        li 
+                            .collapsible-header
+                                = i
+                                =" "
+                                a(href="/userstats?id="+user._id)
+                                    em
+                                        = user.location
+                            .collapsible-body
+                                div(class="table-responsive")
+                                    table(class="table highlight striped")
+                                      thead
+                                          tr.trhideclass
+                                              th No.
+                                              th Event
+                                          tbody
+                                              - var statcounter = 0
+                                              each stat in user.stats
+                                                - statcounter++
+                                                tr.trhideclass
+                                                  td
+                                                    = statcounter
+                                                  td
+                                                    =stat.action
+                                                    =" "
+                                                    if(stat.action == "App_installed")
+                                                        |through campaign
+                                                        =" "
+                                                        =stat.content_id
+                                                    else if(stat.content_id != "")
+                                                        a(href="http://wompwomp.co/v/"+stat.content_id)
+                                                             =stat.content_id
+                                                    =" "
+                                                    |at
+                                                    =" "
+                                                    =moment_local(stat.timestamp).tz(user.timezone).format('h:mm A z')
