@@ -12,7 +12,7 @@ block content
                       - var firstDay = days[days.length - 1]
                       - var now = moment_local();
                       - var firstMoment = moment_local([parseInt(firstDay._id.year), parseInt(firstDay._id.month) - 1, parseInt(firstDay._id.day)])
-                      - var totalDaysAsUser = now.diff(firstMoment, 'days') 
+                      - var totalDaysAsUser = Math.ceil(now.diff(firstMoment, 'days', true)) 
                       |Active on 
                       = days.length
                       =" "
