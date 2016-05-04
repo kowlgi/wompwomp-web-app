@@ -1703,9 +1703,9 @@ function QueryString(params) {
 exports.updateFeaturedItems = function() {
     var now = new Date();
     var oneWeekAgo = new Date();
-    oneWeekAgo.setDate(now.getDate() - 21);
+    oneWeekAgo.setDate(now.getDate() - 7);
     var oneDayAgo = new Date();
-    oneDayAgo.setDate(now.getDate() - 11);
+    oneDayAgo.setDate(now.getDate() - 1);
 
     AgniModel.
     find(NEITHER_HIDDEN_NOR_BUFFERED_CATEGORY).
