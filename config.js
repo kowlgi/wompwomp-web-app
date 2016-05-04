@@ -20,6 +20,8 @@ config.push_upgrade_card_version = "10";
    to be released  */
 config.push_notification_scheduler_frequency = "10 0 3,14 * * *";
 
+config.update_featured_items_frequency = "0 0 */1 * * *";
+
 /* image upload */
 config.imgurkey = "490ca385c5ef403";
 config.height = 640;

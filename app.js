@@ -150,6 +150,7 @@ app.use(flash());
 // Set up routes
 const routes  = require( './routes' );
 app.use('/', routes.router);
+routes.updateFeaturedItems();
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -204,6 +205,7 @@ schedule.scheduleJob(config.push_share_card_scheduler_frequency, routes.pushShar
 schedule.scheduleJob(config.push_rate_card_scheduler_frequency, routes.pushRateCard);
 schedule.scheduleJob(config.push_upgrade_card_scheduler_frequency, routes.pushUpgradeCard);
 schedule.scheduleJob(config.push_remove_all_cta_scheduler_frequency, routes.pushRemoveAllCTA);
+schedule.scheduleJob(config.update_featured_items_frequency, routes.updateFeaturedItems);
 
 // Start server
 http.createServer(app).listen(app.get('port'), function() {
