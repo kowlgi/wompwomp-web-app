@@ -1700,43 +1700,6 @@ function QueryString(params) {
     return query_string;
 }
 
-function DumpJSONForElasticSearch() {
-    AgniUserStatsModel.
-    find().
-    sort({
-        timestamp: -1
-    }).
-    skip(90000).
-    limit(30000).
-    exec(function(err, result) {
-        ESFriendlyJSON = "";
-        for (i = 0; i < result.length; i++) {
-            var timestamp = new Date(result[i].timestamp);
-            var geo = geoip.lookup(result[i].ip_address) || {
-                city: "XX",
-                region: "XX",
-                country: "XX"
-            };
-            ESFriendlyJSON += "{ \"index\" : { \"_index\" : \"wompers\", \"_type\" : \"wwstat\"} }\n";
-            ESFriendlyJSON += "{ \"ip_address\": \"" + result[i].ip_address +
-                "\", \"id\" : \"" + result[i].installation_id +
-                "\", \"timestamp\" : \"" + timestamp.toISOString() +
-                "\", \"action\" : \"" + result[i].action +
-                "\", \"content_id\" : \"" + result[i].content_id +
-                "\", \"city\" : \"" + geo.city +
-                "\", \"country\" : \"" + CountryList.getName(geo.country) +
-                "\"}\n";
-        }
-
-        FS.writeFile("/tmp/wwtest4.json", ESFriendlyJSON, function(err) {
-            if (err) {
-                return console.log(err);
-            }
-            console.log("The file was saved!");
-        });
-    });
-}
-
 exports.updateFeaturedItems = function() {
     var now = new Date();
     var oneWeekAgo = new Date();
@@ -1897,5 +1860,41 @@ exports.updateFeaturedItems = function() {
     });
 }
 
+function Utility_DumpJSONForElasticSearch() {
+    AgniUserStatsModel.
+    find().
+    sort({
+        timestamp: -1
+    }).
+    skip(90000).
+    limit(30000).
+    exec(function(err, result) {
+        ESFriendlyJSON = "";
+        for (i = 0; i < result.length; i++) {
+            var timestamp = new Date(result[i].timestamp);
+            var geo = geoip.lookup(result[i].ip_address) || {
+                city: "XX",
+                region: "XX",
+                country: "XX"
+            };
+            ESFriendlyJSON += "{ \"index\" : { \"_index\" : \"wompers\", \"_type\" : \"wwstat\"} }\n";
+            ESFriendlyJSON += "{ \"ip_address\": \"" + result[i].ip_address +
+                "\", \"id\" : \"" + result[i].installation_id +
+                "\", \"timestamp\" : \"" + timestamp.toISOString() +
+                "\", \"action\" : \"" + result[i].action +
+                "\", \"content_id\" : \"" + result[i].content_id +
+                "\", \"city\" : \"" + geo.city +
+                "\", \"country\" : \"" + CountryList.getName(geo.country) +
+                "\"}\n";
+        }
+
+        FS.writeFile("/tmp/wwtest4.json", ESFriendlyJSON, function(err) {
+            if (err) {
+                return console.log(err);
+            }
+            console.log("The file was saved!");
+        });
+    });
+}
+
 exports.router = Router;
-exports.DumpJSONForElasticSearch = DumpJSONForElasticSearch;
