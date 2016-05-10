@@ -11,7 +11,7 @@ config.userstatsdb = "agniuserstats";
 
 config.release_content_scheduler_frequency = "0 0 1,3,7,10,14,17 * * *";
 config.push_share_card_scheduler_frequency = "10 59 2 * * 1,3,5";
-config.push_rate_card_scheduler_frequency = "10 59 13 * * 4";
+config.push_rate_card_scheduler_frequency = "10 59 13 * * 0,4";
 config.push_upgrade_card_scheduler_frequency = "30 59 7 * * 0,3,6";
 config.push_remove_all_cta_scheduler_frequency = "1 50 2 * * *";
 config.push_upgrade_card_version = "10";
