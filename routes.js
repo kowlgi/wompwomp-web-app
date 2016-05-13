@@ -1850,8 +1850,10 @@ exports.updateFeaturedItems = function() {
                             /* number of times the video was played */
                             "z": items[itemIndex].filesize || 0,
                             /* size of the video file */
-                            "n": items[itemIndex].annotation
-                                /* annotations */
+                            "n": items[itemIndex].annotation,
+                            /* annotations */
+                            "r": itemIndex
+                            /* item priority */
                         });
                         FEATURED_ITEMS = featuredItems;
                     }
