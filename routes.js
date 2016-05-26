@@ -1899,9 +1899,12 @@ Router.get('/retention', App.user.can('access admin page'), function(req, res, n
             return;
         }
 
-        var lowerDateBound = new Date('2016-01-31T00:00:00');
+        var startDate = new Date('2016-01-31T00:00:00');
+        if (typeof req.query.date !== 'undefined' && validator.isDate(req.query.date)) {
+            startDate = new Date(req.query.date);
+        }
         var now = new Date();
-        var maxBuckets = Math.ceil(days_between(lowerDateBound, now) / 7);
+        var maxBuckets = Math.ceil(days_between(startDate, now) / 7);
 
         // pick a start date and end date
         // starting count: count all users that have a first activation within that date
@@ -1909,7 +1912,7 @@ Router.get('/retention', App.user.can('access admin page'), function(req, res, n
         // bucket 1: % of starting count users that came back in the user's week 2, etc.
         var cohortRetention = [];
         for (cohortIndex = 0; cohortIndex < maxBuckets; cohortIndex++) {
-            var lowerDateBound = new Date('2016-01-31T00:00:00');
+            var lowerDateBound = new Date(startDate);
             lowerDateBound.setDate(lowerDateBound.getDate() + 7 * cohortIndex);
             var upperDateBound = new Date(lowerDateBound);
             upperDateBound.setDate(upperDateBound.getDate() + 7);
