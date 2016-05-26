@@ -45,8 +45,8 @@ app.set('view engine', 'jade');
 app.locals.moment_local = require('moment-timezone');
 
 exports.contentdb = mongoose.createConnection('mongodb://localhost/' + config.db);
-require('./content').init(exports.contentdb);
-update_db = require('./update_db');
+require('./db_content').init(exports.contentdb);
+update_db = require('./updatedb');
 if(ops.updatedb) {
     func = "update_db_" + ops.updatedb;
     if(typeof update_db[func] === 'function') {
@@ -107,7 +107,11 @@ app.use('/edititem', express.static(__dirname +'/public'));
 app.disable('etag');
 
 exports.userstatsdb = mongoose.createConnection('mongodb://localhost/' + config.userstatsdb);
-require('./userstats').init(exports.userstatsdb);
+require('./db_userstats').init(exports.userstatsdb);
+
+exports.userretentionstatsdb = mongoose.createConnection('mongodb://localhost/' + config.userretentionstatsdb);
+require('./db_userretentionstats').init(exports.userretentionstatsdb);
+
 exports.logindb = mongoose.createConnection('mongodb://localhost/' + config.logindb);
 require('./account').init(exports.logindb);
 const Account = exports.logindb.model('Accounts');
@@ -151,6 +155,7 @@ app.use(flash());
 const routes  = require( './routes' );
 app.use('/', routes.router);
 routes.updateFeaturedItems();
+routes.updateUserRetention();
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -198,7 +203,7 @@ winston.info('Running in realm ' + ops.realm + ' and sending emails to: ' + MAIL
 const mg = require('mailgun-js')({apiKey: config.mailgun_key, domain: config.email_domain});
 
 const mailinglist = require('./mailinglist');
-schedule.scheduleJob(mailing_list_frequency , mailinglist.GetFresh);
+schedule.scheduleJob(mailing_list_frequency, mailinglist.GetFresh);
 schedule.scheduleJob(config.release_content_scheduler_frequency, routes.releaseBufferedContent);
 schedule.scheduleJob(config.push_notification_scheduler_frequency, routes.pushContentNotification);
 schedule.scheduleJob(config.push_share_card_scheduler_frequency, routes.pushShareCard);
@@ -206,6 +211,7 @@ schedule.scheduleJob(config.push_rate_card_scheduler_frequency, routes.pushRateC
 schedule.scheduleJob(config.push_upgrade_card_scheduler_frequency, routes.pushUpgradeCard);
 schedule.scheduleJob(config.push_remove_all_cta_scheduler_frequency, routes.pushRemoveAllCTA);
 schedule.scheduleJob(config.update_featured_items_frequency, routes.updateFeaturedItems);
+schedule.scheduleJob(config.update_user_retention_frequency, routes.updateUserRetention);
 
 // Start server
 http.createServer(app).listen(app.get('port'), function() {

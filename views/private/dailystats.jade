@@ -59,11 +59,11 @@ block content
                                     =" "
                                     =totalShares
                                     =" "
-                                    |shares,     
+                                    |shares,
                                     =" "
                                     =totalLikes
                                     =" "
-                                    |likes      
+                                    |likes
                                 else
                                     br
                                     em
@@ -139,7 +139,7 @@ block content
                                  else
                                      br
                                      em
-                                         |No videos played today :(                           
+                                         |No videos played today :(
           div.row
               div.col.l4.offset-l4
                   h5 User Stats
@@ -147,13 +147,19 @@ block content
                   ul.collapsible.popout(data-collapsible="expandable")
                       each user in users
                         - i++
-                        li 
+                        li
                             .collapsible-header
                                 = i
                                 =" "
                                 a(href="/userstats?id="+user._id)
                                     em
                                         = user.location
+                                if(user.daysSinceFirstActivation)
+                                    em.tiny
+                                        =" "
+                                        = user.daysSinceFirstActivation
+                                        =" "
+                                        |days
                             .collapsible-body
                                 div(class="table-responsive")
                                     table(class="table highlight striped")

@@ -1,0 +1,39 @@
+extends layout
+
+block content
+    div.section
+        div.row.center
+            div.col.l4.offset-l4
+                h5 Cohort Retention Stats
+        div.row
+            div.col.l10.offset-l1
+                div(class="table-responsive")
+                    table(class="table highlight striped")
+                      thead
+                          tr.trhideclass
+                              th Cohort
+                              th New users
+                              each val, index in cohorts[0].buckets
+                                th
+                                    if index == 0
+                                        |<1 week
+                                    else
+                                        = index
+                          tbody
+                              each cohort in cohorts
+                                  - var maxIndex =
+                                  tr.trhideclass
+                                      td
+                                        |Week of
+                                        =" "
+                                        =moment_local(cohort.eventDate).format('MMM DD, YYYY')
+                                      td
+                                        = cohort.usersInCohort
+                                      each bucket, index in cohort.buckets
+                                        td
+                                            if index < cohort.maxBucketIndex
+                                                = bucket
+                                                =" "
+                                                |%
+                                            else
+                                                |-

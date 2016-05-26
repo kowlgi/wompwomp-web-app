@@ -11,6 +11,7 @@ const AgniModel = App.contentdb.model('Agni');
 const AgniMailingListModel = App.contentdb.model('AgniMailingList');
 const AgniPushNotificationStatsModel = App.contentdb.model('AgniPushNotificationStats');
 const AgniUserStatsModel = App.userstatsdb.model('AgniUserStats');
+const AgniUserRetentionStatsModel = App.userretentionstatsdb.model('AgniUserRetentionStats');
 const geoip = require('geoip-lite');
 const validator = require('validator');
 const Express = require('express');
@@ -913,139 +914,166 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
                 return next(err);
             }
 
-            var likedSharedPlayedItems = [];
-            var appInstallData = [];
-            for (i = 0; i < userlist.length; i++) {
-                var ip_address = userlist[i].stats[0].ip_address
-                var geo = geoip.lookup(ip_address) || {
-                    city: "XX",
-                    region: "XX",
-                    country: "XX"
-                };
-
-                if (geo.city != '') {
-                    userlist[i].location = geo.city + ", ";
-                } else {
-                    userlist[i].location = '';
+            AgniUserRetentionStatsModel.
+            find({
+                all_days_activated: lowerDateBound
+            }).
+            exec(function(err, users) {
+                if (err) {
+                    winston.error(err);
+                    return next(err);
                 }
 
-                if (geo.country != '') {
-                    userlist[i].location += CountryList.getName(geo.country);
-                }
-
-                userlist[i].timezone = timezone_lookup(geo.country, geo.region) ||
-                    'America/New_York';
-
-                likedSharedPlayedItems = likedSharedPlayedItems.concat(
-                    _.filter(userlist[i].stats, function(item) {
-                        return item.action === LIKE || item.action === SHARE || item.action === PLAY_VIDEO;
-                    })
-                );
-
-                _.map(userlist[i].stats, function(item) {
-                    if (item.action === APP_INSTALLED) {
-                        var mod_item = item;
-                        mod_item.content_id = QueryString(mod_item.content_id).campaignid;
-                        return mod_item;
-                    } else {
-                        return item;
+                var likedSharedPlayedItems = [];
+                var appInstallData = [];
+                for (i = 0; i < userlist.length; i++) {
+                    for (index = 0; index < users.length; index++) {
+                        if (users[index].installation_id == userlist[i]._id) {
+                            userlist[i].daysSinceFirstActivation = days_between(lowerDateBound,
+                                users[index].first_activation);
+                            break;
+                        }
                     }
+
+                    var ip_address = userlist[i].stats[0].ip_address
+                    var geo = geoip.lookup(ip_address) || {
+                        city: "XX",
+                        region: "XX",
+                        country: "XX"
+                    };
+
+                    if (geo.city != '') {
+                        userlist[i].location = geo.city + ", ";
+                    } else {
+                        userlist[i].location = '';
+                    }
+
+                    if (geo.country != '') {
+                        userlist[i].location += CountryList.getName(geo.country);
+                    }
+
+                    userlist[i].timezone = timezone_lookup(geo.country, geo.region) ||
+                        'America/New_York';
+
+                    likedSharedPlayedItems = likedSharedPlayedItems.concat(
+                        _.filter(userlist[i].stats, function(item) {
+                            return item.action === LIKE || item.action === SHARE || item.action === PLAY_VIDEO;
+                        })
+                    );
+
+                    _.map(userlist[i].stats, function(item) {
+                        if (item.action === APP_INSTALLED) {
+                            var mod_item = item;
+                            mod_item.content_id = QueryString(mod_item.content_id).campaignid;
+                            return mod_item;
+                        } else {
+                            return item;
+                        }
+                    });
+
+                    appInstallData = appInstallData.concat(
+                        _.filter(userlist[i].stats, function(item) {
+                            return item.action === APP_INSTALLED;
+                        })
+                    );
+                }
+
+                var userInteractions = {};
+                for (i = 0; i < likedSharedPlayedItems.length; i++) {
+                    var item = likedSharedPlayedItems[i];
+                    if (!(item.content_id in userInteractions)) {
+                        userInteractions[item.content_id] = {
+                            numshares: 0,
+                            numfavorites: 0,
+                            numplays: 0,
+                            id: item.content_id
+                        };
+                    }
+
+                    if (item.action === SHARE) {
+                        userInteractions[item.content_id].numshares++;
+                    } else if (item.action === LIKE) {
+                        userInteractions[item.content_id].numfavorites++;
+                    } else if (item.action === PLAY_VIDEO) {
+                        userInteractions[item.content_id].numplays++;
+                    }
+                }
+
+                var campaignAttributions = {};
+                for (i = 0; i < appInstallData.length; i++) {
+                    var item = appInstallData[i];
+                    if (item.content_id in campaignAttributions) {
+                        campaignAttributions[item.content_id].numinstalls++;
+                    } else {
+                        campaignAttributions[item.content_id] = {
+                            numinstalls: 1,
+                            id: item.content_id
+                        };
+                    }
+                }
+
+                var topItems = [];
+                var topVideos = [];
+                for (var key in userInteractions) {
+                    if (userInteractions[key].numfavorites > 0 ||
+                        userInteractions[key].numshares > 0) {
+                        topItems.push([key, userInteractions[key]]);
+                    }
+
+                    if (userInteractions[key].numplays > 0) {
+                        topVideos.push([key, userInteractions[key]]);
+                    }
+                }
+
+                topItems.sort(function(a, b) {
+                    a = a[1];
+                    b = b[1];
+                    if (a.numfavorites + a.numshares < b.numfavorites + b.numshares)
+                        return 1;
+                    if (a.numfavorites + a.numshares > b.numfavorites + b.numshares)
+                        return -1;
+                    return 0;
                 });
 
-                appInstallData = appInstallData.concat(
-                    _.filter(userlist[i].stats, function(item) {
-                        return item.action === APP_INSTALLED;
-                    })
-                );
-            }
+                topVideos.sort(function(a, b) {
+                    a = a[1];
+                    b = b[1];
+                    if (a.numplays < b.numplays)
+                        return 1;
+                    if (a.numplays > b.numplays)
+                        return -1;
+                    return 0;
+                });
 
-            var userInteractions = {};
-            for (i = 0; i < likedSharedPlayedItems.length; i++) {
-                var item = likedSharedPlayedItems[i];
-                if (!(item.content_id in userInteractions)) {
-                    userInteractions[item.content_id] = {
-                        numshares: 0,
-                        numfavorites: 0,
-                        numplays: 0,
-                        id: item.content_id
-                    };
-                }
+                var topCampaigns = [];
+                for (var key in campaignAttributions) topCampaigns.push([key, campaignAttributions[key]]);
+                topCampaigns.sort(function(a, b) {
+                    a = a[1];
+                    b = b[1];
 
-                if (item.action === SHARE) {
-                    userInteractions[item.content_id].numshares++;
-                } else if (item.action === LIKE) {
-                    userInteractions[item.content_id].numfavorites++;
-                } else if (item.action === PLAY_VIDEO) {
-                    userInteractions[item.content_id].numplays++;
-                }
-            }
+                    if (a.numinstalls < b.numinstalls)
+                        return 1;
+                    if (a.numinstalls > b.numinstalls)
+                        return -1;
+                    return 0;
+                });
 
-            var campaignAttributions = {};
-            for (i = 0; i < appInstallData.length; i++) {
-                var item = appInstallData[i];
-                if (item.content_id in campaignAttributions) {
-                    campaignAttributions[item.content_id].numinstalls++;
-                } else {
-                    campaignAttributions[item.content_id] = {
-                        numinstalls: 1,
-                        id: item.content_id
-                    };
-                }
-            }
+                userlist.sort(function(a, b) {
+                    if (a.daysSinceFirstActivation < b.daysSinceFirstActivation)
+                        return 1;
+                    if (a.daysSinceFirstActivation > b.daysSinceFirstActivation)
+                        return -1;
+                    return 0;
+                });
 
-            var topItems = [];
-            var topVideos = [];
-            for (var key in userInteractions) {
-                if (userInteractions[key].numfavorites > 0 ||
-                    userInteractions[key].numshares > 0) {
-                    topItems.push([key, userInteractions[key]]);
-                }
-
-                if (userInteractions[key].numplays > 0) {
-                    topVideos.push([key, userInteractions[key]]);
-                }
-            }
-
-            topItems.sort(function(a, b) {
-                a = a[1];
-                b = b[1];
-                if (a.numfavorites + a.numshares < b.numfavorites + b.numshares)
-                    return 1;
-                if (a.numfavorites + a.numshares > b.numfavorites + b.numshares)
-                    return -1;
-                return 0;
-            });
-
-            topVideos.sort(function(a, b) {
-                a = a[1];
-                b = b[1];
-                if (a.numplays < b.numplays)
-                    return 1;
-                if (a.numplays > b.numplays)
-                    return -1;
-                return 0;
-            });
-
-            var topCampaigns = [];
-            for (var key in campaignAttributions) topCampaigns.push([key, campaignAttributions[key]]);
-            topCampaigns.sort(function(a, b) {
-                a = a[1];
-                b = b[1];
-
-                if (a.numinstalls < b.numinstalls)
-                    return 1;
-                if (a.numinstalls > b.numinstalls)
-                    return -1;
-                return 0;
-            });
-
-            res.render('private/dailystats', {
-                users: userlist,
-                today: lowerDateBound,
-                user: req.user,
-                topItems: topItems,
-                topVideos: topVideos,
-                topCampaigns: topCampaigns
+                res.render('private/dailystats', {
+                    users: userlist,
+                    today: lowerDateBound,
+                    user: req.user,
+                    topItems: topItems,
+                    topVideos: topVideos,
+                    topCampaigns: topCampaigns
+                });
             });
         });
 });
@@ -1853,7 +1881,7 @@ exports.updateFeaturedItems = function() {
                             "n": items[itemIndex].annotation,
                             /* annotations */
                             "r": itemIndex
-                            /* item priority */
+                                /* item priority */
                         });
                         FEATURED_ITEMS = featuredItems;
                     }
@@ -1862,7 +1890,187 @@ exports.updateFeaturedItems = function() {
     });
 }
 
-function Utility_DumpJSONForElasticSearch() {
+Router.get('/retention', App.user.can('access admin page'), function(req, res, next) {
+    AgniUserRetentionStatsModel.
+    find().
+    exec(function(err, userretentionstats) {
+        if (err || userretentionstats.length <= 0) {
+            winston.error(err);
+            return;
+        }
+
+        var lowerDateBound = new Date('2016-01-31T00:00:00');
+        var now = new Date();
+        var maxBuckets = Math.ceil(days_between(lowerDateBound, now) / 7);
+
+        // pick a start date and end date
+        // starting count: count all users that have a first activation within that date
+        // bucket 0: % of starting count users that came back in the user's week 1
+        // bucket 1: % of starting count users that came back in the user's week 2, etc.
+        var cohortRetention = [];
+        for (cohortIndex = 0; cohortIndex < maxBuckets; cohortIndex++) {
+            var lowerDateBound = new Date('2016-01-31T00:00:00');
+            lowerDateBound.setDate(lowerDateBound.getDate() + 7 * cohortIndex);
+            var upperDateBound = new Date(lowerDateBound);
+            upperDateBound.setDate(upperDateBound.getDate() + 7);
+
+            var newUsers = _.filter(userretentionstats, function(user) {
+                return user.first_activation.getTime() < upperDateBound.getTime() &&
+                    user.first_activation.getTime() >= lowerDateBound.getTime();
+            });
+
+            var startingCount = newUsers.length;
+            var overall_buckets = _.times(maxBuckets, _.constant(0));
+            var overall_buckets_percentage = _.times(maxBuckets, _.constant(0));
+            for (userIndex = 0; userIndex < newUsers.length; userIndex++) {
+                // remove the first activation date from consideration
+                var first_activation = newUsers[userIndex].first_activation;
+                first_activation.setHours(0, 0, 0, 0);
+                _.remove(newUsers[userIndex].all_days_activated, function(item){
+                    return item.getTime() == first_activation.getTime();
+                });
+
+                var user_bucket = _.times(maxBuckets, _.constant(0));
+                for (dayIndex = 0; dayIndex < newUsers[userIndex].all_days_activated.length; dayIndex++) {
+                    var bucketIndex = Math.floor(days_between(newUsers[userIndex].all_days_activated[dayIndex],
+                        newUsers[userIndex].first_activation) / 7);
+                    user_bucket[bucketIndex] = 1;
+                }
+
+                for (bucketIndex = 0; bucketIndex < overall_buckets.length; bucketIndex++) {
+                    overall_buckets[bucketIndex] += user_bucket[bucketIndex];
+                }
+            }
+
+            for(bucketIndex = 0; bucketIndex < overall_buckets_percentage.length; bucketIndex++){
+                overall_buckets_percentage[bucketIndex] =
+                    Math.ceil((overall_buckets[bucketIndex] / startingCount) * 100);
+            }
+
+            maxBucketIndex = Math.ceil(days_between(lowerDateBound, now) / 7);
+
+            cohortRetention.push({
+                eventDate: lowerDateBound,
+                usersInCohort: startingCount,
+                buckets: overall_buckets_percentage,
+                maxBucketIndex: maxBucketIndex
+            });
+        }
+
+        res.render('private/retention', {cohorts: cohortRetention});
+    });
+});
+
+exports.updateUserRetention = function() {
+    AgniUserRetentionStatsModel.
+    find().
+    sort({
+        latest_activation: -1
+    }).
+    exec(function(err, retentionstats) {
+        if (err) {
+            winston.error(err);
+            return;
+        }
+
+        var timeOffset = new Date('1982-12-17T03:10:10');
+        if (retentionstats.length > 0) {
+            timeOffset = retentionstats[0].latest_activation;
+        }
+
+        AgniUserStatsModel.
+        find({
+            timestamp: {
+                $gt: timeOffset
+            }
+        }).
+        sort({
+            timestamp: 1
+        }).
+        exec(function(err, userstats) {
+            if (err || userstats.length <= 0) {
+                winston.error(err);
+                return;
+            }
+
+            var users = [];
+            var userDayActivations = {};
+            var userLatestActivations = {};
+            var userFirstActivations = {};
+            var user
+            for (i = 0; i < retentionstats.length; i++) {
+                userDayActivations[retentionstats[i].installation_id] = retentionstats[i].all_days_activated;
+                userLatestActivations[retentionstats[i].installation_id] = retentionstats[i].latest_activation;
+                userFirstActivations[retentionstats[i].installation_id] = retentionstats[i].first_activation;
+            }
+
+            var dateUpperBound = new Date();
+            var dateLowerBound = new Date('2015-12-05T00:00:00');
+            for (i = 0; i < userstats.length; i++) {
+                // floor date value to midnight of current day. We only want to record
+                // at the granularity of days
+                var dateOnlyTimestamp = new Date(userstats[i].timestamp.toString());
+                dateOnlyTimestamp.setHours(0, 0, 0, 0);
+
+                // sometimes we see bizarre timestamps from the future
+                // or waaay in the past so we just ignore them
+                if (dateOnlyTimestamp.getTime() > dateUpperBound.getTime() ||
+                    dateOnlyTimestamp.getTime() < dateLowerBound.getTime()) {
+                    continue;
+                }
+
+                if (!(userstats[i].installation_id in userDayActivations)) {
+                    userDayActivations[userstats[i].installation_id] = [];
+                    userDayActivations[userstats[i].installation_id].push(dateOnlyTimestamp);
+                    userLatestActivations[userstats[i].installation_id] = userstats[i].timestamp;
+                    userFirstActivations[userstats[i].installation_id] = userstats[i].timestamp;
+                } else {
+                    var array_length = userDayActivations[userstats[i].installation_id].length;
+                    userLatestActivations[userstats[i].installation_id] = userstats[i].timestamp;
+                    if (userDayActivations[userstats[i].installation_id][array_length - 1].getTime() != dateOnlyTimestamp.getTime()) {
+                        userDayActivations[userstats[i].installation_id].push(dateOnlyTimestamp);
+                    }
+                }
+            }
+
+            var userlist = Object.keys(userFirstActivations);
+            for (i = 0; i < userlist.length; i++) {
+                var id = userlist[i];
+                users.push({
+                    installation_id: id,
+                    all_days_activated: userDayActivations[id],
+                    latest_activation: userLatestActivations[id],
+                    first_activation: userFirstActivations[id]
+                });
+            }
+
+            var bulk = AgniUserRetentionStatsModel.collection.initializeUnorderedBulkOp();
+            for (i = 0; i < users.length; i++) {
+                bulk.
+                find({
+                    installation_id: users[i].installation_id
+                }).
+                upsert().
+                updateOne({
+                    $set: {
+                        installation_id: users[i].installation_id,
+                        first_activation: users[i].first_activation,
+                        latest_activation: users[i].latest_activation,
+                        all_days_activated: users[i].all_days_activated
+                    }
+                });
+            }
+            bulk.execute(function(err) {
+                if (err) {
+                    winston.error(err);
+                    return;
+                }
+            });
+        });
+    });
+}
+
+function utility_DumpJSONForElasticSearch() {
     AgniUserStatsModel.
     find().
     sort({
