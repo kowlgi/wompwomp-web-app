@@ -1926,13 +1926,13 @@ Router.get('/retention', App.user.can('access admin page'), function(req, res, n
                 // remove the first activation date from consideration
                 var first_activation = newUsers[userIndex].first_activation;
                 first_activation.setHours(0, 0, 0, 0);
-                _.remove(newUsers[userIndex].all_days_activated, function(item){
-                    return item.getTime() == first_activation.getTime();
-                });
+                var all_days_activated = newUsers[userIndex].all_days_activated.slice(
+                    1,
+                    newUsers[userIndex].all_days_activated.length);
 
                 var user_bucket = _.times(maxBuckets, _.constant(0));
-                for (dayIndex = 0; dayIndex < newUsers[userIndex].all_days_activated.length; dayIndex++) {
-                    var bucketIndex = Math.floor(days_between(newUsers[userIndex].all_days_activated[dayIndex],
+                for (dayIndex = 0; dayIndex < all_days_activated.length; dayIndex++) {
+                    var bucketIndex = Math.floor(days_between(all_days_activated[dayIndex],
                         newUsers[userIndex].first_activation) / 7);
                     user_bucket[bucketIndex] = 1;
                 }
