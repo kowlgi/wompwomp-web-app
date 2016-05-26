@@ -15,7 +15,7 @@ block content
                     div.col.s12(id="image")
                         form(role='form', action="/post", method="post", style='max-width: 300px;', enctype="multipart/form-data")
                             div.row
-                                em    
+                                em
                                     |1. Upload an image file less than 200KB
                                 div.file-field.input-field
                                     div.btn
@@ -43,8 +43,10 @@ block content
                         form(id="uploadvideoform", role='form', action="http://wompwomp.s3.amazonaws.com/", method="post", style='max-width: 300px;', enctype="multipart/form-data")
                             input(type="text", name="key", id="videofilename", value=videofilename hidden)
                             div.row
-                                em    
-                                    |1. Upload an mp4 file less than 2MB
+                                em
+                                    |1. Upload an mp4 file less than 200KB.
+                                    =" "
+                                    a.tooltipped(data-position="bottom" data-delay="50" data-tooltip="Go to cloudconvert.com. After you select and load a .gif/.mp4 file, click on the spanner icon. In the menu that opens, select the h264 option with 28(low quality encoding) setting. Scroll down and select an audio track 'none'. Then hit 'convert' to get a new, nimble .mp4 file.") How?
                                 div.file-field.input-field
                                     div.btn
                                         span File
@@ -57,13 +59,13 @@ block content
                                     |2. Take a screenshot for the video thumbnail
                                 div(id="data-vid")
                                 p(id="size-vid")
-                                input.btn.btn-default(type="button", id="takescreenshotbutton", value="Take Screenshot" disabled) 
+                                input.btn.btn-default(type="button", id="takescreenshotbutton", value="Take Screenshot" disabled)
                             div.row
                                 em
                                     |3. Optionally write a funny caption in 140 characters or less
                                 div.input-field
                                     textarea.materialize-textarea(id="videocaption", name="caption", length="140", maxLength="140", placeholder="Write a funny caption...")
-                            button.btn.btn-large(id="videosubmitbutton", type='submit' disabled) Submit   
+                            button.btn.btn-large(id="videosubmitbutton", type='submit' disabled) Submit
                         br
                         div.image_preview
                             h3.grey-text Preview

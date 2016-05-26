@@ -45,4 +45,6 @@ $(document).ready(function() {
 
     $('#dashboardtabs').css({padding: '0px'});
 
+    $('.tooltipped').tooltip({delay: 50});
+
 });
