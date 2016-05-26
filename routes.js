@@ -934,6 +934,10 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
                             break;
                         }
                     }
+                    
+                    if(typeof userlist[i].daysSinceFirstActivation == 'undefined') {
+                        userlist[i].daysSinceFirstActivation = 0;
+                    }
 
                     var ip_address = userlist[i].stats[0].ip_address
                     var geo = geoip.lookup(ip_address) || {
