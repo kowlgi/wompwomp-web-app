@@ -1364,17 +1364,38 @@ Router.get('/dashboard', function(req, res, next) {
         var reviewitems = [],
             goingliveitems = [],
             liveitems = [];
+
+        var now = new Date();
+        var startDate = new Date('2015-12-05T00:00:00');
+        var start = startDate.getDate() - startDate.getDay();
+        const dateLowerBound = new Date(startDate.setDate(start));
+        const MAX_HISTORY_IN_WEEKS = Math.ceil(days_between(dateLowerBound, now) / 7);
+        var buckets = _.times(MAX_HISTORY_IN_WEEKS, _.constant(0));
+
         for (i = 0; i < items.length; i++) {
+            var index = Math.floor(days_between(items[i].created_on, dateLowerBound)/7);
             if (items[i].category[0] == "in_review") {
                 reviewitems.push(items[i]);
             } else if (items[i].category[0] == "buffered") {
                 goingliveitems.push(items[i]);
+                buckets[index]++;
             } else if (items[i].category[0] == "hidden") {
                 // do nothing
             } else {
                 // must be live if it's no other category
                 liveitems.push(items[i]);
+                buckets[index]++;
             }
+        }
+
+        var postinghistory = [];
+        for(index = 0; index < buckets.length; index++) {
+            var bucketDate = new Date(dateLowerBound);
+            bucketDate.setDate(bucketDate.getDate() + 7 * index);
+            postinghistory.push({
+                "date": Moment(bucketDate).format('DD-MMM-YY'),
+                "posts":buckets[index]
+            });
         }
 
         return res.render(
@@ -1382,7 +1403,8 @@ Router.get('/dashboard', function(req, res, next) {
                 user: req.user,
                 reviewitems: reviewitems,
                 goingliveitems: goingliveitems,
-                liveitems: liveitems
+                liveitems: liveitems,
+                postinghistory: postinghistory
             }
         );
     });

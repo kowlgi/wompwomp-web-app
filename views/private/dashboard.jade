@@ -21,10 +21,13 @@ block content
                             |Hi
                             =" "
                             =user.username
-                            |!     
+                            |!
                         br
                         p
                             a.waves-effect.btn-large.theme-dark(href="/post") Post Something Funny
+                        br
+                        div.chart
+                        include dashboard_postinghistory.jade
                         br
                         ul.tabs(id="dashboardtabs")
                             li.tab.col.s3
@@ -37,7 +40,7 @@ block content
                             h5
                                 =reviewitems.length
                                 =" "
-                                if(reviewitems.length == 1) 
+                                if(reviewitems.length == 1)
                                     |item
                                 else
                                     |items
@@ -56,10 +59,10 @@ block content
                                          td
                                             include ../fullcard.jade
                         div.col.s12(id="going_live")
-                            h5 
+                            h5
                                 =goingliveitems.length
                                 =" "
-                                if(goingliveitems.length == 1) 
+                                if(goingliveitems.length == 1)
                                     |item
                                 else
                                     |items
@@ -86,7 +89,7 @@ block content
                             h5
                                 =liveitems.length
                                 =" "
-                                if(liveitems.length == 1) 
+                                if(liveitems.length == 1)
                                     |item
                                 else
                                     |items
@@ -95,7 +98,7 @@ block content
                             h5
                                 i.material-icons.red-text(style="vertical-align: middle;") favorite
                                 =" "
-                                =totalfavorites    
+                                =totalfavorites
                                 |&nbsp;&nbsp;&nbsp;
                                 i.material-icons.grey-text(style="vertical-align: middle;") share
                                 =" "
@@ -112,6 +115,3 @@ block content
                                                = i
                                            td
                                               include ../fullcard.jade
-
-
-                        
