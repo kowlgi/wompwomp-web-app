@@ -12,6 +12,7 @@ head
         media="screen,projection")
     link(rel="stylesheet", href="css/agni.css")
     link(rel="stylesheet", href="css/flags.css")
+    include ../favicon.jade
     style.
         .chart { font: 12px Arial;}
         .axis path,
@@ -34,52 +35,52 @@ body
     nav
         div.nav-wrapper.theme-background
             a(href="/dashboard",class="brand-logo")
-                image(src="images/trombone_white.svg", height="36px", width="auto")
-                |wompwomp
-                a(href="#", data-activates="mobile-demo" class="button-collapse")
-                    i.material-icons menu
-                ul(id="nav-mobile", class="right hide-on-med-and-down")
+                image(src="images/wompwomp_newicon.svg", height="36px", width="auto")
+                |&nbsp;wompwomp
+            a(href="#", data-activates="mobile-demo" class="button-collapse")
+                i.material-icons menu
+            ul(id="nav-mobile", class="right hide-on-med-and-down")
+                li
+                    a(href="/") Home
+                li
+                    a(href="/dashboard ") Dashboard
+                if(user)
+                    if(user.role == "admin")
+                        li
+                            a(href="/buffer") Buffer
+                        li
+                            a(href="/review") Review
+                        li
+                            a(href="/dailystats") Usage Stats
+                        li
+                            a(href="/retention?date=01-31-2016") Retention
                     li
-                        a(href="/") Home
+                        a(href="/itemstats") Popular Posts
                     li
-                        a(href="/dashboard ") Dashboard
-                    if(user)
-                        if(user.role == "admin")
-                            li
-                                a(href="/buffer") Buffer
-                            li
-                                a(href="/review") Review
-                            li
-                                a(href="/dailystats") Usage Stats
-                            li
-                                a(href="/retention?date=01-31-2016") Retention
-                        li
-                            a(href="/itemstats") Popular Posts
-                        li
-                            a(href="/post") Post
-                        li
-                            a(href="/signout") Sign Out
-                ul(class="side-nav", id="mobile-demo")
+                        a(href="/post") Post
                     li
-                        a(href="/") Home
+                        a(href="/signout") Sign Out
+            ul(class="side-nav", id="mobile-demo")
+                li
+                    a(href="/") Home
+                li
+                    a(href="/dashboard ") Dashboard
+                if(user)
+                    if(user.role == "admin")
+                        li
+                            a(href="/buffer") Buffer
+                        li
+                            a(href="/review") Review
+                        li
+                            a(href="/dailystats") Usage Stats
+                        li
+                            a(href="/retention?date=01-31-2016") Retention
                     li
-                        a(href="/dashboard ") Dashboard
-                    if(user)
-                        if(user.role == "admin")
-                            li
-                                a(href="/buffer") Buffer
-                            li
-                                a(href="/review") Review
-                            li
-                                a(href="/dailystats") Usage Stats
-                            li
-                                a(href="/retention?date=01-31-2016") Retention
-                        li
-                            a(href="/itemstats") Popular Posts
-                        li
-                            a(href="/post") Post
-                        li
-                            a(href="/signout") Sign Out
+                        a(href="/itemstats") Popular Posts
+                    li
+                        a(href="/post") Post
+                    li
+                        a(href="/signout") Sign Out
     .container-fluid
         div.section
             div.row.center

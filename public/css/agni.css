@@ -4,8 +4,9 @@
  * Copyright 2015–2015, Hatching Amazing Labs
  */
 
+
 .theme-background {
-    background-color: #6985EC;
+    background-color: rgba(234, 239, 255 ,0.9); /* #6985EC ;*/
 }
 
 .theme-color-text {
@@ -13,7 +14,7 @@
 }
 
 .theme-text {
-    color: #ffffff;
+    color: #6985EC; /*#ffffff;*/
 }
 
 .theme-dark, .btn, .btn:hover, .btn:focus, .btn-large, .btn-large:hover, .btn-large:focus{
@@ -70,35 +71,35 @@ html, body {
 
 /* label color */
 .modalinput label {
-    color: #ffffff;
+    color: #6985EC; /*#ffffff;*/
 }
 
 /* label focus color */
 .modalinput input[type=email]:focus + label {
-    color: #ffffff;
+    color: #6985EC; /*#ffffff;*/
 }
 /* label underline focus color */
 .modalinput input[type=email]:focus {
-    border-bottom: 1px solid #ffffff;
-    box-shadow: 0 1px 0 0 #ffffff;
+    border-bottom: 1px solid  #6985EC; /*#ffffff;*/
+    box-shadow: 0 1px 0 0  #6985EC; /*#ffffff;*/
 }
 /* valid color */
 .modalinput input[type=email].valid {
-    border-bottom: 1px solid #ffffff;
-    box-shadow: 0 1px 0 0 #ffffff;
+    border-bottom: 1px solid  #6985EC; /*#ffffff;*/
+    box-shadow: 0 1px 0 0  #6985EC; /*#ffffff;*/
 }
 /* invalid color */
 .modalinput input[type=email].invalid {
-    border-bottom: 1px solid #ffffff;
-    box-shadow: 0 1px 0 0 #ffffff;
+    border-bottom: 1px solid  #6985EC; /*#ffffff;*/
+    box-shadow: 0 1px 0 0  #6985EC; /*#ffffff;*/
 }
 /* icon prefix focus color */
 .modalinput .prefix.active {
-    color: #ffffff;
+    color:  #6985EC; /*#ffffff;*/
 }
 
 .modalemailinput {
-   border-bottom: 1px solid #ffffff;
+   border-bottom: 1px solid  #6985EC; /*#ffffff;*/
 }
 
 #pinnedinstallclosebutton, #pinnedsubscribeclosebutton {
@@ -139,7 +140,7 @@ ul {
 }
 
 .indicator {
-    background-color: #6985EC !important;
+    background-color: #6985EC; !important;
 }
 
 #spinner {
@@ -153,4 +154,17 @@ ul {
 .card-image {
     display: block;
     text-align: center;
+}
+
+/* everything below is required only for a white background */
+nav .brand-logo, nav ul a, nav .button-collapse i {
+    color: #6985EC !important;
+}
+
+nav .brand-logo {
+    padding: 5px;
+}
+
+nav {
+    background-color: #ffffff;
 }
