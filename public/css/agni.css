@@ -4,6 +4,10 @@
  * Copyright 2015–2015, Hatching Amazing Labs
  */
 
+body {
+    font-family: "BPreplay", sans-serif;
+    font-size: 1.1em;
+}
 
 .theme-background {
     background-color: rgba(234, 239, 255 ,0.9); /* #6985EC ;*/
@@ -30,7 +34,7 @@
 }
 
 .brand {
-    font-weight: 600;
+    font-weight: 700;
     font-size: 3em;
 }
 
