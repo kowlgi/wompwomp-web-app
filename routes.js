@@ -832,7 +832,7 @@ Router.get('/subscribe', function(req, res, next) {
     const appStoreLink = "http://play.google.com/store/apps/details?id=co.wompwomp.sunshine&referrer=campaignid%3D" + id;
 
     if (!isAndroid) {
-        req.flash('info', "We don't have an app yet for your device. You can enjoy wompwomp by getting on our mailing list. Subscribe below");
+        req.flash('info', "Sorry, we don't have an app yet for your device. You can enjoy wompwomp by getting on our mailing list. Subscribe below");
     }
     return res.render('subscribe', {
         app_store_link: appStoreLink,
