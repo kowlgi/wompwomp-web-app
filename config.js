@@ -21,7 +21,8 @@ config.push_upgrade_card_version = "10";
    to be released  */
 config.push_notification_scheduler_frequency = "10 0 3 * * *";
 
-config.update_featured_items_frequency = "0 0 */1 * * *";
+config.update_home_items_frequency = "0 0 */1 * * *";
+config.update_featured_items_frequency = "30 0 0 */1 * *";
 config.update_user_retention_frequency = "0 0 0 */1 * *"
 
 /* image upload */

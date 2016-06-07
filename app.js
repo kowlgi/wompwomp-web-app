@@ -154,6 +154,7 @@ app.use(flash());
 // Set up routes
 const routes  = require( './routes' );
 app.use('/', routes.router);
+routes.updateHomeItems();
 routes.updateFeaturedItems();
 routes.updateUserRetention();
 
@@ -210,6 +211,7 @@ schedule.scheduleJob(config.push_share_card_scheduler_frequency, routes.pushShar
 schedule.scheduleJob(config.push_rate_card_scheduler_frequency, routes.pushRateCard);
 schedule.scheduleJob(config.push_upgrade_card_scheduler_frequency, routes.pushUpgradeCard);
 schedule.scheduleJob(config.push_remove_all_cta_scheduler_frequency, routes.pushRemoveAllCTA);
+schedule.scheduleJob(config.update_home_items_frequency, routes.updateHomeItems);
 schedule.scheduleJob(config.update_featured_items_frequency, routes.updateFeaturedItems);
 schedule.scheduleJob(config.update_user_retention_frequency, routes.updateUserRetention);
 

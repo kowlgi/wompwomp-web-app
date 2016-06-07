@@ -78,6 +78,7 @@ const APP_OPENED = "App_opened";
 const APP_CLOSED = "App_closed";
 const PUSH_NOTIFICATION_CLICKED = "Push_notification_clicked";
 var FEATURED_ITEMS = [];
+var HOME_ITEMS = [];
 
 Router.get('/', function(req, res, next) {
     AgniModel.
@@ -499,7 +500,7 @@ Router.get('/iva', function(req, res, next) {
     exec(function(err, quotes) {
         var quotelist = [];
         for (var i = 0; i < quotes.length; i++) {
-            var featuredItem = _.find(FEATURED_ITEMS, {
+            var featuredItem = _.find(HOME_ITEMS, {
                 'i': quotes[i].id
             });
             var annotation = "";
@@ -935,7 +936,7 @@ Router.get('/dailystats', App.user.can('access admin page'), function(req, res, 
                         }
                     }
 
-                    if(typeof userlist[i].daysSinceFirstActivation == 'undefined') {
+                    if (typeof userlist[i].daysSinceFirstActivation == 'undefined') {
                         userlist[i].daysSinceFirstActivation = 0;
                     }
 
@@ -1373,7 +1374,7 @@ Router.get('/dashboard', function(req, res, next) {
         var buckets = _.times(MAX_HISTORY_IN_WEEKS, _.constant(0));
 
         for (i = 0; i < items.length; i++) {
-            var index = Math.floor(days_between(items[i].created_on, dateLowerBound)/7);
+            var index = Math.floor(days_between(items[i].created_on, dateLowerBound) / 7);
             if (items[i].category[0] == "in_review") {
                 reviewitems.push(items[i]);
             } else if (items[i].category[0] == "buffered") {
@@ -1389,12 +1390,12 @@ Router.get('/dashboard', function(req, res, next) {
         }
 
         var postinghistory = [];
-        for(index = 0; index < buckets.length; index++) {
+        for (index = 0; index < buckets.length; index++) {
             var bucketDate = new Date(dateLowerBound);
             bucketDate.setDate(bucketDate.getDate() + 7 * index);
             postinghistory.push({
                 "date": Moment(bucketDate).format('DD-MMM-YY'),
-                "posts":buckets[index]
+                "posts": buckets[index]
             });
         }
 
@@ -1758,6 +1759,149 @@ exports.updateFeaturedItems = function() {
     var now = new Date();
     var oneWeekAgo = new Date();
     oneWeekAgo.setDate(now.getDate() - 7);
+    var firstDayOfPreviousMonth = new Date();
+    firstDayOfPreviousMonth.setDate(1);
+    firstDayOfPreviousMonth.setMonth(now.getMonth() - 1);
+    var startDate = new Date('2016-02-01T00:00:00');
+
+    AgniModel.
+    aggregate([{
+            $match: {
+                $and: [{
+                    created_on: {
+                        $lte: oneWeekAgo
+                    }
+                }, {
+                    created_on: {
+                        $gte: startDate
+                    }
+                }]
+            }
+        }, {
+            $group: {
+                _id: {
+                    year: {
+                        $year: "$created_on"
+                    },
+                    month: {
+                        $month: "$created_on"
+                    }
+                },
+                posts: {
+                    $push: '$$ROOT'
+                },
+            }
+        }],
+        function(err, months) {
+            if (err) {
+                winston.error(err);
+                return;
+            }
+
+            var featuredItems = [];
+            var previousThirtyDayWindow = [];
+            for (i = 0; i < months.length; i++) {
+                var postsInRecent30DayPeriod = _.filter(months[i].posts, function(a) {
+                    return a.created_on > firstDayOfPreviousMonth;
+                });
+
+                if (postsInRecent30DayPeriod.length > 0) {
+                    previousThirtyDayWindow.push.apply(previousThirtyDayWindow, postsInRecent30DayPeriod);
+                } else {
+                    months[i].posts.sort(compareUserInteractions);
+                    var topPosts = months[i].posts.slice(0, 10);
+                    var nonZeroLikesAndShares = _.filter(topPosts, function(a) {
+                        return a.numfavorites + a.numshares > 0;
+                    });
+
+                    var randomIndex = _.random(0, nonZeroLikesAndShares.length - 1);
+                    var topPostInMonth = nonZeroLikesAndShares[randomIndex];
+
+                    featuredItems.push({
+                        "t": topPostInMonth.text,
+                        /* text */
+                        "u": topPostInMonth.imageuri,
+                        /* image uri */
+                        "i": topPostInMonth.id,
+                        /* unique id */
+                        "c": topPostInMonth.created_on,
+                        /* created_on */
+                        "f": topPostInMonth.numfavorites,
+                        /* num favorites */
+                        "s": topPostInMonth.numshares,
+                        /* num shares */
+                        "a": topPostInMonth.sourceuri,
+                        /* author's name */
+                        "m": topPostInMonth.videouri || "",
+                        /* video uri is populated only for videos */
+                        "p": topPostInMonth.numplays || 0,
+                        /* number of times the video was played */
+                        "z": topPostInMonth.filesize || 0,
+                        /* size of the video file */
+                        "n": "B",
+                        /* annotations */
+                        "r": 0
+                        /* item priority */
+                    });
+                }
+            }
+
+            featuredItems.sort(function(a, b) {
+                if (a.c < b.c) return 1;
+                else if (a.c > b.c) return -1;
+                return 0;
+            });
+
+            for (i = 0; i < featuredItems.length; i++) {
+                featuredItems[i].r = featuredItems.length - i;
+            }
+
+            previousThirtyDayWindow.sort(compareUserInteractions);
+            previousThirtyDayWindow = previousThirtyDayWindow.slice(0, 10);
+            var topRank = featuredItems.length;
+            for (i = 0; i < 3; i++) {
+                var randIdx = _.random(0, previousThirtyDayWindow.length - 1);
+                var topPost = previousThirtyDayWindow[randIdx];
+                _.remove(previousThirtyDayWindow, function(a) {
+                    return a.id == topPost.id;
+                });
+
+                featuredItems.push({
+                    "t": topPost.text,
+                    /* text */
+                    "u": topPost.imageuri,
+                    /* image uri */
+                    "i": topPost.id,
+                    /* unique id */
+                    "c": topPost.created_on,
+                    /* created_on */
+                    "f": topPost.numfavorites,
+                    /* num favorites */
+                    "s": topPost.numshares,
+                    /* num shares */
+                    "a": topPost.sourceuri,
+                    /* author's name */
+                    "m": topPost.videouri || "",
+                    /* video uri is populated only for videos */
+                    "p": topPost.numplays || 0,
+                    /* number of times the video was played */
+                    "z": topPost.filesize || 0,
+                    /* size of the video file */
+                    "n": "BC",
+                    /* annotations */
+                    "r": topRank + i + 1
+                    /* item priority */
+                });
+            }
+
+            FEATURED_ITEMS = featuredItems;
+        });
+}
+
+exports.updateHomeItems = function() {
+    var now = new Date();
+    var oneWeekAgo = new Date();
+    oneWeekAgo.setDate(now.getDate() - 7);
     var oneDayAgo = new Date();
     oneDayAgo.setDate(now.getDate() - 1);
 
@@ -1770,7 +1914,7 @@ exports.updateFeaturedItems = function() {
         }
 
         items.sort(compareUserInteractions);
-        const trendingAllTime = _.map(_.filter(items.slice(0, 10), function(item) {
+        const trendingAllTime = _.map(_.filter(items.slice(0, 5), function(item) {
             return item.numshares + item.numfavorites > 0;
         }), 'id');
 
@@ -1836,7 +1980,7 @@ exports.updateFeaturedItems = function() {
                         return -1;
                     return 0;
                 });
-                const trendingLastWeek = _.map(_.filter(items.slice(0, 10), function(item) {
+                const trendingLastWeek = _.map(_.filter(items.slice(0, 5), function(item) {
                     return item.weekOldShareLikeCount > 0;
                 }), '_id');
 
@@ -1847,7 +1991,7 @@ exports.updateFeaturedItems = function() {
                         return -1;
                     return 0;
                 });
-                const trendingLastDay = _.map(_.filter(items.slice(0, 10), function(item) {
+                const trendingLastDay = _.map(_.filter(items.slice(0, 5), function(item) {
                     return item.dayOldShareLikeCount > 0;
                 }), '_id');
 
@@ -1868,7 +2012,7 @@ exports.updateFeaturedItems = function() {
                         return;
                     }
 
-                    featuredItems = []
+                    homeItems = []
                     for (itemIndex = 0; itemIndex < items.length; itemIndex++) {
                         items[itemIndex].annotation = "";
                         if (trendingAllTime.indexOf(items[itemIndex].id) >= 0) {
@@ -1883,7 +2027,7 @@ exports.updateFeaturedItems = function() {
                             items[itemIndex].annotation += "D";
                         }
 
-                        featuredItems.push({
+                        homeItems.push({
                             "t": items[itemIndex].text,
                             /* text */
                             "u": items[itemIndex].imageuri,
@@ -1909,7 +2053,7 @@ exports.updateFeaturedItems = function() {
                             "r": itemIndex
                                 /* item priority */
                         });
-                        FEATURED_ITEMS = featuredItems;
+                        HOME_ITEMS = homeItems;
                     }
                 });
             });
@@ -1971,7 +2115,7 @@ Router.get('/retention', App.user.can('access admin page'), function(req, res, n
                 }
             }
 
-            for(bucketIndex = 0; bucketIndex < overall_buckets_percentage.length; bucketIndex++){
+            for (bucketIndex = 0; bucketIndex < overall_buckets_percentage.length; bucketIndex++) {
                 overall_buckets_percentage[bucketIndex] =
                     Math.ceil((overall_buckets[bucketIndex] / startingCount) * 100);
             }
@@ -1986,7 +2130,9 @@ Router.get('/retention', App.user.can('access admin page'), function(req, res, n
             });
         }
 
-        res.render('private/retention', {cohorts: cohortRetention});
+        res.render('private/retention', {
+            cohorts: cohortRetention
+        });
     });
 });
 

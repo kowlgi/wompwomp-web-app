@@ -1,0 +1,14 @@
+1. Convert .m3u8 to .mp4
+ffmpeg -i "https://video.twimg.com/ext_tw_video/568443211194961920/pu/pl/_-SI8rfFP30kg6zk.m3u8" -an -preset slow -crf 28 sleepslap.mp4
+
+2. Convert .gif to .mp4 (output mp4 does NOT open on Apple devices or android)
+ffmpeg -f gif -i "OiUwmee - Imgur.gif" -an -preset slow -crf 37 imgur.mp4
+
+3. Convert .gif to .mp4 (output mp4 works on Apple devices)
+ffmpeg -i stunt-bungee-jump-like-a-boss-3136425.gif -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -pix_fmt yuv420p -an -preset slow -crf 28 stuntbungee.mp4
+
+what the arguments do:
+-pix_fmt: http://apple.stackexchange.com/questions/166553/why-wont-video-from-ffmpeg-show-in-quicktime-imovie-or-quick-preview
+-vf: http://stackoverflow.com/questions/20847674/ffmpeg-libx264-height-not-divisible-by-2
+-preset slow: optimize for size
+-crf: compression factor to reduce file size
