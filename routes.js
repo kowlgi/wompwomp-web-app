@@ -1887,7 +1887,7 @@ exports.updateFeaturedItems = function() {
                     /* number of times the video was played */
                     "z": topPost.filesize || 0,
                     /* size of the video file */
-                    "n": "BC",
+                    "n": "C",
                     /* annotations */
                     "r": topRank + i + 1
                     /* item priority */
