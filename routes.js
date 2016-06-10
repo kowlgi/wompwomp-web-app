@@ -1809,7 +1809,7 @@ exports.updateFeaturedItems = function() {
                     previousThirtyDayWindow.push.apply(previousThirtyDayWindow, postsInRecent30DayPeriod);
                 } else {
                     months[i].posts.sort(compareUserInteractions);
-                    var topPosts = months[i].posts.slice(0, 10);
+                    var topPosts = months[i].posts.slice(0, 20);
                     var nonZeroLikesAndShares = _.filter(topPosts, function(a) {
                         return a.numfavorites + a.numshares > 0;
                     });
@@ -1857,7 +1857,7 @@ exports.updateFeaturedItems = function() {
             }
 
             previousThirtyDayWindow.sort(compareUserInteractions);
-            previousThirtyDayWindow = previousThirtyDayWindow.slice(0, 10);
+            previousThirtyDayWindow = previousThirtyDayWindow.slice(0, 20);
             var topRank = featuredItems.length;
             for (i = 0; i < 3; i++) {
                 var randIdx = _.random(0, previousThirtyDayWindow.length - 1);
