@@ -1691,10 +1691,12 @@ exports.pushUpgradeCard = function() {
 }
 
 exports.pushRemoveAllCTA = function() {
-    var date = new Date();
     sendNotification("/topics/remove_all_ctas");
 }
 
+exports.pushInitNotificationAlarm = function() {
+    sendNotification("/topics/init_notification_alarm");
+}
 // route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {
 

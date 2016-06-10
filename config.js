@@ -16,6 +16,7 @@ config.push_rate_card_scheduler_frequency = "10 59 13 * * 0,4";
 config.push_upgrade_card_scheduler_frequency = "30 59 7 * * 0,3,6";
 config.push_remove_all_cta_scheduler_frequency = "1 50 2 * * *";
 config.push_upgrade_card_version = "10";
+config.push_init_notification_alarm_frequency = "0 0 */12 * * *";
 
 /* in cases where release time overlaps, give ~10 seconds for buffered content
    to be released  */
@@ -23,7 +24,7 @@ config.push_notification_scheduler_frequency = "10 0 3 * * *";
 
 config.update_home_items_frequency = "0 0 */1 * * *";
 config.update_featured_items_frequency = "30 0 0 */1 * *";
-config.update_user_retention_frequency = "0 0 0 */1 * *"
+config.update_user_retention_frequency = "0 0 0 */1 * *";
 
 /* image upload */
 config.imgurkey = "490ca385c5ef403";
