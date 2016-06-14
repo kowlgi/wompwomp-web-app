@@ -1367,7 +1367,7 @@ Router.get('/dashboard', function(req, res, next) {
             liveitems = [];
 
         var now = new Date();
-        var startDate = new Date('2015-12-05T00:00:00');
+        var startDate = new Date('2015-12-06T00:00:00');
         var start = startDate.getDate() - startDate.getDay();
         const dateLowerBound = new Date(startDate.setDate(start));
         const MAX_HISTORY_IN_WEEKS = Math.ceil(days_between(dateLowerBound, now) / 7);
@@ -1404,7 +1404,7 @@ Router.get('/dashboard', function(req, res, next) {
                 user: req.user,
                 reviewitems: reviewitems,
                 goingliveitems: goingliveitems,
-                liveitems: liveitems,
+                liveitems: liveitems.slice(0,5),
                 postinghistory: postinghistory
             }
         );

@@ -5,10 +5,38 @@ ffmpeg -i "https://video.twimg.com/ext_tw_video/568443211194961920/pu/pl/_-SI8rf
 ffmpeg -f gif -i "OiUwmee - Imgur.gif" -an -preset slow -crf 37 imgur.mp4
 
 3. Convert .gif to .mp4 (output mp4 works on Apple devices)
-ffmpeg -i stunt-bungee-jump-like-a-boss-3136425.gif -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -pix_fmt yuv420p -an -preset slow -crf 28 stuntbungee.mp4
+ffmpeg -i input.gif -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -pix_fmt yuv420p -an -preset slow -crf 28 output.mp4
 
 what the arguments do:
 -pix_fmt: http://apple.stackexchange.com/questions/166553/why-wont-video-from-ffmpeg-show-in-quicktime-imovie-or-quick-preview
 -vf: http://stackoverflow.com/questions/20847674/ffmpeg-libx264-height-not-divisible-by-2
 -preset slow: optimize for size
 -crf: compression factor to reduce file size
+
+4.1 I wanted to add a text overlay to video, so I tried using the 'drawtext' option
+ but it wouldn't work as the ffmpeg binary on my machine wasn't configured with the following
+ options -- http://ffmpeg.org/ffmpeg-filters.html#drawtext-1 :
+
+9.40 drawtext
+Draw a text string or text from a specified file on top of a video, using the libfreetype library.
+To enable compilation of this filter, you need to configure FFmpeg with --enable-libfreetype.
+To enable default font fallback and the font option you need to configure FFmpeg with --enable-libfontconfig.
+To enable the text_shaping option, you need to configure FFmpeg with --enable-libfribidi.
+
+4.2 To use drawtext I had rebuild ffmpeg: https://trac.ffmpeg.org/wiki/CompilationGuide/MacOSX
+
+a. ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+b. brew install automake fdk-aac git lame libass libtool libvorbis libvpx \
+opus sdl shtool texi2html theora wget x264 xvid yasm
+c.
+i. cd ffmpeg
+ii. ./configure  --prefix=/usr/local --enable-gpl --enable-nonfree --enable-libass \
+--enable-libfdk-aac --enable-libfreetype --enable-libmp3lame --enable-libopus \
+--enable-libfontconfig
+iii. make && sudo make install
+
+4.3 ./ffmpeg -i ~/Downloads/EkJ6b-Tb-.mp4 -vf drawtext="fontfile=/Library/Fonts/Arial.ttf:text='Spotted Hareesh on Sand Hill Rd': fontcolor=white: fontsize=12: box=1: boxcolor=black@0.5: \
+boxborderw=5: x=(w-text_w)/2: y=(h-30)" -codec:a copy output.mp4
+
+5. Convert gif to mp4 while adding text overlay
+./ffmpeg -i ~/Downloads/tumblr_o8f2m2xmcx1s02vreo1_400.gif -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2, drawtext=fontfile=/Library/Fonts/Arial.ttf:text='Pit stop': fontcolor=white: fontsize=12: box=1: boxcolor=black@0.5: boxborderw=5: x=(w-text_w)/2: y=(h-10)" -pix_fmt yuv420p -an -preset slow -crf 28 pitstop.mp4
