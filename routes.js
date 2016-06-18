@@ -1367,7 +1367,8 @@ Router.get('/dashboard', function(req, res, next) {
             liveitems = [];
 
         var now = new Date();
-        var startDate = new Date('2015-12-06T00:00:00');
+        // setting time to mid-day so this code works correctly for CST
+        var startDate = new Date(Date.UTC(2015, 11, 6, 12, 0, 0));
         var start = startDate.getDate() - startDate.getDay();
         const dateLowerBound = new Date(startDate.setDate(start));
         const MAX_HISTORY_IN_WEEKS = Math.floor(days_between(dateLowerBound, now) / 7);
