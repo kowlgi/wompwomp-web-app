@@ -1370,7 +1370,7 @@ Router.get('/dashboard', function(req, res, next) {
         var startDate = new Date('2015-12-06T00:00:00');
         var start = startDate.getDate() - startDate.getDay();
         const dateLowerBound = new Date(startDate.setDate(start));
-        const MAX_HISTORY_IN_WEEKS = Math.ceil(days_between(dateLowerBound, now) / 7);
+        const MAX_HISTORY_IN_WEEKS = Math.floor(days_between(dateLowerBound, now) / 7);
         var buckets = _.times(MAX_HISTORY_IN_WEEKS, _.constant(0));
 
         for (i = 0; i < items.length; i++) {
