@@ -10,7 +10,7 @@ config.sessiondb = "agnisession";
 config.userstatsdb = "agniuserstats";
 config.userretentionstatsdb = "agniuserretentionstats";
 
-config.release_content_scheduler_frequency = "0 0 1,3,10,17 * * *";
+config.release_content_scheduler_frequency = "0 0 1 * * *"; // once a day
 config.push_share_card_scheduler_frequency = "10 59 2 * * 1,3,5";
 config.push_rate_card_scheduler_frequency = "10 59 13 * * 0,4";
 config.push_upgrade_card_scheduler_frequency = "30 59 7 * * 0,3,6";
