@@ -24,12 +24,3 @@ WompWomp had 10K installs and hosted over 3000 pictures and video memes.
 * Clone this git repo
 * npm install
 * npm start
-
-### App visuals
-Images from the Play store page
-
-![App screenshot 1](./images/screen0.jpeg)
-![App screenshot 2](./images/screen1.jpeg)
-![App screenshot 3](./images/screen2.jpeg)
-![App screenshot 4](./images/screen3.jpeg)
-![App screenshot 5](./images/screen4.jpeg)
